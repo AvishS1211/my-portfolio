@@ -213,7 +213,7 @@
   .contrib-week { display: flex; flex-direction: column; gap: 3px; }
   .contrib-day { width: 11px; height: 11px; border-radius: 2.5px; background: rgba(255,255,255,0.04); transition: all 0.3s var(--ease); position: relative; cursor: default; }
   .contrib-day:hover { transform: scale(1.6); z-index: 2; }
-  .contrib-tooltip { position: fixed; background: var(--surface-3); border: 1px solid var(--border-hover); border-radius: 8px; padding: 7px 12px; font-size: 0.7rem; color: var(--text); pointer-events: none; z-index: 9999; white-space: nowrap; opacity: 0; transition: opacity 0.15s; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .contrib-tooltip { position: fixed; background: var(--surface-3); border: 1px solid var(--border-hover); border-radius: 8px; padding: 7px 12px; font-size: 0.7rem; color: var(--text); pointer-events: none; z-index: 9999; white-space: nowrap; opacity: 0; transition: opacity 0.15s; box-shadow: 0 8px 24px rgba(0,0,0,0.4); transform: translateX(-50%); left: -9999px; top: -9999px; }
   .contrib-tooltip strong { color: var(--accent); }
   .contrib-skeleton { width: 11px; height: 11px; border-radius: 2.5px; background: rgba(255,255,255,0.04); animation: skelPulse 1.4s ease-in-out infinite; }
   @keyframes skelPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
@@ -629,15 +629,15 @@
           // Tooltip
           if(!isFuture){
             const label = cursor.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-            day.addEventListener('mouseenter', e=>{
+            day.addEventListener('mouseenter', ()=>{
               tooltip.innerHTML = count
                 ? `<strong>${count} contribution${count!==1?'s':''}</strong> on ${label}`
                 : `No contributions on ${label}`;
-              tooltip.style.opacity='1';
-            });
-            day.addEventListener('mousemove', e=>{
-              tooltip.style.left = (e.clientX+14)+'px';
-              tooltip.style.top  = (e.clientY-36)+'px';
+              // Centre above the cell using translateX(-50%) so no width calc needed
+              const r = day.getBoundingClientRect();
+              tooltip.style.left = (r.left + r.width / 2) + 'px';
+              tooltip.style.top  = (r.top - tooltip.offsetHeight - 10) + 'px';
+              tooltip.style.opacity = '1';
             });
             day.addEventListener('mouseleave',()=>{ tooltip.style.opacity='0'; });
           }
