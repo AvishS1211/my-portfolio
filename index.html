@@ -211,8 +211,12 @@
   .contrib-graph { display: flex; gap: 3px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
   .contrib-graph::-webkit-scrollbar { display: none; }
   .contrib-week { display: flex; flex-direction: column; gap: 3px; }
-  .contrib-day { width: 11px; height: 11px; border-radius: 2.5px; background: rgba(255,255,255,0.04); transition: all 0.3s var(--ease); position: relative; }
+  .contrib-day { width: 11px; height: 11px; border-radius: 2.5px; background: rgba(255,255,255,0.04); transition: all 0.3s var(--ease); position: relative; cursor: default; }
   .contrib-day:hover { transform: scale(1.6); z-index: 2; }
+  .contrib-tooltip { position: fixed; background: var(--surface-3); border: 1px solid var(--border-hover); border-radius: 8px; padding: 7px 12px; font-size: 0.7rem; color: var(--text); pointer-events: none; z-index: 9999; white-space: nowrap; opacity: 0; transition: opacity 0.15s; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .contrib-tooltip strong { color: var(--accent); }
+  .contrib-skeleton { width: 11px; height: 11px; border-radius: 2.5px; background: rgba(255,255,255,0.04); animation: skelPulse 1.4s ease-in-out infinite; }
+  @keyframes skelPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
   .contrib-day.lvl-1 { background: rgba(232, 255, 90, 0.15); }
   .contrib-day.lvl-2 { background: rgba(232, 255, 90, 0.3); }
   .contrib-day.lvl-3 { background: rgba(232, 255, 90, 0.5); }
@@ -396,10 +400,9 @@
       </div>
       <a href="https://github.com/AvishS1211" target="_blank" class="contrib-link">@AvishS1211 <span>&#8599;</span></a>
     </div>
-    <div class="contrib-months">
-      <span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span>
-    </div>
+    <div class="contrib-months" id="contribMonths"></div>
     <div class="contrib-graph" id="contribGraph"></div>
+    <div class="contrib-tooltip" id="contribTooltip"></div>
     <div class="contrib-footer">
       <span class="contrib-legend" style="opacity:0">.</span>
       <div class="contrib-legend">
@@ -533,35 +536,161 @@
   // Smooth Scroll
   document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
 
-  // GitHub Contribution Graph
+  // GitHub Contribution Graph — live data
   (function(){
-    const graph=document.getElementById('contribGraph');
-    if(!graph)return;
-    const weeks=52;
-    function seededRandom(seed){let s=seed;return function(){s=(s*16807)%2147483647;return(s-1)/2147483646}}
-    const rand=seededRandom(2026);
-    const hotWeeks=[3,4,5,18,19,20,21,33,34,35,44,45,46,47,48,49,50,51];
-    for(let w=0;w<weeks;w++){
-      const week=document.createElement('div');
-      week.className='contrib-week';
-      for(let d=0;d<7;d++){
-        const day=document.createElement('div');
-        day.className='contrib-day';
-        const r=rand();
-        const isHot=hotWeeks.includes(w);
-        let lvl=0;
-        if(isHot){if(r>0.55)lvl=1;if(r>0.7)lvl=2;if(r>0.85)lvl=3;if(r>0.93)lvl=4}
-        else{if(r>0.92)lvl=1;if(r>0.97)lvl=2}
-        if(lvl>0)day.classList.add('lvl-'+lvl);
-        day.style.opacity='0';
-        day.style.transform='scale(0)';
-        day.style.transition='all 0.3s '+(0.005*w+0.01*d).toFixed(3)+'s cubic-bezier(0.34,1.56,0.64,1)';
-        week.appendChild(day);
+    const graph    = document.getElementById('contribGraph');
+    const titleEl  = document.querySelector('.contrib-title');
+    const monthsEl = document.getElementById('contribMonths');
+    const tooltip  = document.getElementById('contribTooltip');
+    if(!graph) return;
+
+    const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    // Show skeleton while loading
+    function renderSkeleton(){
+      graph.innerHTML='';
+      for(let w=0;w<53;w++){
+        const week=document.createElement('div');
+        week.className='contrib-week';
+        for(let d=0;d<7;d++){
+          const s=document.createElement('div');
+          s.className='contrib-skeleton';
+          s.style.animationDelay=(w*7+d)*8+'ms';
+          week.appendChild(s);
+        }
+        graph.appendChild(week);
       }
-      graph.appendChild(week);
     }
-    const cObs=new IntersectionObserver(entries=>{entries.forEach(en=>{if(en.isIntersecting){graph.querySelectorAll('.contrib-day').forEach(d=>{d.style.opacity='1';d.style.transform='scale(1)'});cObs.unobserve(en.target)}})},{threshold:0.2});
-    cObs.observe(graph);
+
+    // Map count → level 0-4
+    function getLevel(count, max){
+      if(!count) return 0;
+      if(count >= max*0.8) return 4;
+      if(count >= max*0.5) return 3;
+      if(count >= max*0.25) return 2;
+      return 1;
+    }
+
+    // Build the graph from real contribution data
+    function renderGraph(contributions, total){
+      graph.innerHTML='';
+      monthsEl.innerHTML='';
+
+      // Filter last 53 weeks worth of data (today backwards)
+      const today = new Date();
+      const start = new Date(today);
+      start.setDate(start.getDate() - 371); // ~53 weeks back
+
+      // Build a map date→count
+      const map={};
+      contributions.forEach(c=>{ map[c.date]=c.count; });
+
+      // Find max for level scaling
+      const max = Math.max(...contributions.map(c=>c.count), 1);
+
+      // Walk week by week, Sun→Sat
+      // Find the Sunday on or before `start`
+      const cursor = new Date(start);
+      cursor.setDate(cursor.getDate() - cursor.getDay()); // rewind to Sunday
+
+      let lastMonth = -1;
+      let weekIndex = 0;
+      const monthPositions = []; // {label, weekIndex}
+
+      while(cursor <= today){
+        const week = document.createElement('div');
+        week.className = 'contrib-week';
+
+        for(let d=0;d<7;d++){
+          const dateStr = cursor.toISOString().slice(0,10);
+          const count   = map[dateStr] || 0;
+          const isFuture = cursor > today;
+
+          // Track month label position
+          if(d===0 && cursor.getMonth()!==lastMonth && !isFuture){
+            monthPositions.push({label: MONTH_NAMES[cursor.getMonth()], weekIndex});
+            lastMonth = cursor.getMonth();
+          }
+
+          const day = document.createElement('div');
+          day.className = 'contrib-day';
+          if(!isFuture){
+            const lvl = getLevel(count, max);
+            if(lvl>0) day.classList.add('lvl-'+lvl);
+          } else {
+            day.style.opacity='0.2';
+          }
+
+          // Animate in
+          day.style.opacity = isFuture ? '0.1' : '0';
+          day.style.transform = 'scale(0)';
+          day.style.transition = `all 0.35s ${(0.004*weekIndex+0.008*d).toFixed(3)}s cubic-bezier(0.34,1.56,0.64,1)`;
+
+          // Tooltip
+          if(!isFuture){
+            const label = cursor.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+            day.addEventListener('mouseenter', e=>{
+              tooltip.innerHTML = count
+                ? `<strong>${count} contribution${count!==1?'s':''}</strong> on ${label}`
+                : `No contributions on ${label}`;
+              tooltip.style.opacity='1';
+            });
+            day.addEventListener('mousemove', e=>{
+              tooltip.style.left = (e.clientX+14)+'px';
+              tooltip.style.top  = (e.clientY-36)+'px';
+            });
+            day.addEventListener('mouseleave',()=>{ tooltip.style.opacity='0'; });
+          }
+
+          week.appendChild(day);
+          cursor.setDate(cursor.getDate()+1);
+        }
+
+        graph.appendChild(week);
+        weekIndex++;
+      }
+
+      // Render month labels — skip first if too close to edge
+      monthPositions.forEach((m, i)=>{
+        if(i===0 && m.weekIndex < 1) return;
+        const span = document.createElement('span');
+        span.textContent = m.label;
+        span.style.minWidth = '52px';
+        monthsEl.appendChild(span);
+      });
+
+      // Update total count
+      if(titleEl) titleEl.innerHTML = `<strong>${total.toLocaleString()}</strong> contributions in the last year`;
+
+      // Animate when scrolled into view
+      const cObs = new IntersectionObserver(entries=>{
+        entries.forEach(en=>{
+          if(en.isIntersecting){
+            graph.querySelectorAll('.contrib-day').forEach(d=>{
+              d.style.opacity='1';
+              d.style.transform='scale(1)';
+            });
+            cObs.unobserve(en.target);
+          }
+        });
+      },{threshold:0.2});
+      cObs.observe(graph);
+    }
+
+    // Fetch from public API — no token needed
+    renderSkeleton();
+    fetch('https://github-contributions-api.jogruber.de/v4/AvishS1211?y=last')
+      .then(r=>r.json())
+      .then(data=>{
+        const year = new Date().getFullYear();
+        const total = data.total[year] ?? data.total['lastYear'] ?? 0;
+        renderGraph(data.contributions, total);
+      })
+      .catch(()=>{
+        // Fallback: graceful error state
+        if(titleEl) titleEl.innerHTML = `GitHub contributions`;
+        graph.innerHTML='<span style="font-size:0.75rem;color:var(--text-dim);padding:8px 0">Could not load contribution data.</span>';
+      });
   })();
 </script>
 </body>
