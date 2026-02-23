@@ -566,144 +566,150 @@
 </footer>
 
 <script>
-  // ─── HERO PARTICLE SYSTEM ───
+  // ─── HERO GRID PARTICLE SYSTEM ───
   (function () {
-    const canvas = document.getElementById('hero-particles');
-    const ctx    = canvas.getContext('2d');
-    const ACCENT = { r: 232, g: 255, b: 90 };
-    const COUNT  = 88;
-    const MOUSE_RADIUS  = 120;
-    const MOUSE_REPEL   = 0.045;
-    const CONNECT_DIST  = 110;
-    const MOUSE_CONNECT = 140;
+    const canvas  = document.getElementById('hero-particles');
+    const ctx     = canvas.getContext('2d');
+    const AR      = { r: 232, g: 255, b: 90 };   // accent RGB
 
-    let W, H, mouse = { x: -999, y: -999 }, raf;
+    const SPACING      = 29;    // grid cell size (px)
+    const MOUSE_RADIUS = 160;   // repulsion reach
+    const REPEL        = 5.5;   // repulsion strength
+    const SPRING       = 0.072; // spring-back stiffness
+    const DAMP         = 0.72;  // velocity damping
+    const DOT_R        = 1.4;   // base dot radius
+    const BASE_ALPHA   = 0.22;  // resting dot opacity
+    const LINE_ALPHA   = 0.10;  // resting line opacity
+    const HOVER_BOOST  = 0.65;  // extra opacity near cursor
 
-    function resize() {
-      const rect = canvas.parentElement.getBoundingClientRect();
-      W = canvas.width  = rect.width;
-      H = canvas.height = rect.height;
-    }
+    let W, H, cols, rows;
+    let particles = [], raf;
+    const mouse = { x: -9999, y: -9999 };
 
-    class Particle {
-      constructor() { this.reset(true); }
-      reset(init) {
-        this.x  = Math.random() * W;
-        this.y  = Math.random() * H;
-        this.vx = (Math.random() - 0.5) * 0.38;
-        this.vy = (Math.random() - 0.5) * 0.38;
-        this.r  = Math.random() * 1.6 + 0.5;
-        this.alpha = Math.random() * 0.5 + 0.15;
-        this.baseAlpha = this.alpha;
+    /* ── Particle ── */
+    class Dot {
+      constructor(hx, hy) {
+        this.hx = hx; this.hy = hy; // home position
+        this.x  = hx; this.y  = hy;
+        this.vx = 0;  this.vy = 0;
+        this.neighbors = []; // filled after grid is built
       }
+
       update() {
+        // repulsion from mouse
         const dx = this.x - mouse.x;
         const dy = this.y - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MOUSE_RADIUS && dist > 0) {
-          const force = (MOUSE_RADIUS - dist) / MOUSE_RADIUS;
-          this.vx += (dx / dist) * force * MOUSE_REPEL * 6;
-          this.vy += (dy / dist) * force * MOUSE_REPEL * 6;
+        const d  = Math.sqrt(dx * dx + dy * dy);
+        if (d < MOUSE_RADIUS && d > 0) {
+          const f = (1 - d / MOUSE_RADIUS) * REPEL;
+          this.vx += (dx / d) * f;
+          this.vy += (dy / d) * f;
         }
-        // Gentle friction
-        this.vx *= 0.985;
-        this.vy *= 0.985;
-        // Nudge back to natural drift if almost stopped
-        if (Math.abs(this.vx) < 0.05) this.vx += (Math.random() - 0.5) * 0.04;
-        if (Math.abs(this.vy) < 0.05) this.vy += (Math.random() - 0.5) * 0.04;
-
-        this.x += this.vx;
-        this.y += this.vy;
-        // Wrap edges
-        if (this.x < -10) this.x = W + 10;
-        if (this.x > W + 10) this.x = -10;
-        if (this.y < -10) this.y = H + 10;
-        if (this.y > H + 10) this.y = -10;
+        // spring toward home
+        this.vx += (this.hx - this.x) * SPRING;
+        this.vy += (this.hy - this.y) * SPRING;
+        // dampen
+        this.vx *= DAMP;
+        this.vy *= DAMP;
+        this.x  += this.vx;
+        this.y  += this.vy;
       }
+
       draw() {
+        const dx   = this.x - mouse.x;
+        const dy   = this.y - mouse.y;
+        const prox = Math.max(0, 1 - Math.sqrt(dx*dx + dy*dy) / MOUSE_RADIUS);
+        const a    = BASE_ALPHA + prox * HOVER_BOOST;
+        const r    = DOT_R + prox * 1.8;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${ACCENT.r},${ACCENT.g},${ACCENT.b},${this.alpha})`;
+        ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${AR.r},${AR.g},${AR.b},${a})`;
         ctx.fill();
       }
     }
 
-    let particles = [];
-    function init() {
-      particles = Array.from({ length: COUNT }, () => new Particle());
-    }
+    /* ── Build grid ── */
+    function buildGrid() {
+      particles = [];
+      cols = Math.ceil(W / SPACING) + 1;
+      rows = Math.ceil(H / SPACING) + 1;
+      const ox = (W - (cols - 1) * SPACING) / 2;
+      const oy = (H - (rows - 1) * SPACING) / 2;
 
-    function drawLine(x1, y1, x2, y2, alpha) {
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.strokeStyle = `rgba(${ACCENT.r},${ACCENT.g},${ACCENT.b},${alpha})`;
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-    }
-
-    function loop() {
-      ctx.clearRect(0, 0, W, H);
-
-      // Connect nearby particles
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const d  = Math.sqrt(dx * dx + dy * dy);
-          if (d < CONNECT_DIST) {
-            drawLine(particles[i].x, particles[i].y, particles[j].x, particles[j].y,
-              (1 - d / CONNECT_DIST) * 0.12);
-          }
-        }
-        // Connect particles near mouse
-        const mdx = particles[i].x - mouse.x;
-        const mdy = particles[i].y - mouse.y;
-        const md  = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (md < MOUSE_CONNECT) {
-          drawLine(particles[i].x, particles[i].y, mouse.x, mouse.y,
-            (1 - md / MOUSE_CONNECT) * 0.35);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          particles.push(new Dot(ox + c * SPACING, oy + r * SPACING));
         }
       }
 
-      // Update & draw particles
-      particles.forEach(p => { p.update(); p.draw(); });
+      // assign direct neighbours (right + down only to avoid duplicates)
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const i = r * cols + c;
+          if (c + 1 < cols) particles[i].neighbors.push(r * cols + (c + 1)); // right
+          if (r + 1 < rows) particles[i].neighbors.push((r + 1) * cols + c); // down
+        }
+      }
+    }
 
+    /* ── Draw lines between neighbours ── */
+    function drawLines() {
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        for (const j of p.neighbors) {
+          const q   = particles[j];
+          // proximity of the closer endpoint to mouse
+          const d1  = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+          const d2  = Math.hypot(q.x - mouse.x, q.y - mouse.y);
+          const prox = Math.max(0, 1 - Math.min(d1, d2) / MOUSE_RADIUS);
+          const a   = LINE_ALPHA + prox * 0.38;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = `rgba(${AR.r},${AR.g},${AR.b},${a})`;
+          ctx.lineWidth   = 0.5 + prox * 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    /* ── Loop ── */
+    function loop() {
+      ctx.clearRect(0, 0, W, H);
+      drawLines();
+      particles.forEach(p => { p.update(); p.draw(); });
       raf = requestAnimationFrame(loop);
     }
 
-    // Only run when hero is visible
+    /* ── Resize ── */
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      W = canvas.width  = rect.width;
+      H = canvas.height = rect.height;
+      buildGrid();
+    }
+
+    /* ── Pause when off-screen ── */
     const heroEl = document.getElementById('hero');
-    const obs = new IntersectionObserver(entries => {
+    new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) { if (!raf) loop(); }
         else { cancelAnimationFrame(raf); raf = null; }
       });
-    }, { threshold: 0 });
-    obs.observe(heroEl);
+    }, { threshold: 0 }).observe(heroEl);
 
-    // Mouse tracking relative to canvas
+    /* ── Mouse ── */
     heroEl.addEventListener('mousemove', e => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
+      const r = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - r.left;
+      mouse.y = e.clientY - r.top;
     });
-    heroEl.addEventListener('mouseleave', () => { mouse.x = -999; mouse.y = -999; });
+    heroEl.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
 
-    window.addEventListener('resize', () => {
-      resize();
-      particles.forEach(p => {
-        if (p.x > W) p.x = Math.random() * W;
-        if (p.y > H) p.y = Math.random() * H;
-      });
-    });
+    window.addEventListener('resize', resize);
 
-    // Defer so layout is fully flushed before reading dimensions
-    requestAnimationFrame(() => {
-      resize();
-      init();
-      loop();
-    });
+    /* ── Kick off after layout flush ── */
+    requestAnimationFrame(() => { resize(); loop(); });
   })();
 
   // Custom Cursor
