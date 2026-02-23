@@ -303,9 +303,75 @@
     .contrib-card { padding: 20px 16px 16px; }
     .contrib-months span { min-width: 40px; }
   }
+
+  /* ─── LOADER ─── */
+  #loader {
+    position: fixed; inset: 0; z-index: 99999;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    transition: opacity 0.9s var(--ease), visibility 0.9s var(--ease);
+  }
+  #loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+  body.loading { overflow: hidden; }
+
+  .loader-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(1.4rem, 4vw, 2.4rem);
+    letter-spacing: -0.03em;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: loaderFadeUp 0.6s 0.15s var(--ease) forwards;
+  }
+  .loader-name em { font-style: normal; color: var(--accent); }
+
+  .loader-count {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(5rem, 16vw, 11rem);
+    letter-spacing: -0.05em;
+    color: var(--text);
+    line-height: 1;
+    display: flex; align-items: flex-end; gap: 6px;
+    opacity: 0;
+    animation: loaderFadeUp 0.6s 0.3s var(--ease) forwards;
+  }
+  .loader-pct {
+    font-size: 0.36em;
+    color: var(--accent);
+    margin-bottom: 0.2em;
+    font-style: italic;
+  }
+
+  .loader-line {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .loader-line-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #b8ff5a);
+    width: 0%;
+    transition: width 0.08s linear;
+    box-shadow: 0 0 12px rgba(232, 255, 90, 0.6);
+  }
+
+  @keyframes loaderFadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 </style>
 </head>
-<body>
+<body class="loading">
+
+<!-- ─── LOADER ─── -->
+<div id="loader">
+  <div class="loader-name">Pushing pixels<em>.</em></div>
+  <div class="loader-count">
+    <span id="loader-num">0</span><span class="loader-pct">%</span>
+  </div>
+  <div class="loader-line"><div class="loader-line-fill" id="loader-fill"></div></div>
+</div>
 
 <!-- Custom Cursor -->
 <div class="cursor" id="cursor"></div>
@@ -676,6 +742,41 @@
       },{threshold:0.2});
       cObs.observe(graph);
     }
+
+    // ─── LOADER ───
+    (function () {
+      const loader = document.getElementById('loader');
+      const numEl  = document.getElementById('loader-num');
+      const fill   = document.getElementById('loader-fill');
+      let count = 0;
+      const tick = 22; // ms per frame
+
+      // Ease-out style increments: fast at start, slow at end
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+      const start = performance.now();
+      const totalDuration = 1900;
+
+      function step(now) {
+        const elapsed = now - start;
+        const t = Math.min(elapsed / totalDuration, 1);
+        count = Math.floor(easeOut(t) * 100);
+        numEl.textContent = count;
+        fill.style.width = count + '%';
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          numEl.textContent = '100';
+          fill.style.width = '100%';
+          setTimeout(() => {
+            loader.classList.add('done');
+            document.body.classList.remove('loading');
+          }, 420);
+        }
+      }
+
+      requestAnimationFrame(step);
+    })();
 
     // Fetch from public API — no token needed
     renderSkeleton();
