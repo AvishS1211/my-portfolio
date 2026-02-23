@@ -88,6 +88,7 @@
   .hero {
     min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
     align-items: center; text-align: center; padding: 140px 32px 80px; position: relative;
+    max-width: 100%; width: 100%;
   }
   #hero-particles {
     position: absolute; inset: 0; width: 100%; height: 100%;
@@ -578,9 +579,9 @@
     const SPRING       = 0.072; // spring-back stiffness
     const DAMP         = 0.72;  // velocity damping
     const DOT_R        = 1.4;   // base dot radius
-    const BASE_ALPHA   = 0.22;  // resting dot opacity
-    const LINE_ALPHA   = 0.10;  // resting line opacity
-    const HOVER_BOOST  = 0.65;  // extra opacity near cursor
+    const BASE_ALPHA   = 0.11;  // resting dot opacity
+    const LINE_ALPHA   = 0.05;  // resting line opacity
+    const HOVER_BOOST  = 0.33;  // extra opacity near cursor
 
     let W, H, cols, rows;
     let particles = [], raf;
@@ -662,7 +663,7 @@
           const d1  = Math.hypot(p.x - mouse.x, p.y - mouse.y);
           const d2  = Math.hypot(q.x - mouse.x, q.y - mouse.y);
           const prox = Math.max(0, 1 - Math.min(d1, d2) / MOUSE_RADIUS);
-          const a   = LINE_ALPHA + prox * 0.38;
+          const a   = LINE_ALPHA + prox * 0.19;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(q.x, q.y);
@@ -683,9 +684,8 @@
 
     /* ── Resize ── */
     function resize() {
-      const rect = canvas.parentElement.getBoundingClientRect();
-      W = canvas.width  = rect.width;
-      H = canvas.height = rect.height;
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
       buildGrid();
     }
 
