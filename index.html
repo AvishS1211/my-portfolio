@@ -89,6 +89,11 @@
     min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
     align-items: center; text-align: center; padding: 140px 32px 80px; position: relative;
   }
+  #hero-particles {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+  }
+  .hero > *:not(#hero-particles):not(.hero-orb) { position: relative; z-index: 1; }
   .hero-orb { position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none; animation: orbFloat 12s ease-in-out infinite alternate; }
   .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(232, 255, 90, 0.06), transparent 70%); top: 10%; left: -10%; }
   .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(90, 130, 255, 0.04), transparent 70%); bottom: 10%; right: -5%; animation-delay: -4s; }
@@ -389,6 +394,7 @@
 
 <!-- Hero -->
 <section class="hero" id="hero">
+  <canvas id="hero-particles"></canvas>
   <div class="hero-orb orb-1"></div>
   <div class="hero-orb orb-2"></div>
 
@@ -560,6 +566,146 @@
 </footer>
 
 <script>
+  // ─── HERO PARTICLE SYSTEM ───
+  (function () {
+    const canvas = document.getElementById('hero-particles');
+    const ctx    = canvas.getContext('2d');
+    const ACCENT = { r: 232, g: 255, b: 90 };
+    const COUNT  = 88;
+    const MOUSE_RADIUS  = 120;
+    const MOUSE_REPEL   = 0.045;
+    const CONNECT_DIST  = 110;
+    const MOUSE_CONNECT = 140;
+
+    let W, H, mouse = { x: -999, y: -999 }, raf;
+
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      W = canvas.width  = rect.width;
+      H = canvas.height = rect.height;
+    }
+
+    class Particle {
+      constructor() { this.reset(true); }
+      reset(init) {
+        this.x  = Math.random() * W;
+        this.y  = Math.random() * H;
+        this.vx = (Math.random() - 0.5) * 0.38;
+        this.vy = (Math.random() - 0.5) * 0.38;
+        this.r  = Math.random() * 1.6 + 0.5;
+        this.alpha = Math.random() * 0.5 + 0.15;
+        this.baseAlpha = this.alpha;
+      }
+      update() {
+        const dx = this.x - mouse.x;
+        const dy = this.y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MOUSE_RADIUS && dist > 0) {
+          const force = (MOUSE_RADIUS - dist) / MOUSE_RADIUS;
+          this.vx += (dx / dist) * force * MOUSE_REPEL * 6;
+          this.vy += (dy / dist) * force * MOUSE_REPEL * 6;
+        }
+        // Gentle friction
+        this.vx *= 0.985;
+        this.vy *= 0.985;
+        // Nudge back to natural drift if almost stopped
+        if (Math.abs(this.vx) < 0.05) this.vx += (Math.random() - 0.5) * 0.04;
+        if (Math.abs(this.vy) < 0.05) this.vy += (Math.random() - 0.5) * 0.04;
+
+        this.x += this.vx;
+        this.y += this.vy;
+        // Wrap edges
+        if (this.x < -10) this.x = W + 10;
+        if (this.x > W + 10) this.x = -10;
+        if (this.y < -10) this.y = H + 10;
+        if (this.y > H + 10) this.y = -10;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${ACCENT.r},${ACCENT.g},${ACCENT.b},${this.alpha})`;
+        ctx.fill();
+      }
+    }
+
+    let particles = [];
+    function init() {
+      particles = Array.from({ length: COUNT }, () => new Particle());
+    }
+
+    function drawLine(x1, y1, x2, y2, alpha) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = `rgba(${ACCENT.r},${ACCENT.g},${ACCENT.b},${alpha})`;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+
+    function loop() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Connect nearby particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const d  = Math.sqrt(dx * dx + dy * dy);
+          if (d < CONNECT_DIST) {
+            drawLine(particles[i].x, particles[i].y, particles[j].x, particles[j].y,
+              (1 - d / CONNECT_DIST) * 0.12);
+          }
+        }
+        // Connect particles near mouse
+        const mdx = particles[i].x - mouse.x;
+        const mdy = particles[i].y - mouse.y;
+        const md  = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (md < MOUSE_CONNECT) {
+          drawLine(particles[i].x, particles[i].y, mouse.x, mouse.y,
+            (1 - md / MOUSE_CONNECT) * 0.35);
+        }
+      }
+
+      // Update & draw particles
+      particles.forEach(p => { p.update(); p.draw(); });
+
+      raf = requestAnimationFrame(loop);
+    }
+
+    // Only run when hero is visible
+    const heroEl = document.getElementById('hero');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { if (!raf) loop(); }
+        else { cancelAnimationFrame(raf); raf = null; }
+      });
+    }, { threshold: 0 });
+    obs.observe(heroEl);
+
+    // Mouse tracking relative to canvas
+    heroEl.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+    heroEl.addEventListener('mouseleave', () => { mouse.x = -999; mouse.y = -999; });
+
+    window.addEventListener('resize', () => {
+      resize();
+      particles.forEach(p => {
+        if (p.x > W) p.x = Math.random() * W;
+        if (p.y > H) p.y = Math.random() * H;
+      });
+    });
+
+    // Defer so layout is fully flushed before reading dimensions
+    requestAnimationFrame(() => {
+      resize();
+      init();
+      loop();
+    });
+  })();
+
   // Custom Cursor
   const cursor=document.getElementById('cursor'),cursorRing=document.getElementById('cursorRing');
   let mx=0,my=0,cx=0,cy=0,rx=0,ry=0;
