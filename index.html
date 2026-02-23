@@ -318,13 +318,13 @@
   .project-card:hover .project-visual-inner { transform: scale(1.06); }
   .project-num { font-family: 'Instrument Serif', serif; font-size: 6rem; color: rgba(255,255,255,0.06); position: absolute; font-style: italic; transition: all 0.5s var(--ease); }
   .project-card:hover .project-num { color: rgba(255,255,255,0.1); transform: scale(1.1); }
-  .vis-1 { background: url('Thumbnail-vibely.png') center/cover no-repeat; }
-  .vis-2 { background: url('Thumbnail-fluff.png') center/cover no-repeat; }
+  .vis-1 { background: linear-gradient(160deg, #160F24, #0c0c0d); }
+  .vis-2 { background: linear-gradient(160deg, #22100F, #0c0c0d); }
+  .project-icon { width: 180px; height: 180px; object-fit: contain; position: relative; z-index: 1; transition: transform 0.45s var(--ease), filter 0.45s var(--ease); }
+  .project-card:hover .project-icon { transform: translateY(-12px); filter: drop-shadow(0 20px 28px rgba(0,0,0,0.55)); }
   .vis-3 { background: linear-gradient(160deg, #0d1b2a, #1b263b, #415a77); }
   .vis-4 { background: linear-gradient(160deg, #2b2024, #3d2b3d, #1a1a2e); }
   .float-shape { position: absolute; border-radius: 50%; opacity: 0.15; animation: floatShape 8s ease-in-out infinite alternate; }
-  .vis-1 .float-shape { display: none; }
-  .vis-2 .float-shape { display: none; }
   .vis-3 .float-shape { background: #5a8fff; width: 100px; height: 100px; top: 30%; left: 25%; animation-delay: -4s; }
   .vis-4 .float-shape { background: #c77dff; width: 90px; height: 90px; bottom: 20%; right: 25%; border-radius: 40%; animation-delay: -6s; }
   @keyframes floatShape { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(20px, -15px) rotate(45deg); } }
@@ -567,7 +567,7 @@
   </div>
   <div class="projects-grid">
     <a class="project-card reveal reveal-delay-1" href="https://medium.com/@avishvshetty/how-i-ended-up-designing-a-landing-page-for-a-dating-app-b02d32c3cfc0" target="_blank" rel="noopener">
-      <div class="project-visual"><div class="project-visual-inner vis-1"><div class="float-shape"></div><span class="project-num">01</span></div></div>
+      <div class="project-visual"><div class="project-visual-inner vis-1"><img class="project-icon" src="Icon-vibely.svg" alt="Vibely"></div></div>
       <div class="project-info">
         <div class="project-meta"><span class="project-category">Social Networking</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
         <h3 class="project-name">How I Ended up Designing a Landing Page for a Dating App 💓</h3>
@@ -576,7 +576,7 @@
       </div>
     </a>
     <a class="project-card reveal reveal-delay-2" href="https://www.figma.com/design/TVjwYS9EnreTuBEw0HJEWc/Assignment--3---Fluff---Avish-Shetty?node-id=325-3052&t=xMDA3gTcWlvoN5CD-1" target="_blank" rel="noopener">
-      <div class="project-visual"><div class="project-visual-inner vis-2"><div class="float-shape"></div><span class="project-num">02</span></div></div>
+      <div class="project-visual"><div class="project-visual-inner vis-2"><img class="project-icon" src="Icon-fluff.svg" alt="Fluff"></div></div>
       <div class="project-info">
         <div class="project-meta"><span class="project-category">Pet Tech</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
         <h3 class="project-name">Fluff — Everything Your Pet Needs, In One App</h3>
