@@ -136,7 +136,7 @@
   .badge-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; background: var(--accent); opacity: 0.4; animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.8); opacity: 0; } }
 
-  .hero h1 { font-family: 'Fungis', serif; font-size: clamp(3.2rem, 8vw, 7.5rem); line-height: 1.15; letter-spacing: -0.04em; font-weight: 400; max-width: 1000px; padding-bottom: 0.15em; }
+  .hero h1 { font-family: 'Fungis', serif; font-size: clamp(2.6rem, 7.2vw, 6.2rem); line-height: 1.15; letter-spacing: -0.04em; font-weight: 400; max-width: 1000px; padding-bottom: 0.15em; }
   .hero h1 .line { display: block; overflow: hidden; }
   .hero h1 .line.revealed { overflow: visible; }
   .hero h1 .line-inner { display: block; opacity: 0; animation: lineReveal 0.9s var(--ease) forwards; }
@@ -326,8 +326,8 @@
   .vis-2 { background: linear-gradient(160deg, #22100F, #0c0c0d); }
   .project-icon { width: 180px; height: 180px; object-fit: contain; position: relative; z-index: 1; transition: transform 0.45s var(--ease), filter 0.45s var(--ease); }
   .project-card:hover .project-icon { transform: translateY(-12px); filter: drop-shadow(0 20px 28px rgba(0,0,0,0.55)); }
-  .vis-3 { background: linear-gradient(160deg, #0d1b2a, #1b263b, #415a77); }
-  .vis-4 { background: linear-gradient(160deg, #2b2024, #3d2b3d, #1a1a2e); }
+  .vis-3 { background: linear-gradient(160deg, #071220, #0d2440, #103561); }
+  .vis-4 { background: linear-gradient(160deg, #0a1a0f, #0f2d1a, #12402a); }
   .float-shape { position: absolute; border-radius: 50%; opacity: 0.15; animation: floatShape 8s ease-in-out infinite alternate; }
   .vis-3 .float-shape { background: #5a8fff; width: 100px; height: 100px; top: 30%; left: 25%; animation-delay: -4s; }
   .vis-4 .float-shape { background: #c77dff; width: 90px; height: 90px; bottom: 20%; right: 25%; border-radius: 40%; animation-delay: -6s; }
@@ -336,6 +336,7 @@
   .project-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
   .project-category { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
   .project-year { font-size: 0.68rem; color: var(--text-dim); }
+  .project-type { font-size: 0.65rem; font-weight: 500; color: var(--text-muted); border: 1px solid var(--border); border-radius: 20px; padding: 2px 8px; letter-spacing: 0.03em; }
   .meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-dim); }
   .project-name { font-family: 'Fungis', serif; font-size: 1.5rem; letter-spacing: -0.02em; margin-bottom: 8px; font-weight: 400; transition: color 0.3s; }
   .project-card:hover .project-name { color: var(--accent); }
@@ -573,7 +574,7 @@
     <a class="project-card reveal reveal-delay-1" href="https://medium.com/@avishvshetty/how-i-ended-up-designing-a-landing-page-for-a-dating-app-b02d32c3cfc0" target="_blank" rel="noopener">
       <div class="project-visual"><div class="project-visual-inner vis-1"><img class="project-icon" src="Icon-vibely.svg" alt="Vibely"></div></div>
       <div class="project-info">
-        <div class="project-meta"><span class="project-category">Social Networking</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
+        <div class="project-meta"><span class="project-category">Social Networking</span><span class="meta-dot"></span><span class="project-type">Landing Page</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
         <h3 class="project-name">How I Ended up Designing a Landing Page for a Dating App 💓</h3>
         <p class="project-desc">Designed a landing page for Vibely, a voice-based dating app aimed at fostering deeper connections through voice over text — as part of a design challenge at 10k Designers.</p>
         <div class="project-tags"><span class="project-tag">UX Research</span><span class="project-tag">Wireframing</span><span class="project-tag">Visual Design</span><span class="project-tag">Landing Page</span></div>
@@ -582,28 +583,28 @@
     <a class="project-card reveal reveal-delay-2" href="https://www.figma.com/design/TVjwYS9EnreTuBEw0HJEWc/Assignment--3---Fluff---Avish-Shetty?node-id=325-3052&t=xMDA3gTcWlvoN5CD-1" target="_blank" rel="noopener">
       <div class="project-visual"><div class="project-visual-inner vis-2"><img class="project-icon" src="Icon-fluff.svg" alt="Fluff"></div></div>
       <div class="project-info">
-        <div class="project-meta"><span class="project-category">Pet Tech</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
+        <div class="project-meta"><span class="project-category">Pet Tech</span><span class="meta-dot"></span><span class="project-type">Mobile App</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
         <h3 class="project-name">Fluff — Everything Your Pet Needs, In One App</h3>
         <p class="project-desc">A pet shopping app designed to help pet parents easily find and buy food, accessories, and care essentials for their furry friends.</p>
         <div class="project-tags"><span class="project-tag">UI/UX Design</span><span class="project-tag">UX Research</span><span class="project-tag">Visual Design</span><span class="project-tag">Product Design</span></div>
       </div>
     </a>
-    <a class="project-card reveal reveal-delay-3" href="#">
+    <a class="project-card reveal reveal-delay-3" href="https://www.figma.com/design/A86DOoD0vwsy7bmCpTnhIs/LoanMonk?node-id=1-2102&t=oJBl6TXTApUuZJvi-1" target="_blank" rel="noopener">
       <div class="project-visual"><div class="project-visual-inner vis-3"><div class="float-shape"></div><span class="project-num">03</span></div></div>
       <div class="project-info">
-        <div class="project-meta"><span class="project-category">Health</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
-        <h3 class="project-name">Mindful — Wellness Companion</h3>
-        <p class="project-desc">A wellness app that makes mental health tracking feel approachable, not clinical.</p>
-        <div class="project-tags"><span class="project-tag">0&#8594;1 Product</span><span class="project-tag">Branding</span><span class="project-tag">iOS</span></div>
+        <div class="project-meta"><span class="project-category">Edtech</span><span class="meta-dot"></span><span class="project-type">Mobile App</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
+        <h3 class="project-name">LoanMonk — Simplifying Education Loan Access to International Students</h3>
+        <p class="project-desc">A mobile application that simplifies the process of finding and applying for education loans for students planning to study abroad.</p>
+        <div class="project-tags"><span class="project-tag">UI/UX Design</span><span class="project-tag">Product Design</span><span class="project-tag">UX Research</span></div>
       </div>
     </a>
-    <a class="project-card reveal reveal-delay-4" href="#">
+    <a class="project-card reveal reveal-delay-4" href="https://www.getsmartcue.com/" target="_blank" rel="noopener">
       <div class="project-visual"><div class="project-visual-inner vis-4"><div class="float-shape"></div><span class="project-num">04</span></div></div>
       <div class="project-info">
-        <div class="project-meta"><span class="project-category">E-commerce</span><span class="meta-dot"></span><span class="project-year">2023</span></div>
-        <h3 class="project-name">Crafted — Artisan Marketplace</h3>
-        <p class="project-desc">A marketplace celebrating craftsmanship, connecting makers directly with buyers worldwide.</p>
-        <div class="project-tags"><span class="project-tag">E-commerce</span><span class="project-tag">Responsive</span><span class="project-tag">Checkout</span></div>
+        <div class="project-meta"><span class="project-category">B2B Marketing SaaS</span><span class="meta-dot"></span><span class="project-type">Landing Page</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
+        <h3 class="project-name">SmartCue – Interactive Product Demo Platform</h3>
+        <p class="project-desc">A landing page for SmartCue, an interactive demo platform that helps businesses create personalized, no-code product demos to engage visitors, qualify leads, and accelerate sales cycles.</p>
+        <div class="project-tags"><span class="project-tag">Visual Design</span><span class="project-tag">UI Design</span><span class="project-tag">Webflow</span></div>
       </div>
     </a>
   </div>
