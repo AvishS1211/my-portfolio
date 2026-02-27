@@ -136,7 +136,7 @@
   .badge-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; background: var(--accent); opacity: 0.4; animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.8); opacity: 0; } }
 
-  .hero h1 { font-family: 'Fungis', serif; font-size: clamp(2.6rem, 7.2vw, 6.2rem); line-height: 1.15; letter-spacing: -0.04em; font-weight: 400; max-width: 1000px; padding-bottom: 0.15em; }
+  .hero h1 { font-family: 'Fungis', serif; font-size: clamp(2.8rem, 4.6vw, 4.1rem); line-height: 1.15; letter-spacing: -0.04em; font-weight: 400; max-width: 1000px; padding-bottom: 0.15em; }
   .hero h1 .line { display: block; overflow: hidden; }
   .hero h1 .line.revealed { overflow: visible; }
   .hero h1 .line-inner { display: block; opacity: 0; animation: lineReveal 0.9s var(--ease) forwards; }
@@ -266,7 +266,10 @@
 
   /* ─── TESTIMONIALS ─── */
   .testimonials-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    display: flex; gap: 20px; align-items: flex-start;
+  }
+  .testimonial-col {
+    flex: 1; display: flex; flex-direction: column; gap: 20px;
   }
   .testimonial-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -290,8 +293,9 @@
   }
   .testimonial-quote::before {
     content: '\201C';
-    font-size: 3.5rem; line-height: 0; vertical-align: -0.6em;
-    color: var(--accent); opacity: 0.5; margin-right: 4px;
+    display: block;
+    font-size: 2.5rem; line-height: 1;
+    color: var(--accent); opacity: 0.5; margin-bottom: -8px;
     font-family: 'Fungis', serif;
   }
   .testimonial-author {
@@ -303,13 +307,14 @@
     background: var(--surface-3); border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
     font-size: 0.85rem; font-weight: 600; color: var(--accent);
-    flex-shrink: 0; letter-spacing: -0.02em;
+    flex-shrink: 0; letter-spacing: -0.02em; overflow: hidden;
   }
+  .testimonial-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .testimonial-meta { display: flex; flex-direction: column; gap: 2px; }
   .testimonial-name { font-size: 0.88rem; font-weight: 600; color: var(--text); }
   .testimonial-role { font-size: 0.75rem; color: var(--text-muted); }
 
-  @media (max-width: 900px) { .testimonials-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .testimonials-grid { flex-direction: column; } .testimonial-col { width: 100%; } }
 
   /* ─── PROJECTS ─── */
   .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
@@ -326,11 +331,8 @@
   .vis-2 { background: linear-gradient(160deg, #22100F, #0c0c0d); }
   .project-icon { width: 180px; height: 180px; object-fit: contain; position: relative; z-index: 1; transition: transform 0.45s var(--ease), filter 0.45s var(--ease); }
   .project-card:hover .project-icon { transform: translateY(-12px); filter: drop-shadow(0 20px 28px rgba(0,0,0,0.55)); }
-  .vis-3 { background: linear-gradient(160deg, #071220, #0d2440, #103561); }
-  .vis-4 { background: linear-gradient(160deg, #0a1a0f, #0f2d1a, #12402a); }
-  .float-shape { position: absolute; border-radius: 50%; opacity: 0.15; animation: floatShape 8s ease-in-out infinite alternate; }
-  .vis-3 .float-shape { background: #5a8fff; width: 100px; height: 100px; top: 30%; left: 25%; animation-delay: -4s; }
-  .vis-4 .float-shape { background: #c77dff; width: 90px; height: 90px; bottom: 20%; right: 25%; border-radius: 40%; animation-delay: -6s; }
+  .vis-3 { background: linear-gradient(160deg, #13232E, #0c0c0d); }
+  .vis-4 { background: linear-gradient(160deg, #151D33, #0c0c0d); }
   @keyframes floatShape { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(20px, -15px) rotate(45deg); } }
   .project-info { padding: 28px 28px 32px; }
   .project-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -464,6 +466,7 @@
     <li><a href="#about">About</a></li>
     <li><a href="#projects">Work</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li><a href="Avish_Shetty_Resume.pdf" target="_blank" rel="noopener">Resume</a></li>
   </ul>
   <a href="#contact" class="nav-cta">Let's talk</a>
 </nav>
@@ -590,7 +593,7 @@
       </div>
     </a>
     <a class="project-card reveal reveal-delay-3" href="https://www.figma.com/design/A86DOoD0vwsy7bmCpTnhIs/LoanMonk?node-id=1-2102&t=oJBl6TXTApUuZJvi-1" target="_blank" rel="noopener">
-      <div class="project-visual"><div class="project-visual-inner vis-3"><div class="float-shape"></div><span class="project-num">03</span></div></div>
+      <div class="project-visual"><div class="project-visual-inner vis-3"><img class="project-icon" src="Icon-ForeignAdmits.svg" alt="LoanMonk"></div></div>
       <div class="project-info">
         <div class="project-meta"><span class="project-category">Edtech</span><span class="meta-dot"></span><span class="project-type">Mobile App</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
         <h3 class="project-name">LoanMonk — Simplifying Education Loan Access to International Students</h3>
@@ -599,7 +602,7 @@
       </div>
     </a>
     <a class="project-card reveal reveal-delay-4" href="https://www.getsmartcue.com/" target="_blank" rel="noopener">
-      <div class="project-visual"><div class="project-visual-inner vis-4"><div class="float-shape"></div><span class="project-num">04</span></div></div>
+      <div class="project-visual"><div class="project-visual-inner vis-4"><img class="project-icon" src="Icon-Smartcue.svg" alt="SmartCue"></div></div>
       <div class="project-info">
         <div class="project-meta"><span class="project-category">B2B Marketing SaaS</span><span class="meta-dot"></span><span class="project-type">Landing Page</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
         <h3 class="project-name">SmartCue – Interactive Product Demo Platform</h3>
@@ -619,68 +622,74 @@
 
   <div class="testimonials-grid">
 
-    <div class="testimonial-card reveal reveal-delay-1">
-      <p class="testimonial-quote">Avish has a rare ability to make complex workflows feel effortless. He doesn't just design screens — he thinks through the whole experience end to end.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar">RK</div>
-        <div class="testimonial-meta">
-          <span class="testimonial-name">Rahul Kamath</span>
-          <span class="testimonial-role">Product Manager · 99games</span>
+    <!-- Column 1 -->
+    <div class="testimonial-col">
+      <div class="testimonial-card reveal reveal-delay-1">
+        <p class="testimonial-quote">Avish has a rare ability to make complex workflows feel effortless. He doesn't just design screens — he thinks through the whole experience end to end.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">RK</div>
+          <div class="testimonial-meta">
+            <span class="testimonial-name">Rahul Kamath</span>
+            <span class="testimonial-role">Product Manager · 99games</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <p class="testimonial-quote">He's one of those designers who genuinely cares about the user, not just the pixel. Every decision was backed by thinking — never just aesthetic preference.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">DM</div>
+          <div class="testimonial-meta">
+            <span class="testimonial-name">Divya Menon</span>
+            <span class="testimonial-role">UX Lead · CodingJudge</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="testimonial-card reveal reveal-delay-2">
-      <p class="testimonial-quote">Working with Avish was a breath of fresh air. He asked the right questions upfront, moved fast without sacrificing quality, and the final product exceeded our expectations.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar">SP</div>
-        <div class="testimonial-meta">
-          <span class="testimonial-name">Sneha Patil</span>
-          <span class="testimonial-role">Founder · ForeignAdmits</span>
+    <!-- Column 2 -->
+    <div class="testimonial-col">
+      <div class="testimonial-card reveal reveal-delay-1">
+        <p class="testimonial-quote">Working with Avish has been an absolute pleasure. As someone who works very closely on product improvements, I truly value how thoughtfully he approaches every requirement. He has a great instinct for user experience and consistently delivers designs that are not just visually clean but also highly practical from a product standpoint. What stands out most is his openness to feedback and his speed of iteration — you can trust him to take inputs seriously and come back with well-thought-through improvements. His work has played a meaningful role in shaping the experience we're building at ForeignAdmits, and I'd happily recommend him to any product team.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar"><img src="Reet Rai.jpeg" alt="Reet Rai"></div>
+          <div class="testimonial-meta">
+            <span class="testimonial-name">Reet Rai</span>
+            <span class="testimonial-role">Associate Product Manager · ForeignAdmits</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <p class="testimonial-quote">Avish picked up our brand language instantly and elevated it. Fast turnarounds, clean handoffs, and zero back-and-forth — exactly what a growing team needs.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">NS</div>
+          <div class="testimonial-meta">
+            <span class="testimonial-name">Nisha Sharma</span>
+            <span class="testimonial-role">Marketing Head · BigBlock Theory</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="testimonial-card reveal reveal-delay-3">
-      <p class="testimonial-quote">Avish completely transformed how our sales team uses the product. The redesign brought clarity and confidence — our demo-to-close rate actually went up.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar">AV</div>
-        <div class="testimonial-meta">
-          <span class="testimonial-name">Arjun Verma</span>
-          <span class="testimonial-role">CEO · Smartcue</span>
+    <!-- Column 3 -->
+    <div class="testimonial-col">
+      <div class="testimonial-card reveal reveal-delay-1">
+        <p class="testimonial-quote">Avish completely transformed how our sales team uses the product. The redesign brought clarity and confidence — our demo-to-close rate actually went up.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AV</div>
+          <div class="testimonial-meta">
+            <span class="testimonial-name">Arjun Verma</span>
+            <span class="testimonial-role">CEO · Smartcue</span>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="testimonial-card reveal reveal-delay-1">
-      <p class="testimonial-quote">He's one of those designers who genuinely cares about the user, not just the pixel. Every decision was backed by thinking — never just aesthetic preference.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar">DM</div>
-        <div class="testimonial-meta">
-          <span class="testimonial-name">Divya Menon</span>
-          <span class="testimonial-role">UX Lead · CodingJudge</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="testimonial-card reveal reveal-delay-2">
-      <p class="testimonial-quote">Avish picked up our brand language instantly and elevated it. Fast turnarounds, clean handoffs, and zero back-and-forth — exactly what a growing team needs.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar">NS</div>
-        <div class="testimonial-meta">
-          <span class="testimonial-name">Nisha Sharma</span>
-          <span class="testimonial-role">Marketing Head · BigBlock Theory</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="testimonial-card reveal reveal-delay-3">
-      <p class="testimonial-quote">What stood out most was his ability to adapt across domains. Whether it was B2B SaaS or consumer gaming, Avish always brought fresh, relevant thinking.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar">KR</div>
-        <div class="testimonial-meta">
-          <span class="testimonial-name">Kiran Rao</span>
-          <span class="testimonial-role">Co-founder · AthrVd</span>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <p class="testimonial-quote">What stood out most was his ability to adapt across domains. Whether it was B2B SaaS or consumer gaming, Avish always brought fresh, relevant thinking.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">KR</div>
+          <div class="testimonial-meta">
+            <span class="testimonial-name">Kiran Rao</span>
+            <span class="testimonial-role">Co-founder · AthrVd</span>
+          </div>
         </div>
       </div>
     </div>
