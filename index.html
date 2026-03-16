@@ -102,7 +102,13 @@
     from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
-  .nav-logo { padding: 8px 20px; font-size: 0.85rem; font-weight: 600; color: var(--text); text-decoration: none; letter-spacing: -0.01em; white-space: nowrap; }
+  .nav-logo { padding: 4px 8px; text-decoration: none; display: flex; align-items: center; position: relative; }
+  .nav-logo-img { width: 36px; height: 36px; border-radius: 1000px; display: block; transition: opacity 0.25s var(--ease); position: absolute; }
+  .nav-logo-img.default  { opacity: 1; }
+  .nav-logo-img.glasses  { opacity: 0; }
+  .nav-logo:hover .nav-logo-img.default  { opacity: 0; }
+  .nav-logo:hover .nav-logo-img.glasses  { opacity: 1; }
+  .nav-logo-spacer { width: 36px; height: 36px; }
   .nav-links { display: flex; gap: 2px; list-style: none; }
   .nav-links a { text-decoration: none; color: var(--text-muted); font-size: 0.8rem; font-weight: 500; padding: 8px 16px; border-radius: 100px; transition: all 0.3s var(--ease); white-space: nowrap; }
   .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
@@ -549,7 +555,11 @@
 
 <!-- Nav -->
 <nav>
-  <a href="#" class="nav-logo">A.S</a>
+  <a href="#" class="nav-logo">
+    <img class="nav-logo-img default" src="favicon - 256.png" alt="Avish Shetty">
+    <img class="nav-logo-img glasses" src="favicon - 256 - Glasses.png" alt="Avish Shetty">
+    <span class="nav-logo-spacer"></span>
+  </a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#projects">Work</a></li>
