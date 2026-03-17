@@ -461,23 +461,6 @@
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   .magnetic { transition: transform 0.3s var(--ease); }
 
-  /* ─── BELL ─── */
-  .bell-btn { position: fixed; bottom: 32px; right: 32px; width: 52px; height: 52px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); cursor: none; display: flex; align-items: center; justify-content: center; z-index: 999; transition: border-color 0.3s var(--ease), transform 0.3s var(--ease), box-shadow 0.3s var(--ease); }
-  .bell-btn:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(232,255,90,0.12); }
-  .bell-btn svg { color: var(--text-muted); transition: color 0.3s var(--ease); }
-  .bell-btn:hover svg { color: var(--accent); }
-  .bell-btn.ringing { animation: bellRing 0.6s var(--ease); }
-  @keyframes bellRing {
-    0%   { transform: rotate(0deg);   }
-    15%  { transform: rotate(18deg);  }
-    35%  { transform: rotate(-18deg); }
-    55%  { transform: rotate(12deg);  }
-    75%  { transform: rotate(-8deg);  }
-    90%  { transform: rotate(4deg);   }
-    100% { transform: rotate(0deg);   }
-  }
-  .bell-toast { position: fixed; bottom: 96px; right: 32px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 18px; font-size: 0.78rem; color: var(--text-muted); z-index: 999; opacity: 0; transform: translateY(8px); transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); pointer-events: none; white-space: nowrap; }
-  .bell-toast.show { opacity: 1; transform: translateY(0); }
 
   /* ─── RESPONSIVE ─── */
   @media (max-width: 1024px) { .about-grid { grid-template-columns: 1fr; gap: 48px; } section { padding: 80px 32px; } }
@@ -710,7 +693,7 @@
       </div>
     </a>
     <a class="project-card reveal reveal-delay-3" href="https://www.figma.com/design/A86DOoD0vwsy7bmCpTnhIs/LoanMonk?node-id=1-2102&t=oJBl6TXTApUuZJvi-1" target="_blank" rel="noopener">
-      <div class="project-visual"><div class="project-visual-inner vis-3"><img class="project-icon" src="Icon-ForeignAdmits.svg" alt="LoanMonk"></div></div>
+      <div class="project-visual"><div class="project-visual-inner vis-3"><img class="project-icon" src="Icon-ForeignAdmits.svg" alt="ForeignAdmits"></div></div>
       <div class="project-info">
         <div class="project-meta"><span class="project-category">Edtech</span><span class="meta-dot"></span><span class="project-type">Mobile App</span><span class="meta-dot"></span><span class="project-year">2024</span></div>
         <h3 class="project-name">LoanMonk — Simplifying Education Loan Access to International Students</h3>
@@ -750,14 +733,14 @@
   <div class="gallery-bento reveal">
     <!-- Row 1: wide + wider -->
     <div class="gb-item gb-1" data-title="Donut">
-      <img src="donutready.png" alt="Donut" loading="lazy">
+      <img src="donutready.png" alt="3D render of a glazed donut with pink icing" loading="lazy">
       <div class="gb-overlay">
         <span class="gallery-tag">3D</span>
         <span class="gallery-caption">Donut</span>
       </div>
     </div>
     <div class="gb-item gb-2" data-title="Studio">
-      <img src="Studio1.png" alt="Studio" loading="lazy">
+      <img src="Studio1.png" alt="3D studio interior environment render with arch and lighting" loading="lazy">
       <div class="gb-overlay">
         <span class="gallery-tag">3D</span>
         <span class="gallery-caption">Studio</span>
@@ -765,21 +748,21 @@
     </div>
     <!-- Row 2: narrow + medium + medium -->
     <div class="gb-item gb-3" data-title="Face Render">
-      <img src="face.png" alt="Face Render" loading="lazy">
+      <img src="face.png" alt="3D sculpted face render with realistic lighting" loading="lazy">
       <div class="gb-overlay">
         <span class="gallery-tag">3D</span>
         <span class="gallery-caption">Face Render</span>
       </div>
     </div>
     <div class="gb-item gb-4" data-title="Racer">
-      <img src="racer.png" alt="Racer" loading="lazy">
+      <img src="racer.png" alt="3D low-poly racing car render" loading="lazy">
       <div class="gb-overlay">
         <span class="gallery-tag">3D</span>
         <span class="gallery-caption">Racer</span>
       </div>
     </div>
     <div class="gb-item gb-5" data-title="Environment">
-      <img src="envi1.png" alt="Environment" loading="lazy">
+      <img src="envi1.png" alt="3D outdoor environment scene with atmospheric lighting" loading="lazy">
       <div class="gb-overlay">
         <span class="gallery-tag">3D</span>
         <span class="gallery-caption">Environment</span>
@@ -1366,72 +1349,6 @@
   </div>
 </div>
 
-<!-- Bell button -->
-<button class="bell-btn magnetic" id="bellBtn" aria-label="Ring the bell">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-  </svg>
-</button>
-<div class="bell-toast" id="bellToast">👋 Thanks for stopping by!</div>
-
-<script>
-  // ─── BELL + DISCORD ───────────────────────────────────────────
-  const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1483085014215430196/6J97NvUNihpRNl-_BtAeSh4fwrk_wLT5DBGFXfu79-4cL7qVsTogWlhXp_akJuITS7yo';
-
-  function playBell() {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const frequencies = [880, 1108, 1320];
-    frequencies.forEach((freq, i) => {
-      const osc  = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.06);
-      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.06);
-      gain.gain.linearRampToValueAtTime(0.35 - i * 0.08, ctx.currentTime + i * 0.06 + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.06 + 2.2);
-      osc.start(ctx.currentTime + i * 0.06);
-      osc.stop(ctx.currentTime  + i * 0.06 + 2.2);
-    });
-  }
-
-  async function notifyDiscord() {
-    if (!DISCORD_WEBHOOK || DISCORD_WEBHOOK === 'YOUR_DISCORD_WEBHOOK_URL_HERE') return;
-    const time = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
-    try {
-      await fetch(DISCORD_WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          embeds: [{
-            title: '🔔 Someone rang the bell!',
-            description: 'A visitor rang the doorbell on your portfolio.',
-            color: 0xCCFF00,
-            fields: [
-              { name: '⏰ Time (IST)', value: time, inline: true },
-              { name: '🌐 Page', value: window.location.href, inline: true }
-            ],
-            footer: { text: 'avishshetty.com' }
-          }]
-        })
-      });
-    } catch (e) { console.warn('Bell notification failed:', e); }
-  }
-
-  document.getElementById('bellBtn').addEventListener('click', () => {
-    const btn   = document.getElementById('bellBtn');
-    const toast = document.getElementById('bellToast');
-    btn.classList.remove('ringing');
-    void btn.offsetWidth; // reflow to restart animation
-    btn.classList.add('ringing');
-    playBell();
-    notifyDiscord();
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-  });
-</script>
 
 </body>
 </html>
