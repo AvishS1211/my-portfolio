@@ -117,8 +117,8 @@
 
   /* ─── HERO ─── */
   .hero {
-    min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between;
-    align-items: flex-start; text-align: left; padding: 140px 60px 60px; position: relative;
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    align-items: center; text-align: center; padding: 140px 60px 60px; position: relative;
     max-width: 100%; width: 100%;
   }
   #hero-particles {
@@ -142,20 +142,17 @@
   .badge-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; background: var(--accent); opacity: 0.4; animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.8); opacity: 0; } }
 
-  .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(4.5rem, 9vw, 10rem); line-height: 1.02; letter-spacing: -0.14rem; font-weight: 700; max-width: 100%; padding-bottom: 0; text-transform: uppercase; }
-  .hero h1 .line { display: block; overflow: visible; }
+  .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(3rem, 5.5vw, 5rem); line-height: 1.08; letter-spacing: -0.04em; font-weight: 700; max-width: 1300px; padding-bottom: 0.15em; text-transform: uppercase; }
+  .hero h1 .line { display: block; overflow: hidden; }
   .hero h1 .line.revealed { overflow: visible; }
   .hero h1 .line-inner { display: block; opacity: 0; animation: lineReveal 0.9s var(--ease) forwards; }
   .hero h1 .line:nth-child(1) .line-inner { animation-delay: 0.9s; }
   .hero h1 .line:nth-child(2) .line-inner { animation-delay: 1.05s; }
-  .hero h1 .line:nth-child(3) .line-inner { animation-delay: 1.2s; }
   @keyframes lineReveal { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
 
-  .hero h1 em { font-style: italic; background: linear-gradient(135deg, var(--accent), #b8ff5a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  .hero-sub { margin-top: 0; font-size: 1rem; color: var(--text-muted); max-width: 400px; line-height: 1.7; font-weight: 300; opacity: 0; animation: fadeUp 0.7s 1.4s var(--ease) forwards; }
-  .hero-actions { margin-top: 28px; display: flex; gap: 14px; align-items: center; opacity: 0; animation: fadeUp 0.7s 1.8s var(--ease) forwards; }
-  .hero-bottom { display: grid; grid-template-columns: 1fr 1fr; width: 100%; margin-top: 60px; }
-  .hero-bottom-right { display: flex; flex-direction: column; gap: 20px; justify-content: flex-end; }
+  .hero h1 em { font-style: normal; background: linear-gradient(135deg, var(--accent), #b8ff5a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-sub { margin-top: 28px; font-size: 1.1rem; color: var(--text-muted); max-width: 460px; line-height: 1.7; font-weight: 300; opacity: 0; animation: fadeUp 0.7s 1.4s var(--ease) forwards; text-align: center; }
+  .hero-actions { margin-top: 44px; display: flex; gap: 14px; align-items: center; opacity: 0; animation: fadeUp 0.7s 1.6s var(--ease) forwards; }
   @media (max-width: 768px) {
     .hero { padding: 120px 24px 48px; }
     .hero-bottom { grid-template-columns: 1fr; }
@@ -586,22 +583,18 @@
   <div class="hero-orb orb-1"></div>
   <div class="hero-orb orb-2"></div>
 
+  <div class="hero-badge"><span class="badge-dot"></span> Available for new projects</div>
+
   <h1>
-    <span class="line"><span class="line-inner"><em style="font-style:italic; color:var(--accent); text-decoration:none;">Designing Products</em></span></span>
-    <span class="line"><span class="line-inner" style="font-style:normal;">People actually</span></span>
-    <span class="line"><span class="line-inner" style="font-style:normal;">love to use</span></span>
+    <span class="line"><span class="line-inner">Designing products</span></span>
+    <span class="line"><span class="line-inner">people <em>actually</em> love to use</span></span>
   </h1>
 
-  <div class="hero-bottom">
-    <div></div>
-    <div class="hero-bottom-right">
-      <p class="hero-sub">Product designer crafting intuitive digital experiences across gaming, edtech, SaaS, and beyond.</p>
+  <p class="hero-sub">Product designer crafting intuitive digital experiences across gaming, edtech, SaaS, and beyond.</p>
 
-      <div class="hero-actions">
-        <a href="#projects" class="btn-glow magnetic">Explore my work <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="#contact" class="btn-outline magnetic">Get in touch</a>
-      </div>
-    </div>
+  <div class="hero-actions">
+    <a href="#projects" class="btn-glow magnetic">Explore my work <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <a href="#contact" class="btn-outline magnetic">Get in touch</a>
   </div>
 </section>
 
