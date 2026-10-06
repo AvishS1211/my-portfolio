@@ -1,0 +1,2879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Avish Shetty — Product Designer</title>
+<link rel="icon" type="image/png" href="../favicon - 256.png">
+<!-- Only Chromium can run an SVG filter over a blurred backdrop (the liquid-glass refraction). Safari, Firefox and iOS get a tuned frosted glass instead. -->
+<script>if (!window.chrome) document.documentElement.classList.add('no-svg-glass');</script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Paralucent'; src: url('../Paralucent_Light.otf') format('opentype'); font-weight: 300; font-display: swap; }
+  @font-face { font-family: 'Paralucent'; src: url('../Paralucent_Text_Book.otf') format('opentype'); font-weight: 400; font-display: swap; }
+  @font-face { font-family: 'Paralucent'; src: url('../Paralucent_Medium.otf') format('opentype'); font-weight: 500; font-display: swap; }
+  @font-face { font-family: 'Paralucent'; src: url('../Paralucent_Demi_Bold.otf') format('opentype'); font-weight: 600; font-display: swap; }
+  @font-face { font-family: 'Paralucent'; src: url('../Paralucent_Bold.otf') format('opentype'); font-weight: 700; font-display: swap; }
+  @font-face { font-family: 'Paralucent Condensed'; src: url('fonts/Paralucent_Condensed_Bold.otf') format('opentype'); font-weight: 700; font-display: swap; }
+  @font-face { font-family: 'Paralucent Condensed'; src: url('fonts/Paralucent_Condensed_Medium.otf') format('opentype'); font-weight: 500; font-display: swap; }
+  @font-face { font-family: 'Paralucent Condensed'; src: url('fonts/Paralucent_Condensed_Demi_Bold.otf') format('opentype'); font-weight: 600; font-display: swap; }
+
+  /* ─── Design tokens — the source of truth is v2/DESIGN.md ─── */
+  :root {
+    /* Color §2 */
+    --blue-900: #2D38B8; --blue-600: #006CFA; --blue-500: #0F80FA; --blue-300: #61A5FF; --blue-100: #CCEAFF; --blue-50: #F6FAFF;
+    --ink-strong: #212121; --ink: #363636; --ink-muted: #646464; --ink-subtle: #767676; --ink-on-blue: #FFFFFF;
+    --surface: #FFFFFF; --paper: #FEFAEF; --paper-shade: #E9E4D6; --line: #EBEBEB;
+    /* Blue holds to 78% so the hero copy always sits on blue that passes 4.5:1 with white text. */
+    --grad-hero: linear-gradient(to bottom, var(--blue-900) 0%, var(--blue-600) 75%, #4C97FB 84%, #B3D3FD 93%, var(--surface) 100%);
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --grad-display: linear-gradient(to bottom, var(--blue-600), var(--blue-50));
+    --grad-title: linear-gradient(to bottom, var(--blue-600), var(--blue-300));
+    --grad-cta: linear-gradient(to bottom, var(--surface), var(--blue-100));
+
+    /* Type §3 */
+    --font-display: 'Paralucent Condensed', 'Paralucent', sans-serif;
+    --font-mono: 'Geist Mono', ui-monospace, monospace;
+    --font-ui: 'Paralucent', system-ui, sans-serif;
+    --track-tight: -0.04em; --track-snug: -0.02em;
+
+    /* Spacing §4 */
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+    --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 80px; --space-10: 120px;
+    --section-y: var(--space-9); --page-x: var(--space-5); --max: 1200px;
+
+    /* Radius §5 */
+    --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px; --r-full: 50%; --r-pill: 999px;
+
+    /* Elevation §6 — navy-tinted, one light source from above */
+    --shadow-1: 0 1px 3px rgb(13 30 80 / 0.06), 0 6px 20px rgb(13 30 80 / 0.06);
+    --shadow-2: 0 2px 6px rgb(13 30 80 / 0.10);
+    --shadow-hover: 0 6px 20px rgb(13 30 80 / 0.18);
+    --shadow-3: 0 24px 60px rgb(10 30 90 / 0.28), 0 2px 8px rgb(13 30 80 / 0.08);
+    --shadow-lift: 0 22px 18px rgb(13 30 80 / 0.28);
+    --text-shadow: 0 4px 8px rgb(0 0 0 / 0.15);
+
+    /* Motion §7 */
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in: cubic-bezier(0.5, 0, 0.75, 0);
+    --dur-fast: 150ms; --dur-base: 300ms; --dur-slow: 600ms;
+
+    /* Layers §8 */
+    --z-nav: 10; --z-cord: 40; --z-popover: 50; --z-drag: 100;
+  }
+  @media (max-width: 1024px) { :root { --section-y: var(--space-8); } }
+  @media (max-width: 640px) { :root { --section-y: var(--space-7); } }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-ui); background: var(--surface); color: var(--ink-strong); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  h1, h2, h3 { font-weight: 700; letter-spacing: var(--track-tight); line-height: 1.1; text-wrap: balance; }
+  p, blockquote { text-wrap: pretty; }
+
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--page-x); }
+  section { padding: var(--section-y) 0; }
+
+  /* The page never scrolls: the frame is fixed to the viewport and its content scrolls inside it. */
+  html, body { height: 100%; }
+  body { overflow: hidden; }
+  .frame-shell { --gutter: 16px; position: fixed; inset: 0; padding: var(--gutter); background: var(--surface); }
+  .frame { position: relative; height: 100%; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; background: var(--surface); box-shadow: var(--shadow-1); }
+  .frame-scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; scroll-behavior: smooth; scroll-padding-top: 88px; scrollbar-width: none; }
+  .frame-scroll::-webkit-scrollbar { display: none; }
+  @media (prefers-reduced-motion: reduce) { .frame-scroll { scroll-behavior: auto; } }
+
+  .hero {
+    position: relative; overflow: hidden;
+    --frame-h: max(600px, calc(100svh - 2 * var(--gutter) - 2px));
+    min-height: var(--frame-h);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    padding: max(110px, calc(var(--frame-h) * 0.2338)) 24px 80px;
+    background: var(--grad-hero);
+    text-align: center; color: var(--ink-on-blue);
+  }
+  /* Film grain over the gradient so it reads as printed, not a flat digital fade. Sits under the hero copy. */
+  .hero::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--grain) 0 0 / 220px; opacity: 0.16; mix-blend-mode: overlay; }
+  .hero > * { position: relative; }
+
+  .dock { position: absolute; z-index: var(--z-nav); top: -1px; left: 50%; transform: translateX(-50%); transform-origin: 50% 0; width: 315px; height: 88px; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; will-change: transform; }
+  .dock.dragging, .dock.dragging a { cursor: grabbing; }
+  .dock.dragging a { transform: none; }
+  /* Liquid glass, clipped to the notch path (315×88 box). clip-path sits on each layer, not a wrapper, because a clipped ancestor would hide the backdrop. */
+  .glass-layer { position: absolute; inset: 0; pointer-events: none; clip-path: path('M25.3127 67.7812C27.171 79.429 37.2178 88 49.013 88H265.987C277.782 88 287.829 79.429 289.687 67.7812L297.191 20.7482C298.297 13.8166 302.382 7.7166 308.37 4.0545L315 0H0L6.63 4.0545C12.6182 7.7166 16.7032 13.8166 17.809 20.7482L25.3127 67.7812Z'); }
+  .glass-distort { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); filter: url(#notch-glass); isolation: isolate; }
+  .glass-tint { background: linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.12)); }
+  .glass-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .dock ul { position: relative; list-style: none; display: flex; justify-content: center; gap: 24px; padding-top: 12px; }
+  .dock a { display: block; width: 64px; height: 64px; border-radius: 16px; transition: transform 0.3s var(--ease-spring); }
+  .dock a:hover, .dock a:focus-visible { transform: translateY(2px) scale(1.08); }
+  .dock a:focus-visible { outline: 2px solid var(--ink-on-blue); outline-offset: 3px; }
+
+  .dock a { position: relative; }
+  .dock a::after {
+    content: attr(data-label);
+    position: absolute; top: calc(100% + 20px); left: 50%;
+    padding: var(--space-2) var(--space-3); border-radius: var(--r-sm); white-space: nowrap; pointer-events: none;
+    background: rgba(13, 21, 38, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    font: 500 13px/1.2 var(--font-ui); letter-spacing: var(--track-snug); color: var(--surface);
+    opacity: 0; transform: translate(-50%, -6px) scale(0.85); transform-origin: 50% 0;
+    transition: opacity 0.15s ease, transform 0.35s var(--ease-spring);
+  }
+  @media (hover: hover) {
+    .dock a:hover::after { opacity: 1; transform: translate(-50%, 0) scale(1); transition-delay: 0.08s; }
+  }
+  .dock a:focus-visible::after { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  .dock.dragging a::after, #about-trigger[aria-expanded="true"]::after { opacity: 0; transform: translate(-50%, -6px) scale(0.85); transition-delay: 0s; }
+  .dock a img { display: block; width: 100%; height: 100%; }
+
+  .hero h1 {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(2.5rem, 12vw, 7.5rem); line-height: 1; letter-spacing: var(--track-tight);
+    text-shadow: var(--text-shadow);
+  }
+  .hero-sub {
+    margin-top: var(--space-5); max-width: 596px;
+    font-family: var(--font-mono); font-weight: 400;
+    font-size: clamp(0.95rem, 1.4vw, 1.125rem); line-height: 1.5; letter-spacing: var(--track-tight);
+    text-shadow: var(--text-shadow);
+  }
+  .hero-cta {
+    margin-top: var(--space-6); padding: var(--space-3) var(--space-5); border-radius: var(--r-md);
+    border: 1px solid var(--surface); background: var(--grad-cta);
+    box-shadow: var(--shadow-2);
+    font-family: var(--font-display); font-weight: 700;
+    font-size: 28px; line-height: 1.2; text-transform: uppercase; color: var(--blue-600);
+    transition: transform 0.3s var(--ease-spring), box-shadow 0.3s;
+  }
+  .hero-cta:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+  .hero-cta:active { transform: translateY(0) scale(0.98); box-shadow: var(--shadow-2); transition-duration: var(--dur-fast); }
+  .hero-cta:focus-visible { outline: 2px solid var(--ink-on-blue); outline-offset: 3px; }
+
+  /* "Currently" pill: light liquid glass on the hero blue, pinned top-left; joins the flow above the headline when
+     the frame is too narrow to clear the notch. */
+  .now-pill {
+    position: absolute; z-index: 2; top: var(--space-5); left: var(--space-5); max-width: calc(50% - 190px);
+    display: inline-flex; align-items: center; gap: var(--space-2); padding: 8px 14px; border-radius: var(--r-pill);
+    box-shadow: 0 4px 14px rgb(13 30 80 / 0.18);
+    font: 500 13px/1.2 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-on-blue); white-space: nowrap;
+  }
+  .hero > .now-pill { position: absolute; }
+  .now-pill .gp-tint { background: linear-gradient(135deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.1)); }
+  .now-pill > :not(.gp-layers) { position: relative; }
+  .now-doing, .now-song { overflow: hidden; text-overflow: ellipsis; }
+  .now-music { display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0; }
+  .now-music[hidden] { display: none; }
+  .now-sep { opacity: 0.6; }
+  .now-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #3DDC84; box-shadow: 0 0 0 0 rgb(61 220 132 / 0.6); animation: now-pulse 2s ease-out infinite; }
+  @keyframes now-pulse { 70% { box-shadow: 0 0 0 7px rgb(61 220 132 / 0); } 100% { box-shadow: 0 0 0 0 rgb(61 220 132 / 0); } }
+  .now-eq { flex: none; display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; }
+  .now-eq i { width: 2px; height: 100%; border-radius: 1px; background: currentColor; transform-origin: 50% 100%; animation: now-eq 0.9s ease-in-out infinite alternate; }
+  .now-eq i:nth-child(2) { animation-duration: 0.7s; animation-delay: -0.3s; }
+  .now-eq i:nth-child(3) { animation-duration: 1.1s; animation-delay: -0.6s; }
+  @keyframes now-eq { from { transform: scaleY(0.25); } to { transform: scaleY(1); } }
+  @media (max-width: 1080px) {
+    .hero > .now-pill { position: relative; top: auto; left: auto; max-width: 100%; margin-bottom: var(--space-5); }
+  }
+  @media (max-width: 420px) { .now-pill { gap: 6px; padding: 7px 12px; font-size: 11.5px; } }
+  @media (prefers-reduced-motion: reduce) { .now-dot, .now-eq i { animation: none; } }
+
+  /* Work-experience tags: each paper tag hangs from its own pushpin in the lower hero. The script places the pins
+     and swings each tag about its pin (--pin-y is the pin's centre from the tag's top edge). */
+  .hero-mobile { --tag-w: 184px; --pin-y: 11px; position: relative; width: calc(100% + 48px); height: 150px; margin: auto -24px -48px; flex: none; }
+  .hm-tags { list-style: none; margin: 0; padding: 0; }
+  .hm-tag {
+    position: absolute; left: 0; top: 0; width: var(--tag-w); margin-left: calc(var(--tag-w) / -2);
+    transform-origin: 50% var(--pin-y); will-change: transform; opacity: 0; transition: opacity 500ms ease;
+  }
+  .hero-mobile.is-ready .hm-tag { opacity: 1; }
+  .hm-card {
+    position: relative; display: flex; align-items: center; gap: var(--space-3); padding: 22px var(--space-3) var(--space-3);
+    border: 1px solid var(--line); border-radius: var(--r-md); background: var(--paper); box-shadow: var(--shadow-1);
+    color: var(--ink-strong); text-align: left; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  .hm-tag.is-dragging .hm-card { cursor: grabbing; box-shadow: var(--shadow-3); }
+  /* Pushpin: a glossy head through the tag's hole, with a soft cast shadow. */
+  .hm-pin {
+    position: absolute; top: calc(var(--pin-y) - 6px); left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff 0 18%, #9fc4ff 45%, var(--blue-600) 100%);
+    box-shadow: 0 2px 3px rgb(13 30 80 / 0.35), 1px 4px 6px rgb(13 30 80 / 0.18);
+  }
+  .hm-logo { flex: none; width: 36px; height: 36px; border-radius: 50%; object-fit: contain; }
+  .hm-logo--mono { display: grid; place-items: center; background: var(--blue-600); color: var(--ink-on-blue); font: 700 20px/1 var(--font-display); }
+  .hm-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .hm-name { font: 600 20px/1.05 var(--font-display); letter-spacing: var(--track-snug); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hm-years { display: inline-flex; align-items: center; gap: 6px; font: 400 12px/1.2 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .hm-live { width: 6px; height: 6px; border-radius: 50%; background: #2DBE6C; }
+  .hm-tip {
+    position: absolute; top: calc(100% + 8px); left: 50%; padding: var(--space-2) var(--space-3); border-radius: var(--r-sm); white-space: nowrap; pointer-events: none;
+    background: rgba(13, 21, 38, 0.86); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    font: 500 12px/1.2 var(--font-mono); letter-spacing: var(--track-tight); color: var(--surface);
+    opacity: 0; transform: translate(-50%, -4px) scale(0.92); transform-origin: 50% 0; transition: opacity 0.15s ease, transform 0.3s var(--ease-spring);
+  }
+  @media (hover: hover) { .hm-card:hover .hm-tip { opacity: 1; transform: translate(-50%, 0); } }
+  .hm-tag.is-open .hm-tip { opacity: 1; transform: translate(-50%, 0); }
+  .hm-tag.is-dragging .hm-tip { opacity: 0; }
+  @media (max-width: 640px) {
+    .hero-mobile { --tag-w: 104px; height: 150px; }
+    .hm-card { flex-direction: column; gap: 6px; padding: 22px 8px 10px; text-align: center; }
+    .hm-text { align-items: center; }
+    .hm-logo { width: 30px; height: 30px; }
+    .hm-name { font-size: 16px; max-width: 100%; }
+    .hm-years { font-size: 11px; }
+  }
+
+
+
+  /* --s scales the whole card from the Figma sizes (330px wide at 1). */
+  .about-card {
+    --s: 1.3;
+    position: fixed; z-index: var(--z-popover); width: min(calc(330px * var(--s)), calc(100vw - 24px));
+    display: flex; flex-direction: column; gap: calc(11px * var(--s)); padding: calc(12px * var(--s));
+    background: var(--surface); border-radius: calc(var(--r-xl) * var(--s)); transform-origin: 0 0;
+    box-shadow: var(--shadow-3);
+  }
+  .about-card[hidden] { display: none; }
+  .about-card:focus { outline: none; }
+  .about-card:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 3px; }
+  .about-photo { aspect-ratio: 306 / 255.7; border-radius: calc(var(--r-md) * var(--s)); overflow: hidden; box-shadow: 0 1.677px 3.353px rgba(0, 0, 0, 0.15); }
+  .about-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .about-text { display: flex; flex-direction: column; gap: calc(5px * var(--s)); }
+  .about-card h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: calc(24px * var(--s)); line-height: 1.2; letter-spacing: var(--track-tight); color: var(--ink-strong); }
+  .about-card p { font-family: var(--font-mono); font-weight: 400; font-size: max(13px, calc(12px * var(--s))); line-height: 1.45; letter-spacing: var(--track-tight); color: var(--ink-subtle); }
+  .about-card b { font-weight: 600; color: var(--ink-strong); }
+  .tools { display: inline-flex; vertical-align: -0.25em; margin: 0 0.06em 0 0.19em; }
+  .tools > * { width: 1.27em; height: 1.27em; border-radius: 0.31em; filter: drop-shadow(0 1.564px 1.564px rgba(0, 0, 0, 0.15)); transform: rotate(-2deg); }
+  .tools > :nth-child(2) { transform: rotate(2deg); }
+  .tools > * + * { margin-left: -0.146em; }
+  .tools .framed { display: block; padding: 0.096em; background: var(--surface); }
+  .tools .framed img { display: block; width: 100%; height: 100%; border-radius: 0.31em; }
+  @media (max-width: 480px) { .about-card { --s: 1; } }
+
+  /* ─── Work: pinned case-study deck that deals upward on scroll ─── */
+  /* Jump links skip the top spacing and land on the pinned deck. */
+  .work { padding: var(--section-y) 0; scroll-margin-top: calc(-1 * var(--section-y)); }
+  /* --s scales every card dimension from the Figma sizes; the script sets it (and --card-top) from the space left under the title. */
+  .work-track {
+    --nav: 88px; --s: 1;
+    --stage-h: max(480px, calc(100svh - 2 * var(--gutter) - 2px - var(--nav)));
+    --title: clamp(56px, min(11vw, 13svh), 150px);
+    --card-top: calc(var(--title) * 0.78);
+    position: relative; height: calc(var(--stage-h) * var(--n));
+  }
+  .work-stage { position: sticky; top: var(--nav); height: var(--stage-h); overflow: hidden; perspective: 1200px; }
+  .work .work-title {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%); margin: 0; white-space: nowrap;
+    font: 700 var(--title)/1.2 var(--font-display); letter-spacing: var(--track-tight); text-transform: uppercase;
+    background: var(--grad-display); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .cs-card {
+    position: absolute; left: 50%; top: var(--card-top); width: calc(871px * var(--s));
+    display: flex; flex-direction: column; gap: calc(var(--space-3) * var(--s)); padding: calc(var(--space-3) * var(--s));
+    border-radius: calc(var(--r-sm) * var(--s)); background: var(--paper);
+    box-shadow: var(--shadow-1); color: inherit; text-decoration: none;
+    transform-origin: 50% 100%; transform: translate(-50%, 0);
+  }
+  .cs-card:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 4px; }
+  .cs-card[hidden] { display: none; }
+
+  /* Design / AI toggle: liquid glass, pinned to the bottom of the Work stage. */
+  .work-toggle {
+    position: absolute; z-index: 20; left: 50%; bottom: var(--space-4); transform: translateX(-50%);
+    display: inline-flex; padding: var(--space-1); border-radius: var(--r-pill); box-shadow: var(--shadow-2); touch-action: pan-y;
+  }
+  .work-toggle .gp-tint { background: linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.16)); }
+  .wt-tab, .wt-lens span {
+    padding: 10px 18px; white-space: nowrap;
+    font: 600 16px/1 var(--font-display); letter-spacing: var(--track-snug); text-transform: uppercase;
+  }
+  .wt-tab { position: relative; z-index: 1; border: none; border-radius: var(--r-pill); background: none; cursor: pointer; color: var(--ink-strong); user-select: none; -webkit-user-select: none; }
+  .wt-tab:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 2px; }
+  /* The thumb is a lens: a glass droplet above the labels showing a magnified blue copy of the text under it.
+     Its position, width, stretch, squash and press-swell are driven by a spring in the script. */
+  .wt-thumb {
+    position: absolute; z-index: 2; top: var(--space-1); left: 0; height: calc(100% - 2 * var(--space-1));
+    border-radius: var(--r-pill); overflow: hidden; pointer-events: none; transform-origin: 50% 50%;
+    box-shadow: 0 4px 14px rgb(13 30 80 / 0.16);
+  }
+  /* The thumb's glass uses the notch recipe; it is a child layer because a backdrop-filter on the thumb itself
+     would stop these layers from seeing what's behind it. Stronger blur + tint haze the label under the lens copy. */
+  .wt-thumb .gp-distort { backdrop-filter: blur(6px) saturate(1.5); -webkit-backdrop-filter: blur(6px) saturate(1.5); filter: url(#thumb-glass); }
+  .wt-thumb .gp-tint { background: linear-gradient(to bottom, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34)); }
+  .wt-thumb::after {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.6), transparent 55%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), inset 0 0 10px rgb(0 108 250 / 0.12);
+  }
+  .wt-lens { position: absolute; left: 0; top: calc(-1 * var(--space-1)); display: inline-flex; padding: var(--space-1); }
+  .wt-lens span { color: var(--blue-600); }
+  @media (prefers-reduced-motion: reduce) { .wt-thumb { transition: none; } }
+  .cs-card > * { opacity: var(--content, 1); }
+  /* The image's top corners are cut away (mask from the Figma export) to make room for the kicker and year. */
+  .cs-media {
+    position: relative; width: 100%; aspect-ratio: 847 / 422; background: var(--media-bg, var(--paper-shade));
+    -webkit-mask: url('assets/card-media-mask.png') center / 100% 100% no-repeat;
+    mask: url('assets/card-media-mask.png') center / 100% 100% no-repeat;
+  }
+  .cs-media > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .cs-kicker {
+    position: absolute; top: calc(12px * var(--s)); left: calc(12px * var(--s)); right: calc(12px * var(--s));
+    display: flex; justify-content: space-between;
+    font: 500 calc(16px * var(--s))/1.2 var(--font-mono); letter-spacing: var(--track-tight); text-transform: uppercase; color: var(--ink-muted);
+  }
+  .cs-bottom { display: flex; flex-direction: column; gap: calc(12px * var(--s)); }
+  .work .cs-title { margin: 0; font: 600 calc(48px * var(--s))/1 var(--font-display); letter-spacing: var(--track-snug); }
+  .cs-title span {
+    background: var(--grad-title); -webkit-background-clip: text; background-clip: text; color: transparent;
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  }
+  .cs-desc { font: 500 calc(14px * var(--s))/1.4 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .cs-badge {
+    position: absolute; z-index: 5; right: calc(36px * var(--s)); top: calc(250px * var(--s));
+    width: calc(142px * var(--s)); height: calc(142px * var(--s));
+  }
+
+  /* Peelable stickers, rendered in WebGL: the canvas overhangs the sticker by 35% each side so the curl, lift and tilt have room. */
+  .sticker {
+    --rot: -8.56deg; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+    transform: rotate(var(--rot)); transition: transform 0.35s var(--ease-spring);
+  }
+  .sticker-canvas {
+    position: absolute; left: -35%; top: -35%; width: 170%; height: 170%; pointer-events: none;
+    filter: drop-shadow(0 var(--sh-y, 2px) var(--sh-b, 3px) rgb(13 30 80 / var(--sh-a, 0.22)));
+  }
+  .sticker-flat { position: absolute; inset: 0; border-radius: 50%; background: var(--surface) var(--img) center / var(--fit, 93.3%) no-repeat; filter: drop-shadow(0 4.76px 4.76px rgb(13 30 80 / 0.15)); }
+  .sticker.is-peeling { position: fixed; z-index: var(--z-drag); margin: 0; cursor: grabbing; transition: none; }
+  .sticker.is-sticking { animation: sticker-stick 0.45s var(--ease-spring); }
+  @keyframes sticker-stick {
+    0% { transform: rotate(var(--rot)) scale(1.04); }
+    55% { transform: rotate(var(--rot)) scale(0.97); }
+    100% { transform: rotate(var(--rot)) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sticker { transition: none; }
+    .sticker.is-sticking { animation: none; }
+  }
+
+  @media (max-width: 820px) {
+    .work-track { --s: 1; --card-top: calc(var(--title) * 1.15); }
+    .cs-card { width: min(420px, calc(100% - 32px)); }
+    /* The notches get too shallow for the kicker on narrow cards, so it moves into its own row above the image. */
+    .cs-kicker { position: static; order: -1; font-size: 12px; }
+    .cs-badge { right: 20px; top: 48px; width: 72px; height: 72px; }
+    .work .cs-title { font-size: 28px; }
+    .cs-desc { font-size: 13px; }
+  }
+
+  /* Reduced motion: no pinning, the case studies simply list one after another. */
+  .work--static .work-track { height: auto; }
+  .work--static .work-stage { position: static; height: auto; overflow: visible; display: flex; flex-direction: column; align-items: center; gap: 32px; padding: 24px 0 96px; }
+  .work--static .work-title { position: static; transform: none; }
+  .work--static .cs-card { position: relative; left: auto; top: auto; transform: none !important; }
+  .work--static .work-toggle { position: relative; left: auto; top: auto; bottom: auto; transform: none; }
+
+  /* ─── Work, option B: a still gold frame whose picture drops in from the top as you scroll ─── */
+  .wg { scroll-margin-top: calc(-1 * var(--section-y)); }
+  .wg-track { --nav: 88px; --stage-h: max(480px, calc(100svh - 2 * var(--gutter) - 2px - var(--nav))); position: relative; height: calc(var(--stage-h) * var(--n)); }
+  .wg-stage {
+    position: sticky; top: var(--nav); height: var(--stage-h); padding: var(--space-5) var(--page-x);
+    display: grid; grid-template-columns: auto minmax(0, 566px); justify-content: center; align-items: start; gap: clamp(32px, 6vw, 73px);
+  }
+  .wg-stage { --frame-h: min(calc(var(--stage-h) - 2 * var(--space-5)), 720px); }
+  .wg-frame { position: relative; height: var(--frame-h); aspect-ratio: 513 / 641.25; }
+  /* Opening measured from the Figma frame (insets as % of the frame box). */
+  .wg-hole { position: absolute; left: 18.52%; top: 15.9%; right: 16.96%; bottom: 15.9%; overflow: hidden; background: var(--paper-shade); }
+  .wg-pic {
+    position: absolute; inset: 0; display: grid; place-items: center; background: var(--media-bg, var(--paper-shade));
+    transform-origin: 50% 100%; box-shadow: 0 14px 28px rgb(0 0 0 / 0.35);
+  }
+  .wg-pic > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .wg-pic > .wg-icon { width: 34%; height: auto; object-fit: contain; }
+  .wg-frame-img { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; filter: drop-shadow(0 18px 24px rgb(13 30 80 / 0.18)); }
+
+  /* The frame image has 3.43% transparent margin above the gold; start the text level with the gold's top edge. */
+  .wg-list { list-style: none; display: flex; flex-direction: column; margin-top: calc(var(--frame-h) * 0.0343); }
+  .wg-item + .wg-item { margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--line); }
+  /* Tags and description fold open for the active project (0fr → 1fr grid rows). */
+  .wg-reveal { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 500ms var(--ease-out), opacity 300ms ease; }
+  .wg-reveal > div { overflow: hidden; }
+  .wg-item.is-active .wg-reveal { grid-template-rows: 1fr; opacity: 1; }
+  .wg-tags { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); padding: 2px 2px var(--space-4); }
+  .wg-tag {
+    padding: 6px var(--space-3); border-radius: var(--r-sm);
+    background: linear-gradient(to bottom, rgba(7, 7, 7, 0.1), rgba(109, 109, 109, 0.1));
+    box-shadow: 0 1.7px 3.5px rgb(13 30 80 / 0.15), inset 1px 1px 1px rgba(255, 255, 255, 0.6);
+    font: 600 12px/1.2 var(--font-mono); letter-spacing: var(--track-tight); text-transform: uppercase; color: var(--blue-600);
+  }
+  .wg .wg-title { margin: 0; font: 600 36px/1 var(--font-display); letter-spacing: var(--track-snug); transition: font-size 500ms var(--ease-out); }
+  .wg-title span {
+    background: linear-gradient(to bottom, #353535, #909090); -webkit-background-clip: text; background-clip: text; color: transparent;
+    -webkit-box-decoration-break: clone; box-decoration-break: clone; opacity: 0.45; transition: opacity 300ms ease;
+  }
+  .wg-title a:hover span { opacity: 0.75; }
+  .wg-title a:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 4px; border-radius: var(--r-xs); }
+  .wg .wg-item.is-active .wg-title { font-size: 54px; }
+  .wg-item.is-active .wg-title span { background-image: var(--grad-title); opacity: 1; }
+  .wg-desc { padding-top: var(--space-3); font: 500 14px/1.4 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+
+  @media (max-width: 820px) {
+    .wg-stage { grid-template-columns: 1fr; grid-template-rows: auto 1fr; justify-items: center; align-content: start; gap: var(--space-4); padding: var(--space-4) var(--page-x); }
+    .wg-stage { --frame-h: min(32svh, 300px); }
+    .wg-list { width: 100%; margin-top: 0; }
+    .wg .wg-title { font-size: 18px; }
+    .wg .wg-item.is-active .wg-title { font-size: 26px; }
+    .wg-item + .wg-item { margin-top: var(--space-4); padding-top: var(--space-4); }
+    .wg-tags { padding-bottom: var(--space-3); }
+    .wg-desc { font-size: 13px; }
+  }
+  .wg--static .wg-track { height: auto; }
+  .wg--static .wg-stage { position: static; height: auto; }
+
+  /* ─── Tools: a MacBook whose tool keys open an app window on its screen, beside an iPhone ─── */
+  /* Like the Work stage: a giant centred title with the laptop overlapping its lower half, hint underneath. */
+  .toolkit {
+    --title: clamp(56px, min(11vw, 13svh), 150px);
+    padding-top: var(--section-y); padding-bottom: var(--section-y);
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    overflow-x: clip; /* the 3D canvas bleeds past the desk; never let it scroll the page sideways */
+  }
+  .toolkit .tools-title {
+    position: relative; z-index: 0; margin: 0; white-space: nowrap;
+    font: 700 var(--title)/1.2 var(--font-display); letter-spacing: var(--track-tight); text-transform: uppercase;
+    background: var(--grad-display); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .tools-sub { position: relative; z-index: 2; margin-top: var(--space-4); font: 400 clamp(0.95rem, 1.4vw, 1.125rem)/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* The CSS Mac (fallback) is drawn at 680×570 and scaled to fit the desk box by the script. */
+  /* --desk-ar starts at the CSS Mac's shape; the 3D script resets it to the laptop's outline from its camera angle.
+     The negative margin tucks the lid over the lower part of the title, like the cards over "My Work". */
+  .desk {
+    --desk-ar: 1.19;
+    position: relative; z-index: 1; aspect-ratio: var(--desk-ar);
+    width: min(100%, 1000px, 76svh * var(--desk-ar)); margin-top: calc(var(--title) * -0.62);
+  }
+  .desk-scale { position: absolute; top: 0; left: 0; width: 680px; height: 570px; display: flex; align-items: flex-end; gap: 20px; transform-origin: 0 0; }
+  .mac { width: 680px; perspective: 2000px; }
+  .mac-lid { position: relative; width: 600px; height: 380px; margin: 0 auto; padding: 12px; border-radius: 18px 18px 6px 6px; background: #0c0d10; box-shadow: 0 0 0 2px #b9bcc3, var(--shadow-1); }
+  .mac-screen { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 8px; background: var(--grad-hero); }
+  .mac-screen::before { content: ''; position: absolute; inset: 0; background: var(--grain) 0 0 / 220px; opacity: 0.16; mix-blend-mode: overlay; pointer-events: none; }
+  .mac-notch { position: absolute; top: 12px; left: 50%; width: 120px; height: 18px; transform: translateX(-50%); border-radius: 0 0 10px 10px; background: #0c0d10; }
+  .mac-menubar {
+    position: relative; display: flex; justify-content: space-between; align-items: center; height: 22px; padding: 0 var(--space-3);
+    background: rgba(255, 255, 255, 0.22); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    font: 500 11px/1 var(--font-ui); color: #fff;
+  }
+  .mac-idle { position: absolute; inset: 22px 0 0; display: grid; place-items: center; font: 400 14px/1 var(--font-mono); letter-spacing: var(--track-tight); color: rgba(255, 255, 255, 0.85); transition: opacity var(--dur-fast) ease; }
+  .caret { animation: caret-blink 1s steps(1) infinite; }
+  @keyframes caret-blink { 50% { opacity: 0; } }
+  .mac-screen.has-app .mac-idle { opacity: 0; }
+  .mac-window {
+    position: absolute; left: 50%; top: 52%; width: 380px; border-radius: var(--r-md); overflow: hidden;
+    background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 18px 40px rgb(13 30 80 / 0.35);
+    opacity: 0; transform: translate(-50%, -50%) scale(0.88); transition: opacity var(--dur-fast) ease, transform 450ms var(--ease-spring);
+  }
+  .mac-screen.has-app .mac-window { opacity: 1; transform: translate(-50%, -50%); }
+  .mw-bar { position: relative; display: flex; gap: 6px; align-items: center; height: 26px; padding: 0 var(--space-3); border-bottom: 1px solid var(--line); }
+  .mw-bar i { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; }
+  .mw-bar i:nth-child(2) { background: #febc2e; }
+  .mw-bar i:nth-child(3) { background: #28c840; }
+  .mw-title { position: absolute; left: 0; right: 0; text-align: center; font: 500 11px/1 var(--font-mono); color: var(--ink-muted); pointer-events: none; }
+  .mw-body { display: flex; gap: var(--space-4); align-items: center; padding: var(--space-5) var(--space-5) var(--space-5); min-height: 120px; }
+  .mw-logo { flex: none; width: 56px; height: 56px; object-fit: contain; }
+  .mw-name { margin: 0 0 var(--space-1); font: 600 30px/1 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-strong); }
+  .mw-desc { min-height: 2.8em; font: 400 13px/1.4 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .mac-hinge { width: 620px; height: 10px; margin: 0 auto; border-radius: 0 0 6px 6px; background: linear-gradient(to bottom, #9ea2aa, #d7dae0); }
+  /* The keyboard deck is tilted away from the viewer for a 3/4 view; the negative margin gives back the space the tilt frees up. */
+  .mac-deck {
+    width: 580px; height: 340px; margin: 0 auto -160px; padding: 18px 14px; border-radius: 4px 4px 26px 26px;
+    background: linear-gradient(to bottom, #e7e9ee, #cdd1d8); box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.7), 0 30px 40px rgb(13 30 80 / 0.18);
+    transform: rotateX(56deg); transform-origin: 50% 0;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+  }
+  .kb { width: 100%; padding: 12px; border-radius: 12px; background: #1b1d22; display: flex; flex-direction: column; gap: 10px; }
+  .kb-row { display: flex; justify-content: center; gap: 10px; }
+  .kb-fn span { width: 30px; height: 18px; border-radius: 4px; background: #2a2d33; }
+  .kb-space span { width: 60px; height: 30px; border-radius: 6px; background: #2a2d33; }
+  .kb-space .sp { width: 220px; }
+  .tk {
+    position: relative; width: 78px; height: 78px; border: none; border-radius: 10px; cursor: pointer; display: grid; place-items: center;
+    background: linear-gradient(to bottom, #30333a, #1f2126);
+    box-shadow: 0 4px 0 #0b0c0f, 0 6px 10px rgb(0 0 0 / 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: transform 70ms ease-out, box-shadow 70ms ease-out;
+  }
+  .tk img { width: 34px; height: 34px; object-fit: contain; transition: filter var(--dur-base) ease; }
+  .tk img.is-invert { filter: invert(1); }
+  .tk-label { position: absolute; left: 8px; bottom: 6px; font: 500 9px/1 var(--font-mono); text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
+  .tk-num { position: absolute; right: 8px; top: 6px; font: 500 9px/1 var(--font-mono); color: rgba(255, 255, 255, 0.3); }
+  .tk:active, .tk.is-down { transform: translateY(3px); box-shadow: 0 1px 0 #0b0c0f, 0 2px 4px rgb(0 0 0 / 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05); }
+  .tk[aria-pressed="true"] img:not(.is-invert) { filter: drop-shadow(0 0 6px currentColor); }
+  .tk:focus-visible { outline: 2px solid var(--blue-300); outline-offset: 3px; }
+  .trackpad { width: 250px; height: 110px; border-radius: 10px; background: linear-gradient(to bottom, #dfe2e7, #d2d6dc); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06); }
+
+  /* 3D Mac: a WebGL canvas laid over the CSS Mac, which stays (invisible) underneath so its buttons keep working for keyboard and screen readers. */
+  .desk--3d .mac { opacity: 0; pointer-events: none; }
+  .mac-3d { position: absolute; z-index: 1; touch-action: pan-y; cursor: grab; opacity: 0; transition: opacity 500ms ease; }
+  .mac-3d.is-ready { opacity: 1; }
+  .mac-3d.is-dragging { cursor: grabbing; }
+  .iphone { flex: none; width: 160px; height: 330px; padding: 6px; border-radius: 34px; background: linear-gradient(135deg, #5b6068, #2b2f36); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2), var(--shadow-1); }
+  .ip-screen {
+    position: relative; height: 100%; border-radius: 28px; overflow: hidden; color: #fff; text-align: center;
+    background: url('assets/about-photo.jpg') 52% center / cover;
+  }
+  .ip-screen::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgb(0 0 0 / 0.35), transparent 45%); pointer-events: none; }
+  .ip-island { position: absolute; z-index: 1; top: 8px; left: 50%; width: 50px; height: 15px; transform: translateX(-50%); border-radius: 10px; background: #000; }
+  .ip-date { position: relative; z-index: 1; margin-top: 34px; font: 500 10px/1.2 var(--font-ui); opacity: 0.9; }
+  .ip-time { position: relative; z-index: 1; font: 600 46px/1 var(--font-display); letter-spacing: var(--track-snug); }
+
+  @media (prefers-reduced-motion: reduce) { .caret { animation: none; } .mac-window { transition: opacity var(--dur-fast) ease; } }
+
+  /* ─── Testimonials ─── */
+  .testimonials { padding-top: var(--section-y); padding-bottom: var(--section-y); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 48px; }
+  .t-intro { flex: 1 1 320px; max-width: 532px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+  /* Section heading: same treatment as "My Work" — short, uppercase, blue fade. */
+  .testimonials .t-title {
+    margin: 0; font: 700 clamp(3rem, 6.25vw, 5rem)/1 var(--font-display); letter-spacing: var(--track-tight); text-transform: uppercase;
+    background: var(--grad-display); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .t-sub { max-width: 40ch; font: 400 clamp(0.95rem, 1.4vw, 1.125rem)/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+
+  /* Liquid glass pill: same layer recipe as the notch, on a rounded rect so overflow clipping is enough. */
+  .glass-pill { position: relative; display: inline-flex; padding: 10px 20px; border-radius: var(--r-md); box-shadow: var(--shadow-2); }
+  .gp-layers { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+  .gp-layers > * { position: absolute; inset: 0; border-radius: inherit; }
+  .gp-distort { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); filter: url(#pill-glass); }
+  /* Frosted-glass fallback where the refraction filter isn't supported (see the head script). */
+  .no-svg-glass .glass-distort, .no-svg-glass .gp-distort, .no-svg-glass .wt-thumb .gp-distort {
+    filter: none; backdrop-filter: blur(14px) saturate(1.8) brightness(1.06); -webkit-backdrop-filter: blur(14px) saturate(1.8) brightness(1.06);
+  }
+  .no-svg-glass .glass-tint { background: linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.18)); }
+  .gp-tint { background: linear-gradient(to bottom, rgba(7, 7, 7, 0.1), rgba(109, 109, 109, 0.1)); }
+  .gp-rim { box-shadow: inset 2px 2px 1px rgba(255, 255, 255, 0.64), inset -1px -1px 1px rgba(255, 255, 255, 0.38), inset 0 0 24px rgba(255, 255, 255, 0.08); }
+  .gp-layers .gp-shine { inset: 0 20% auto; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent); }
+  .glass-pill .gp-text { position: relative; font: 600 20px/1.2 var(--font-display); letter-spacing: var(--track-tight); text-transform: uppercase; color: var(--blue-600); }
+
+  .t-grid { display: flex; align-items: flex-start; gap: 12px; }
+  .t-col { width: 304px; display: flex; flex-direction: column; gap: 12px; }
+  .t-card { margin: 0; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); filter: drop-shadow(0 2px 4px rgb(13 30 80 / 0.06)); }
+  .t-head { display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 2px dashed var(--line); }
+  .t-avatar { flex: none; width: 48px; height: 48px; object-fit: cover; border-radius: var(--r-sm) var(--r-md) var(--r-md) var(--r-md); }
+  .t-person { display: flex; flex-direction: column; gap: 2px; }
+  .t-name { font: 600 20px/1.2 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-strong); }
+  .t-role { display: flex; align-items: center; gap: 2px; font: 500 14px/1.2 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-muted); }
+  .t-role img { height: 16px; width: auto; }
+  .t-card blockquote { margin: 0; padding: 12px; font: 400 16px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-strong); }
+
+  @media (max-width: 700px) {
+    .t-grid { flex-direction: column; width: 100%; }
+    .t-col { width: 100%; }
+  }
+
+  /* ─── Doorbell pull-cord (ported from pullcord, MIT — see licenses/pullcord.txt) ─── */
+  .pullcord {
+    position: fixed; z-index: var(--z-cord); top: calc(var(--gutter, 16px) + 1px); right: calc(var(--gutter, 16px) + 72px);
+    width: 64px; height: 340px; pointer-events: none;
+  }
+  .pullcord-inner { position: absolute; inset: 0; }
+  .pullcord-inner--drop { animation: pullcord-drop 0.6s 0.4s cubic-bezier(0.45, 0, 0.9, 0.5) both; }
+  @keyframes pullcord-drop {
+    0% { opacity: 0; transform: translateY(-230px); }
+    20% { opacity: 1; }
+    100% { transform: translateY(0); }
+  }
+  .pullcord svg { overflow: visible; }
+  .pullcord-knob {
+    position: absolute; width: 46px; height: 46px; padding: 0; border: none; border-radius: 50%;
+    background: transparent; cursor: grab; touch-action: none; pointer-events: auto; -webkit-tap-highlight-color: transparent;
+  }
+  .pullcord-knob:active { cursor: grabbing; }
+  .pullcord-knob:focus-visible { outline: 2px solid rgba(127, 127, 127, 0.6); outline-offset: -9px; }
+  @media (max-width: 640px) { .pullcord { top: 9px; right: -12px; } }
+  @media (prefers-reduced-motion: reduce) { .pullcord-inner--drop { animation: none; } }
+
+  /* ─── Footer: contact row, base line, giant name with a dictionary card on hover ─── */
+  .site-footer { padding-top: var(--section-y); overflow: hidden; }
+  .footer-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: var(--space-6); }
+  .footer-label { margin-bottom: var(--space-3); font: 500 14px/1.2 var(--font-mono); letter-spacing: var(--track-tight); text-transform: uppercase; color: var(--ink-muted); }
+  .footer-email-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+  .footer-email {
+    font: 600 clamp(28px, 4.5vw, 48px)/1 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-strong);
+    text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 0.12em; text-decoration-thickness: 2px;
+    transition: color var(--dur-base) ease, text-decoration-color var(--dur-base) ease;
+  }
+  .footer-email:hover { color: var(--blue-600); text-decoration-color: currentColor; }
+  .footer-copy, .footer-top {
+    font: 500 13px/1 var(--font-mono); letter-spacing: var(--track-tight); text-transform: uppercase; color: var(--ink-muted); cursor: pointer;
+    transition: color var(--dur-base) ease, border-color var(--dur-base) ease, transform var(--dur-fast) ease;
+  }
+  .footer-copy { padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); }
+  .footer-copy:hover { color: var(--blue-600); border-color: var(--blue-600); }
+  .footer-copy:active, .footer-top:active { transform: scale(0.97); }
+  .footer-copied { font: 500 13px/1 var(--font-mono); letter-spacing: var(--track-tight); color: var(--blue-600); }
+  .footer-links { list-style: none; display: flex; gap: var(--space-5); font: 500 16px/1.2 var(--font-mono); letter-spacing: var(--track-tight); text-transform: uppercase; }
+  .footer-links a { color: var(--ink-strong); transition: color var(--dur-base) ease; }
+  .footer-links a:hover { color: var(--blue-600); }
+  .site-footer a:focus-visible, .site-footer button:focus-visible, .footer-name:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 4px; border-radius: var(--r-xs); }
+  /* Sits above the wordmark, whose tall box reaches up over this line. */
+  .footer-base {
+    position: relative; z-index: 1;
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3);
+    margin-top: var(--space-8); padding-top: var(--space-4); border-top: 1px solid var(--line);
+    font: 400 13px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted);
+  }
+  .footer-top { padding: 0; border: none; background: none; }
+  .footer-top:hover { color: var(--blue-600); }
+  /* "AVISH" measures 2.07em wide; this makes it 85% of the frame's inner width. */
+  .footer-name {
+    display: block; width: fit-content; margin: var(--space-5) auto -0.1em; cursor: default; user-select: none; -webkit-user-select: none;
+    font: 700 calc((100vw - 2 * var(--gutter) - 2px - 2 * var(--page-x)) / 2.07 * 0.85)/0.82 var(--font-display);
+    letter-spacing: var(--track-tight); text-transform: uppercase;
+    background: var(--grad-display); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  /* Credits: native modal dialog on paper, opened from the footer. */
+  .footer-credits { text-transform: none; font-weight: 400; color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  .credits {
+    width: min(480px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); margin: auto; padding: var(--space-5);
+    border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--paper); color: var(--ink-strong); box-shadow: var(--shadow-3);
+  }
+  .credits::backdrop { background: rgb(13 30 80 / 0.28); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  .credits[open] { animation: credits-in 380ms var(--ease-spring); }
+  .credits[open]::backdrop { animation: credits-fade var(--dur-base) ease; }
+  @keyframes credits-in { from { opacity: 0; transform: translateY(12px) scale(0.96); } }
+  @keyframes credits-fade { from { opacity: 0; } }
+  .credits-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .credits h2 { margin: 0; font: 700 32px/1 var(--font-display); letter-spacing: var(--track-tight); text-transform: uppercase; background: var(--grad-display); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .credits-close { width: 32px; height: 32px; border: 1px solid var(--line); border-radius: var(--r-full); background: var(--surface); color: var(--ink-muted); cursor: pointer; font-size: 13px; transition: color var(--dur-base) ease, border-color var(--dur-base) ease; }
+  .credits-close:hover { color: var(--blue-600); border-color: var(--blue-600); }
+  .credits-close:focus-visible, .credits a:focus-visible, .footer-credits:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 2px; }
+  .credits-intro { margin: var(--space-2) 0 var(--space-4); font: 400 14px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .credits-list { list-style: none; margin: 0; padding: 0; }
+  .credits-list li { display: flex; flex-direction: column; gap: 2px; padding: var(--space-3) 0; border-top: 1px dashed var(--paper-shade); }
+  .credits-what { font: 600 18px/1.2 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-strong); }
+  .credits-who { font: 400 13px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .credits-who a { color: var(--blue-600); text-underline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { .credits[open], .credits[open]::backdrop { animation: none; } }
+
+  .name-card {
+    position: fixed; z-index: var(--z-popover); left: 0; top: 0; width: min(320px, calc(100vw - 24px));
+    padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--paper); box-shadow: var(--shadow-3);
+    pointer-events: none; opacity: 0; visibility: hidden;
+    transition: opacity var(--dur-fast) ease, visibility 0s linear var(--dur-fast);
+  }
+  .name-card.is-open { opacity: 1; visibility: visible; transition: opacity var(--dur-fast) ease; }
+  .name-card-inner { transform: scale(0.9) translateY(6px); transform-origin: 0 0; transition: transform var(--dur-base) var(--ease-spring); }
+  .name-card.is-open .name-card-inner { transform: none; }
+  .nc-head { display: flex; align-items: baseline; gap: var(--space-2); padding-bottom: var(--space-3); margin-bottom: var(--space-3); border-bottom: 2px dashed var(--line); }
+  .nc-word { font: 700 32px/1 var(--font-display); letter-spacing: var(--track-tight); color: var(--ink-strong); }
+  .nc-pos { font: italic 400 13px/1 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .nc-senses { list-style: none; display: flex; flex-direction: column; gap: var(--space-1); margin-bottom: var(--space-3); counter-reset: sense; }
+  .nc-senses li { counter-increment: sense; font: 600 20px/1.2 var(--font-display); letter-spacing: var(--track-snug); color: var(--blue-600); }
+  .nc-senses li::before { content: counter(sense) ". "; font: 500 14px/1 var(--font-mono); color: var(--ink-muted); }
+  .nc-def { font: 400 14px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-strong); }
+  @media (prefers-reduced-motion: reduce) { .name-card-inner { transition: none; transform: none; } }
+  @media (max-width: 640px) { .footer-links { gap: var(--space-4); font-size: 14px; } }
+
+  @media (max-width: 640px) {
+    .frame-shell { --gutter: 8px; }
+    .hero { padding: 110px 16px 64px; }
+    .hero-cta { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="frame-shell">
+  <div class="frame">
+      <nav class="dock" aria-label="Primary">
+        <svg class="glass-svg" viewBox="0 0 315 88" aria-hidden="true">
+          <defs>
+            <filter id="notch-shadow-blur" x="-30%" y="-30%" width="160%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+            <mask id="notch-shadow-cut" maskUnits="userSpaceOnUse" x="-60" y="-60" width="435" height="208">
+              <rect x="-60" y="-60" width="435" height="208" fill="#fff"/>
+              <use href="#notch-path" fill="#000"/>
+            </mask>
+            <path id="notch-path" d="M25.3127 67.7812C27.171 79.429 37.2178 88 49.013 88H265.987C277.782 88 287.829 79.429 289.687 67.7812L297.191 20.7482C298.297 13.8166 302.382 7.7166 308.37 4.0545L315 0H0L6.63 4.0545C12.6182 7.7166 16.7032 13.8166 17.809 20.7482L25.3127 67.7812Z"/>
+          </defs>
+          <g mask="url(#notch-shadow-cut)">
+            <use href="#notch-path" transform="translate(0 8)" fill="rgba(0,0,0,0.18)" filter="url(#notch-shadow-blur)"/>
+            <use href="#notch-path" fill="rgba(0,0,0,0.08)" filter="url(#notch-shadow-blur)" transform="scale(1.04) translate(-6 0)"/>
+          </g>
+        </svg>
+        <div class="glass-layer glass-distort" aria-hidden="true"></div>
+        <div class="glass-layer glass-tint" aria-hidden="true"></div>
+        <svg class="glass-svg" viewBox="0 0 315 88" aria-hidden="true">
+          <defs>
+            <linearGradient id="notch-rim" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fff" stop-opacity="0.64"/>
+              <stop offset="0.5" stop-color="#fff" stop-opacity="0.2"/>
+              <stop offset="1" stop-color="#fff" stop-opacity="0.38"/>
+            </linearGradient>
+            <linearGradient id="notch-shine" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+              <stop offset="0.5" stop-color="#fff" stop-opacity="0.9"/>
+              <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0 0L6.63 4.0545C12.6182 7.7166 16.7032 13.8166 17.809 20.7482L25.3127 67.7812C27.171 79.429 37.2178 88 49.013 88H265.987C277.782 88 287.829 79.429 289.687 67.7812L297.191 20.7482C298.297 13.8166 302.382 7.7166 308.37 4.0545L315 0" fill="none" stroke="url(#notch-rim)" stroke-width="2"/>
+          <path d="M69 87H246" stroke="url(#notch-shine)" stroke-width="1"/>
+        </svg>
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+          <filter id="notch-glass" x="-40%" y="-40%" width="180%" height="180%" filterUnits="objectBoundingBox">
+            <feTurbulence type="fractalNoise" baseFrequency="0.001 0.005" numOctaves="1" seed="17" result="turbulence"/>
+            <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap"/>
+            <feDisplacementMap in="SourceGraphic" in2="softMap" scale="200" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+            <!-- Chrome ignores clip-path on a filtered backdrop, so the notch shape is cut inside the filter. -->
+            <feImage x="0" y="0" width="315" height="88" preserveAspectRatio="none" result="shape" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='315' height='88' viewBox='0 0 315 88'%3E%3Cpath d='M25.3127 67.7812C27.171 79.429 37.2178 88 49.013 88H265.987C277.782 88 287.829 79.429 289.687 67.7812L297.191 20.7482C298.297 13.8166 302.382 7.7166 308.37 4.0545L315 0H0L6.63 4.0545C12.6182 7.7166 16.7032 13.8166 17.809 20.7482L25.3127 67.7812Z'/%3E%3C/svg%3E"/>
+            <feComposite in="displaced" in2="shape" operator="in"/>
+          </filter>
+        </svg>
+        <ul>
+          <li><a href="#work-gallery" aria-label="My Work" data-label="My Work" draggable="false"><img src="assets/icon-work.png" alt="" draggable="false"></a></li>
+          <li><a href="#about" id="about-trigger" aria-label="About Me" data-label="About Me" aria-haspopup="dialog" aria-expanded="false" aria-controls="about-card" draggable="false"><img src="assets/icon-about.png" alt="" draggable="false"></a></li>
+          <li><a href="../Avish_Shetty_Resume.pdf" target="_blank" rel="noopener" aria-label="Resume (PDF)" data-label="Resume" draggable="false"><img src="assets/icon-resume.png" alt="" draggable="false"></a></li>
+        </ul>
+      </nav>
+
+    <div class="frame-scroll">
+    <main id="top">
+    <header class="hero">
+      <!-- "Currently" pill — edit the CURRENTLY object in the script to update it. -->
+      <p class="now-pill" aria-label="Currently">
+        <span class="gp-layers" aria-hidden="true"><span class="gp-distort"></span><span class="gp-tint"></span><span class="gp-rim"></span><span class="gp-shine"></span></span>
+        <span class="now-dot" aria-hidden="true"></span>
+        <span class="now-doing"></span>
+        <span class="now-sep" aria-hidden="true">·</span>
+        <span class="now-time"></span>
+        <span class="now-music" hidden><span class="now-sep" aria-hidden="true">·</span><span class="now-eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="now-song"></span></span>
+      </p>
+      <h1>Product Designer<br>who ships with AI</h1>
+      <p class="hero-sub">Figma to shipped product — using Claude Code and Next.js to build what I design.</p>
+      <a href="#work-gallery" class="hero-cta">Jump to Work</a>
+
+      <!-- Work experience: a paper tag per company, each hanging from its own pin, in date order. Swing them. -->
+      <div class="hero-mobile">
+        <ol class="hm-tags" aria-label="Where I've worked">
+          <li class="hm-tag" data-t="0.2">
+            <div class="hm-card">
+              <span class="hm-pin" aria-hidden="true"></span>
+              <span class="hm-logo hm-logo--mono" aria-hidden="true">A</span>
+              <span class="hm-text"><span class="hm-name">AthrVEd</span><span class="hm-years">2020 – 2022</span></span>
+              <span class="hm-tip">Generalist · Jan 2020 – Apr 2022</span>
+            </div>
+          </li>
+          <li class="hm-tag" data-t="0.5">
+            <div class="hm-card">
+              <span class="hm-pin" aria-hidden="true"></span>
+              <img class="hm-logo" src="assets/badge-foreignadmits.png" alt="" draggable="false">
+              <span class="hm-text"><span class="hm-name">ForeignAdmits</span><span class="hm-years">2022 – 2024</span></span>
+              <span class="hm-tip">Product Designer · Apr 2022 – Dec 2024</span>
+            </div>
+          </li>
+          <li class="hm-tag" data-t="0.8">
+            <div class="hm-card">
+              <span class="hm-pin" aria-hidden="true"></span>
+              <span class="hm-logo hm-logo--mono" aria-hidden="true">B</span>
+              <span class="hm-text"><span class="hm-name">BigBlockTheory</span><span class="hm-years"><span class="hm-live" aria-hidden="true"></span>2024 – Now</span></span>
+              <span class="hm-tip">Designer · Dec 2024 – Present</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </header>
+
+
+
+
+
+  <!-- Work, option A (card deck) — shown alongside the gallery for now; to be removed later. -->
+  <section id="work" class="work" aria-labelledby="work-title">
+    <div class="work-track" style="--n: 4">
+      <div class="work-stage" id="work-stage">
+        <h2 id="work-title" class="work-title">My Work</h2>
+        <div class="work-toggle" role="tablist" aria-label="Type of work">
+          <span class="gp-layers" aria-hidden="true"><span class="gp-distort"></span><span class="gp-tint"></span><span class="gp-rim"></span><span class="gp-shine"></span></span>
+          <button type="button" class="wt-tab" role="tab" id="tab-design" data-set="design" aria-selected="true" aria-controls="work-stage">Design Work</button>
+          <button type="button" class="wt-tab" role="tab" id="tab-ai" data-set="ai" aria-selected="false" aria-controls="work-stage" tabindex="-1">AI Work</button>
+          <span class="wt-thumb" aria-hidden="true"><span class="gp-layers wt-glass"><span class="gp-distort"></span><span class="gp-tint"></span><span class="gp-rim"></span><span class="gp-shine"></span></span><span class="wt-lens"><span>Design Work</span><span>AI Work</span></span></span>
+        </div>
+          <a class="cs-card" data-set="design" href="https://www.figma.com/design/A86DOoD0vwsy7bmCpTnhIs/LoanMonk?node-id=1-2102&t=oJBl6TXTApUuZJvi-1" target="_blank" rel="noopener">
+            <div class="cs-media"><img src="assets/cs-loanmonk-hills.jpg" alt="" width="1694" height="844" loading="lazy"></div>
+            <div class="cs-kicker"><span>Ed-tech</span><span>2024</span></div>
+            <div class="cs-bottom">
+              <h3 class="cs-title"><span>LoanMonk - Simplifying Education Loans</span></h3>
+              <p class="cs-desc">A mobile application that simplifies the process of finding and applying for education loans for students planning to study abroad.</p>
+            </div>
+            <span class="cs-badge" style="--img: url('assets/badge-foreignadmits.png'); --fit: 93.3%"></span>
+          </a>
+          <a class="cs-card" data-set="design" href="https://www.figma.com/design/OuNIb2khirIPRZ3FH2Jl5B/Coding-Judge?node-id=54-11&t=ZssSQCR24Sl3CayA-1" target="_blank" rel="noopener">
+            <div class="cs-media" style="--media-bg: linear-gradient(160deg, #001A41, #0c0c0d)"></div>
+            <div class="cs-kicker"><span>Ed-tech</span><span>2025</span></div>
+            <div class="cs-bottom">
+              <h3 class="cs-title"><span>Coding Judge - Learn Coding & AI the Right Way</span></h3>
+              <p class="cs-desc">An edtech platform designed for college students to learn coding and AI through a structured, hands-on experience. Led the end-to-end product design — from information architecture to high-fidelity UI.</p>
+            </div>
+            <span class="cs-badge cs-badge--icon" style="--img: url('assets/icon-codingjudge.svg'); --fit: 64%"></span>
+          </a>
+          <a class="cs-card" data-set="design" href="https://www.getsmartcue.com/" target="_blank" rel="noopener">
+            <div class="cs-media" style="--media-bg: linear-gradient(160deg, #151D33, #0c0c0d)"></div>
+            <div class="cs-kicker"><span>B2B SaaS</span><span>2024</span></div>
+            <div class="cs-bottom">
+              <h3 class="cs-title"><span>SmartCue - Interactive Product Demos</span></h3>
+              <p class="cs-desc">A landing page for SmartCue, an interactive demo platform that helps businesses create personalized, no-code product demos to engage visitors, qualify leads, and accelerate sales cycles.</p>
+            </div>
+            <span class="cs-badge cs-badge--icon" style="--img: url('assets/icon-smartcue.svg'); --fit: 64%"></span>
+          </a>
+          <a class="cs-card" data-set="design" href="https://www.figma.com/design/TVjwYS9EnreTuBEw0HJEWc/Assignment--3---Fluff---Avish-Shetty?node-id=325-3052&t=xMDA3gTcWlvoN5CD-1" target="_blank" rel="noopener">
+            <div class="cs-media" style="--media-bg: linear-gradient(160deg, #22100F, #0c0c0d)"></div>
+            <div class="cs-kicker"><span>Pet tech</span><span>2024</span></div>
+            <div class="cs-bottom">
+              <h3 class="cs-title"><span>Fluff - Everything Your Pet Needs</span></h3>
+              <p class="cs-desc">A pet shopping app designed to help pet parents easily find and buy food, accessories, and care essentials for their furry friends.</p>
+            </div>
+            <span class="cs-badge cs-badge--icon" style="--img: url('assets/icon-fluff.svg'); --fit: 64%"></span>
+          </a>
+          <article class="cs-card cs-card--soon" data-set="ai" hidden>
+            <div class="cs-media" style="--media-bg: var(--grad-hero)"></div>
+            <div class="cs-kicker"><span>AI Work</span><span>Soon</span></div>
+            <div class="cs-bottom">
+              <h3 class="cs-title"><span>AI case studies are on the way</span></h3>
+              <p class="cs-desc">Write-ups of the projects I've built with AI are in progress. Check back soon.</p>
+            </div>
+          </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work, option B (gallery frame) — live. -->
+  <section id="work-gallery" class="wg" aria-label="Selected work">
+    <div class="wg-track" style="--n: 4">
+      <div class="wg-stage">
+        <div class="wg-frame">
+          <div class="wg-hole" aria-hidden="true">
+              <div class="wg-pic"><img src="assets/cs-loanmonk-hills.jpg" alt="" loading="lazy"></div>
+              <div class="wg-pic" style="--media-bg: linear-gradient(160deg, #001A41, #0c0c0d)"><img class="wg-icon" src="assets/icon-codingjudge.svg" alt=""></div>
+              <div class="wg-pic" style="--media-bg: linear-gradient(160deg, #151D33, #0c0c0d)"><img class="wg-icon" src="assets/icon-smartcue.svg" alt=""></div>
+              <div class="wg-pic" style="--media-bg: linear-gradient(160deg, #22100F, #0c0c0d)"><img class="wg-icon" src="assets/icon-fluff.svg" alt=""></div>
+          </div>
+          <img class="wg-frame-img" src="assets/gold-frame.png" alt="" width="1026" height="1283">
+        </div>
+        <ol class="wg-list">
+          <li class="wg-item is-active">
+            <div class="wg-reveal"><div><ul class="wg-tags" aria-label="Details"><li class="wg-tag">Ed-tech</li><li class="wg-tag">2024</li><li class="wg-tag">0 → 1</li><li class="wg-tag">ForeignAdmits</li></ul></div></div>
+            <h3 class="wg-title"><a href="https://www.figma.com/design/A86DOoD0vwsy7bmCpTnhIs/LoanMonk?node-id=1-2102&t=oJBl6TXTApUuZJvi-1" target="_blank" rel="noopener"><span>LoanMonk - Simplifying Education Loans</span></a></h3>
+            <div class="wg-reveal"><div><p class="wg-desc">A mobile application that simplifies the process of finding and applying for education loans for students planning to study abroad.</p></div></div>
+          </li>
+          <li class="wg-item">
+            <div class="wg-reveal"><div><ul class="wg-tags" aria-label="Details"><li class="wg-tag">Ed-tech</li><li class="wg-tag">2025</li><li class="wg-tag">Web App</li></ul></div></div>
+            <h3 class="wg-title"><a href="https://www.figma.com/design/OuNIb2khirIPRZ3FH2Jl5B/Coding-Judge?node-id=54-11&t=ZssSQCR24Sl3CayA-1" target="_blank" rel="noopener"><span>Coding Judge - Learn Coding & AI the Right Way</span></a></h3>
+            <div class="wg-reveal"><div><p class="wg-desc">An edtech platform designed for college students to learn coding and AI through a structured, hands-on experience. Led the end-to-end product design — from information architecture to high-fidelity UI.</p></div></div>
+          </li>
+          <li class="wg-item">
+            <div class="wg-reveal"><div><ul class="wg-tags" aria-label="Details"><li class="wg-tag">B2B SaaS</li><li class="wg-tag">2024</li><li class="wg-tag">Landing Page</li></ul></div></div>
+            <h3 class="wg-title"><a href="https://www.getsmartcue.com/" target="_blank" rel="noopener"><span>SmartCue - Interactive Product Demos</span></a></h3>
+            <div class="wg-reveal"><div><p class="wg-desc">A landing page for SmartCue, an interactive demo platform that helps businesses create personalized, no-code product demos to engage visitors, qualify leads, and accelerate sales cycles.</p></div></div>
+          </li>
+          <li class="wg-item">
+            <div class="wg-reveal"><div><ul class="wg-tags" aria-label="Details"><li class="wg-tag">Pet tech</li><li class="wg-tag">2024</li><li class="wg-tag">Mobile App</li></ul></div></div>
+            <h3 class="wg-title"><a href="https://www.figma.com/design/TVjwYS9EnreTuBEw0HJEWc/Assignment--3---Fluff---Avish-Shetty?node-id=325-3052&t=xMDA3gTcWlvoN5CD-1" target="_blank" rel="noopener"><span>Fluff - Everything Your Pet Needs</span></a></h3>
+            <div class="wg-reveal"><div><p class="wg-desc">A pet shopping app designed to help pet parents easily find and buy food, accessories, and care essentials for their furry friends.</p></div></div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="tools" class="wrap toolkit" aria-labelledby="tools-title">
+    <h2 id="tools-title" class="tools-title">My Tools</h2>
+
+    <div class="desk">
+      <div class="desk-scale">
+        <div class="mac">
+          <div class="mac-lid">
+            <div class="mac-screen">
+              <div class="mac-menubar" aria-hidden="true"><span>Avish's MacBook</span><span class="mac-clock"></span></div>
+              <p class="mac-idle" aria-hidden="true">Press a tool key <span class="caret">_</span></p>
+              <div class="mac-window" aria-hidden="true">
+                <div class="mw-bar"><i></i><i></i><i></i><span class="mw-title"></span></div>
+                <div class="mw-body">
+                  <img class="mw-logo" alt="">
+                  <div><h3 class="mw-name"></h3><p class="mw-desc"></p></div>
+                </div>
+              </div>
+            </div>
+            <span class="mac-notch" aria-hidden="true"></span>
+          </div>
+          <div class="mac-hinge" aria-hidden="true"></div>
+          <div class="mac-deck">
+            <div class="kb">
+              <div class="kb-row kb-fn" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="kb-row kb-tools" role="group" aria-label="Tools"></div>
+              <div class="kb-row kb-space" aria-hidden="true"><span></span><span></span><span class="sp"></span><span></span><span></span></div>
+            </div>
+            <div class="trackpad" aria-hidden="true"></div>
+          </div>
+        </div>
+        <!-- iPhone — PARKED for now; remove `hidden` to bring it back (its CSS and clock are kept). -->
+        <div class="iphone" aria-hidden="true" hidden>
+          <div class="ip-screen">
+            <span class="ip-island"></span>
+            <p class="ip-date"></p>
+            <p class="ip-time"></p>
+          </div>
+        </div>
+      </div>
+      <p class="tools-status visually-hidden" role="status" aria-live="polite"></p>
+    </div>
+    <p class="tools-sub">Press a key on the Mac, or 1–6 on yours.</p>
+  </section>
+
+  <section id="testimonials" class="wrap testimonials">
+    <div class="t-intro">
+      <p class="glass-pill">
+        <span class="gp-layers" aria-hidden="true"><span class="gp-distort"></span><span class="gp-tint"></span><span class="gp-rim"></span><span class="gp-shine"></span></span>
+        <span class="gp-text">Testimonial</span>
+      </p>
+      <h2 class="t-title">Kind words</h2>
+      <p class="t-sub">From people I have worked with.</p>
+      <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <filter id="pill-glass" x="-40%" y="-40%" width="180%" height="180%" filterUnits="objectBoundingBox">
+          <feTurbulence type="fractalNoise" baseFrequency="0.001 0.005" numOctaves="1" seed="17" result="turbulence"/>
+          <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap"/>
+          <feDisplacementMap in="SourceGraphic" in2="softMap" scale="200" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+        <filter id="thumb-glass" x="-40%" y="-40%" width="180%" height="180%" filterUnits="objectBoundingBox">
+          <feTurbulence type="fractalNoise" baseFrequency="0.001 0.005" numOctaves="1" seed="17" result="turbulence"/>
+          <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap"/>
+          <feDisplacementMap in="SourceGraphic" in2="softMap" scale="36" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </svg>
+    </div>
+
+    <div class="t-grid">
+      <div class="t-col">
+        <figure class="t-card">
+          <figcaption class="t-head">
+            <img class="t-avatar" src="assets/avatar-sourav.jpg" alt="" width="144" height="144">
+            <span class="t-person"><span class="t-name">Sourav Mohanty</span><span class="t-role">PMM @ <img src="assets/logo-justcall.png" alt="JustCall" width="244" height="62"></span></span>
+          </figcaption>
+          <blockquote>“Avish is a rockstar when it comes to design thinking and quick execution. Great collaborator who tries to understand the intent of the work before putting the pen to it.”</blockquote>
+        </figure>
+        <figure class="t-card">
+          <figcaption class="t-head">
+            <img class="t-avatar" src="assets/avatar-dheeraj.jpg" alt="" width="144" height="144">
+            <span class="t-person"><span class="t-name">Dheeraj Mehndiratta</span><span class="t-role">GTM Consultant</span></span>
+          </figcaption>
+          <blockquote>“Avish has a rare ability to balance aesthetics with usability. Our landing page didn't just look great — it felt effortless to navigate. He nailed the visual hierarchy, made the CTAs impossible to miss, and gave the whole page a cohesive feel that matched our brand perfectly. You can tell he thinks like a user, not just a designer.”</blockquote>
+        </figure>
+      </div>
+      <div class="t-col">
+        <figure class="t-card">
+          <figcaption class="t-head">
+            <img class="t-avatar" src="assets/avatar-reet.jpg" alt="" width="144" height="144">
+            <span class="t-person"><span class="t-name">Reet Rai</span><span class="t-role">PM @ <img src="assets/logo-reet-company.png" alt="R360" width="115" height="34"></span></span>
+          </figcaption>
+          <blockquote>“Working with Avish has been a pleasure. He has a strong instinct for user experience and delivers designs that are clean, practical, and built for the product. He takes feedback seriously and iterates fast, always coming back with thoughtful improvements. His work has meaningfully shaped what we're building at ForeignAdmits, and I'd happily recommend him to any product team.”</blockquote>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-row">
+      <div class="footer-mail">
+        <p class="footer-label">Say hello</p>
+        <div class="footer-email-line">
+          <a class="footer-email" href="mailto:avishvshetty@gmail.com">avishvshetty@gmail.com</a>
+          <button type="button" class="footer-copy" data-copy="avishvshetty@gmail.com" aria-label="Copy email address">Copy</button>
+          <span class="footer-copied" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+      <ul class="footer-links">
+        <li><a href="https://www.linkedin.com/in/avish-shetty/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+        <li><a href="https://x.com/AvishShetty3" target="_blank" rel="noopener">X ↗</a></li>
+        <li><a href="../Avish_Shetty_Resume.pdf" target="_blank" rel="noopener">Resume ↗</a></li>
+      </ul>
+    </div>
+    <div class="footer-base">
+      <span>© 2026 Avish Shetty</span>
+      <span>Built with Claude Code · <button type="button" class="footer-top footer-credits" aria-haspopup="dialog">Credits</button></span>
+      <button type="button" class="footer-top">Back to top ↑</button>
+    </div>
+  </div>
+  <p class="footer-name" tabindex="0" aria-describedby="name-meaning">Avish</p>
+</footer>
+    </div>
+  </div>
+</div>
+
+<dialog class="credits" id="credits" aria-labelledby="credits-title">
+  <div class="credits-head">
+    <h2 id="credits-title">Credits</h2>
+    <button type="button" class="credits-close" aria-label="Close credits">✕</button>
+  </div>
+  <p class="credits-intro">Things on this site that other people made.</p>
+  <ul class="credits-list">
+    <li>
+      <span class="credits-what">3D MacBook Pro model</span>
+      <span class="credits-who">by <a href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2024-8e34fc2b303144f78490007d91ff57c4" target="_blank" rel="noopener">jackbaeten</a> on Sketchfab · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · compressed for the web</span>
+    </li>
+    <li>
+      <span class="credits-what">Doorbell pull-cord</span>
+      <span class="credits-who">ported from <a href="https://github.com/mortspace/feralui" target="_blank" rel="noopener">pullcord</a> by iisac · <a href="licenses/pullcord.txt" target="_blank" rel="noopener">MIT</a></span>
+    </li>
+    <li>
+      <span class="credits-what">3D rendering</span>
+      <span class="credits-who"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> · MIT</span>
+    </li>
+    <li>
+      <span class="credits-what">Geist Mono typeface</span>
+      <span class="credits-who">by <a href="https://vercel.com/font" target="_blank" rel="noopener">Vercel</a> · SIL Open Font License</span>
+    </li>
+    <li>
+      <span class="credits-what">Tool logos</span>
+      <span class="credits-who">Figma, Claude, ChatGPT, Gemini, Framer and Adobe logos are trademarks of their owners, shown only to name the tools I use.</span>
+    </li>
+  </ul>
+</dialog>
+
+<div class="pullcord" id="pullcord"></div>
+
+<div id="name-meaning" class="name-card" role="tooltip">
+  <div class="name-card-inner">
+    <p class="nc-head"><span class="nc-word">Avish</span><span class="nc-pos">name</span></p>
+    <ol class="nc-senses">
+      <li>Ocean <span aria-hidden="true">🌊</span></li>
+      <li>King <span aria-hidden="true">👑</span></li>
+    </ol>
+    <p class="nc-def">Avish symbolizes vastness, depth, and leadership. The boundless nature of the ocean can represent infinite knowledge and potential for growth.</p>
+  </div>
+</div>
+
+<div id="about-card" class="about-card" role="dialog" aria-labelledby="about-card-title" tabindex="-1" hidden>
+  <div class="about-photo"><img src="assets/about-photo.jpg" alt="Avish leaning on a railing by the sea" width="918" height="767"></div>
+  <div class="about-text">
+    <h2 id="about-card-title">Namaskara! I am Avish Shetty</h2>
+    <p>I design <b>product interfaces</b>, then get impatient waiting for someone else to build them — so I <b>build them with</b><span class="tools"><img src="assets/tool-claude.png" alt="Claude"><img src="assets/tool-chatgpt.png" alt="ChatGPT"><span class="framed"><img src="assets/tool-gemini.png" alt="Gemini"></span></span>. Four years in and I still can't name my "one industry" — <b>I go wherever the interesting problem is</b>. I'd rather give you an <b>unambiguous opinion</b> and be wrong than a safe one that's useless. Outside work, gym or three tabs deep into some new AI tool.</p>
+  </div>
+</div>
+
+<script>
+(() => {
+  const dock = document.querySelector('.dock');
+  const hero = document.querySelector('.frame');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const EDGE = 16, DRAG_THRESHOLD = 5, STIFFNESS = 260, DAMPING = 16, RETURN_DELAY = 5000;
+  let x = 0, v = 0, target = 0, raf = 0, drag = null, moved = false, returnTimer = 0;
+
+  const limit = () => Math.max(0, (hero.clientWidth - dock.offsetWidth) / 2 - EDGE);
+  const clamp = (n, L) => Math.min(L, Math.max(-L, n));
+  const rubber = (n, L) => (Math.abs(n) <= L ? n : Math.sign(n) * (L + (Math.abs(n) - L) * 0.35));
+
+  const render = () => {
+    const s = reduceMotion ? 0 : Math.min(Math.abs(v) / 3000, 0.08);
+    dock.style.transform = `translateX(calc(-50% + ${x}px)) scale(${1 + s}, ${1 - s * 0.6})`;
+  };
+
+  const settle = () => {
+    cancelAnimationFrame(raf);
+    if (reduceMotion) { x = target; v = 0; render(); return; }
+    let last = performance.now();
+    const step = (now) => {
+      const dt = Math.min((now - last) / 1000, 1 / 30);
+      last = now;
+      v += (-STIFFNESS * (x - target) - DAMPING * v) * dt;
+      x += v * dt;
+      if (Math.abs(x - target) < 0.3 && Math.abs(v) < 5) { x = target; v = 0; render(); return; }
+      render();
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+  };
+
+  dock.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    cancelAnimationFrame(raf);
+    clearTimeout(returnTimer);
+    v = 0; moved = false;
+    drag = { id: e.pointerId, startX: e.clientX, originX: x, lastX: e.clientX, lastT: e.timeStamp };
+  });
+
+  dock.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.startX;
+    if (!moved) {
+      if (Math.abs(dx) < DRAG_THRESHOLD) return;
+      moved = true;
+      dock.dispatchEvent(new CustomEvent('dockdragstart'));
+      dock.setPointerCapture(e.pointerId);
+      dock.classList.add('dragging');
+    }
+    const dt = e.timeStamp - drag.lastT;
+    if (dt > 0) v = 0.8 * ((e.clientX - drag.lastX) / dt) * 1000 + 0.2 * v;
+    drag.lastX = e.clientX; drag.lastT = e.timeStamp;
+    x = rubber(drag.originX + dx, limit());
+    render();
+  });
+
+  const release = (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    drag = null;
+    dock.classList.remove('dragging');
+    if (!moved) return;
+    target = clamp(x + v * 0.18, limit());
+    settle();
+    if (target !== 0) returnTimer = setTimeout(() => { target = 0; settle(); }, RETURN_DELAY);
+  };
+  dock.addEventListener('pointerup', release);
+  dock.addEventListener('pointercancel', release);
+
+  // A drag that ends over an icon must not also open that link.
+  dock.addEventListener('click', (e) => {
+    if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; }
+  }, true);
+
+  addEventListener('resize', () => {
+    target = clamp(target, limit());
+    x = clamp(x, limit());
+    render();
+  });
+})();
+
+(() => {
+  const trigger = document.getElementById('about-trigger');
+  const card = document.getElementById('about-card');
+  const dock = document.querySelector('.dock');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const GAP = 20, MARGIN = 12;
+  let open = false;
+
+  // Centred under the notch, which it slides out from.
+  const place = () => {
+    const notch = dock.getBoundingClientRect();
+    const w = card.offsetWidth;
+    const left = Math.min(Math.max(notch.left + notch.width / 2 - w / 2, MARGIN), innerWidth - w - MARGIN);
+    card.style.left = `${left}px`;
+    card.style.top = `${notch.bottom + GAP}px`;
+  };
+
+  // Tucked away: pulled up so its bottom edge meets the notch's, and clipped to below that edge so it reads as
+  // hiding behind the notch. Clip and slide share one easing, so the clip line stays pinned to the notch mid-move.
+  const tucked = () => {
+    const h = card.offsetHeight;
+    return { transform: `translateY(${-(h + GAP)}px)`, clipPath: `inset(${h}px -80px -80px -80px)` };
+  };
+  const shown = { transform: 'translateY(0)', clipPath: `inset(${-GAP}px -80px -80px -80px)` };
+
+  const stopAnimations = () => card.getAnimations().forEach((a) => a.cancel());
+
+  const show = () => {
+    open = true;
+    stopAnimations();
+    card.hidden = false;
+    place();
+    trigger.setAttribute('aria-expanded', 'true');
+    card.focus({ preventScroll: true });
+    if (reduceMotion) {
+      card.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 150 });
+      return;
+    }
+    card.animate([tucked(), shown], { duration: 650, easing: 'cubic-bezier(0.34, 1.3, 0.64, 1)' });
+    trigger.animate([{ transform: 'scale(1)' }, { transform: 'scale(0.88)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' });
+  };
+
+  const hide = ({ returnFocus = false } = {}) => {
+    if (!open) return;
+    open = false;
+    stopAnimations();
+    trigger.setAttribute('aria-expanded', 'false');
+    if (returnFocus) trigger.focus({ preventScroll: true });
+    const finish = () => { if (!open) card.hidden = true; };
+    if (reduceMotion) {
+      card.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120 }).onfinish = finish;
+      return;
+    }
+    card.animate([shown, tucked()], { duration: 380, easing: 'cubic-bezier(0.5, 0, 0.75, 0)', fill: 'forwards' }).onfinish = finish;
+  };
+
+  trigger.addEventListener('click', (e) => {
+    e.preventDefault();
+    open ? hide() : show();
+  });
+
+  document.addEventListener('pointerdown', (e) => {
+    if (open && !card.contains(e.target) && !trigger.contains(e.target)) hide();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (open && e.key === 'Escape') hide({ returnFocus: true });
+  });
+
+  dock.addEventListener('dockdragstart', () => hide());
+
+  addEventListener('resize', () => { if (open) place(); });
+})();
+
+(() => {
+  const section = document.getElementById('work');
+  if (section.hidden) return;
+  const track = section.querySelector('.work-track');
+  const stage = section.querySelector('.work-stage');
+  const title = section.querySelector('.work-title');
+  const allCards = [...section.querySelectorAll('.cs-card')];
+  const tabs = [...section.querySelectorAll('.wt-tab')];
+  const thumb = section.querySelector('.wt-thumb');
+  const lens = section.querySelector('.wt-lens');
+  const toggle = section.querySelector('.work-toggle');
+  const scroller = document.querySelector('.frame-scroll');
+  const animated = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const LIFT = -150, TILT = 35, STEP_Y = 4, STEP_SCALE = 0.075, VISIBLE_BEHIND = 2;
+  const CARD_W = 871, MAX_SCALE = 1.4, CARD_OVERLAP = 0.78;
+
+  allCards.forEach((card) => { card.draggable = false; });
+  if (!animated) section.classList.add('work--static');
+
+  let cards = [], N = 0, raf = 0, currentSet = '';
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const clamp01 = (n) => Math.min(Math.max(n, 0), 1);
+  const mobile = matchMedia('(max-width: 820px)');
+  const navOffset = () => parseFloat(getComputedStyle(stage).top) || 0;
+  const trackTop = () => scroller.scrollTop + track.getBoundingClientRect().top - scroller.getBoundingClientRect().top - navOffset();
+
+  // Fit the card (plus the peeking cards behind it) into the space under the title.
+  const layout = () => {
+    if (!animated) return;
+    if (mobile.matches) {
+      track.style.removeProperty('--s');
+      track.style.removeProperty('--card-top');
+      return;
+    }
+    track.style.setProperty('--s', '1');
+    const cardH = Math.max(...cards.map((card) => card.offsetHeight));
+    const cardTop = parseFloat(getComputedStyle(title).fontSize) * CARD_OVERLAP;
+    const toggleSpace = toggle.offsetHeight + 28;
+    const room = stage.clientHeight - cardTop - 12 - toggleSpace;
+    const s = Math.min(MAX_SCALE, room / (cardH * (1 + (VISIBLE_BEHIND * STEP_Y) / 100)), (stage.clientWidth - 48) / CARD_W);
+    track.style.setProperty('--s', Math.max(0.6, s).toFixed(3));
+    track.style.setProperty('--card-top', `${cardTop}px`);
+  };
+
+  const update = () => {
+    raf = 0;
+    if (!animated) return;
+    const range = track.offsetHeight - stage.offsetHeight;
+    const scrolled = scroller.getBoundingClientRect().top + navOffset() - track.getBoundingClientRect().top;
+    const t = N > 1 && range > 0 ? clamp01(scrolled / range) * (N - 1) : 0;
+    const active = Math.min(Math.floor(t), N - 1);
+    const segP = active === N - 1 ? 0 : t - active;
+    const front = segP < 0.5 ? active : active + 1;
+
+    cards.forEach((card, i) => {
+      card.style.zIndex = String(N - i);
+      card.style.pointerEvents = i === front ? '' : 'none';
+      let opacity = 1;
+      if (i < active) {
+        card.style.transform = `translate(-50%, ${LIFT - 50}%) rotateX(${TILT}deg)`;
+      } else if (i === active) {
+        card.style.transform = `translate(-50%, ${lerp(0, LIFT, segP)}%) rotateX(${lerp(0, TILT, segP)}deg)`;
+      } else {
+        const k = i - active - segP;
+        card.style.transform = `translate(-50%, ${k * STEP_Y}%) scale(${1 - k * STEP_SCALE})`;
+        opacity = clamp01(VISIBLE_BEHIND + 1 - k);
+      }
+      card.style.opacity = String(opacity);
+      // Only the card coming to the front shows its content; the queue behind reads as blank paper.
+      const depth = i <= active ? 0 : i - active - segP;
+      card.style.setProperty('--content', String(clamp01(1 - depth)));
+    });
+  };
+
+  const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
+
+  // ── Liquid thumb: springs to the selected tab, stretching and squashing with its speed. ──
+  const MAG = 1.12, K = 420, C = 28, K_PRESS = 600, C_PRESS = 30;
+  const th = { x: 0, w: 0, vx: 0, vw: 0, press: 1, vp: 0, tx: 0, tw: 0, tp: 1, raf: 0, prev: 0, placed: false };
+  const tabBox = (tab) => ({ x: tab.offsetLeft, w: tab.offsetWidth });
+  const selectedTab = () => tabs.find((t) => t.getAttribute('aria-selected') === 'true');
+
+  const renderThumb = () => {
+    const stretch = animated ? Math.min(Math.abs(th.vx) * 0.045, 34) : 0;
+    const squash = animated ? Math.min(Math.abs(th.vx) * 0.00018, 0.14) : 0;
+    const w = th.w + stretch, x = th.x - stretch / 2;
+    thumb.style.width = `${w}px`;
+    thumb.style.transform = `translateX(${x}px) scale(${th.press}, ${th.press * (1 - squash)})`;
+    // Keep the copied labels lined up with the real ones, magnified around the thumb's centre.
+    lens.style.transformOrigin = `${x + w / 2}px 50%`;
+    lens.style.transform = `translateX(${-x}px) scale(${MAG})`;
+  };
+
+  const stepThumb = (now) => {
+    const dt = th.prev ? Math.min((now - th.prev) / 1000, 1 / 30) : 1 / 60;
+    th.prev = now;
+    th.vx += (-K * (th.x - th.tx) - C * th.vx) * dt; th.x += th.vx * dt;
+    th.vw += (-K * (th.w - th.tw) - C * th.vw) * dt; th.w += th.vw * dt;
+    th.vp += (-K_PRESS * (th.press - th.tp) - C_PRESS * th.vp) * dt; th.press += th.vp * dt;
+    renderThumb();
+    const settled = Math.abs(th.x - th.tx) < 0.2 && Math.abs(th.vx) < 2 && Math.abs(th.w - th.tw) < 0.2 && Math.abs(th.vw) < 2 && Math.abs(th.press - th.tp) < 0.002 && Math.abs(th.vp) < 0.02;
+    if (settled && !thumbDrag) { Object.assign(th, { x: th.tx, w: th.tw, press: th.tp, vx: 0, vw: 0, vp: 0, raf: 0, prev: 0 }); renderThumb(); return; }
+    th.raf = requestAnimationFrame(stepThumb);
+  };
+  const kickThumb = () => { if (!th.raf) { th.prev = 0; th.raf = requestAnimationFrame(stepThumb); } };
+
+  const aimThumb = (tab, snap = false) => {
+    const b = tabBox(tab);
+    th.tx = b.x; th.tw = b.w;
+    if (snap || !animated || !th.placed) {
+      cancelAnimationFrame(th.raf);
+      Object.assign(th, { x: b.x, w: b.w, vx: 0, vw: 0, raf: 0, placed: true });
+      renderThumb();
+      return;
+    }
+    kickThumb();
+  };
+
+  // Drag the thumb itself; it swells while held and snaps to the nearest tab on release.
+  let thumbDrag = null;
+  toggle.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || !animated) return;
+    const lx = e.clientX - toggle.getBoundingClientRect().left;
+    if (lx < th.x || lx > th.x + th.w) return;
+    thumbDrag = { id: e.pointerId, offset: lx - th.x, startX: e.clientX, moved: false };
+    th.tp = 1.1;
+    kickThumb();
+    toggle.setPointerCapture(e.pointerId);
+  });
+  toggle.addEventListener('pointermove', (e) => {
+    if (!thumbDrag || e.pointerId !== thumbDrag.id) return;
+    if (!thumbDrag.moved && Math.abs(e.clientX - thumbDrag.startX) < 3) return;
+    thumbDrag.moved = true;
+    const [a, b] = tabs.map(tabBox);
+    const lx = e.clientX - toggle.getBoundingClientRect().left;
+    const f = clamp01((lx - thumbDrag.offset - a.x) / (b.x - a.x));
+    th.tx = a.x + (b.x - a.x) * f;
+    th.tw = a.w + (b.w - a.w) * f;
+    kickThumb();
+  });
+  const endThumbDrag = (e) => {
+    if (!thumbDrag || e.pointerId !== thumbDrag.id) return;
+    const moved = thumbDrag.moved;
+    thumbDrag = null;
+    th.tp = 1;
+    if (!moved) { kickThumb(); return; }
+    const centre = th.tx + th.tw / 2;
+    const nearest = tabs.reduce((best, tab) => {
+      const b = tabBox(tab);
+      return Math.abs(b.x + b.w / 2 - centre) < Math.abs(best.x + best.w / 2 - centre) ? { ...b, tab } : best;
+    }, { ...tabBox(tabs[0]), tab: tabs[0] }).tab;
+    nearest.focus({ preventScroll: true });
+    if (nearest.dataset.set !== currentSet) switchTo(nearest.dataset.set);
+    else aimThumb(nearest);
+  };
+  toggle.addEventListener('pointerup', endThumbDrag);
+  toggle.addEventListener('pointercancel', endThumbDrag);
+
+  const useSet = (set) => {
+    currentSet = set;
+    cards = allCards.filter((card) => card.dataset.set === set);
+    N = cards.length;
+    allCards.forEach((card) => { card.hidden = card.dataset.set !== set; });
+    track.style.setProperty('--n', String(N));
+    tabs.forEach((tab) => {
+      const on = tab.dataset.set === set;
+      tab.setAttribute('aria-selected', String(on));
+      tab.tabIndex = on ? 0 : -1;
+    });
+    stage.setAttribute('aria-labelledby', `tab-${set}`);
+    aimThumb(selectedTab());
+  };
+
+  const switchTo = (set) => {
+    if (set === currentSet) return;
+    // If you're inside the deck, restart it at the top so the new set starts from its first card.
+    const top = trackTop();
+    const inDeck = scroller.scrollTop >= top - 1;
+    useSet(set);
+    layout();
+    if (inDeck && animated) scroller.scrollTo({ top, behavior: 'auto' });
+    update();
+    if (!animated) return;
+    cards.slice(0, VISIBLE_BEHIND + 1).forEach((card, i) => {
+      card.animate([{ opacity: 0, translate: '0 48px' }, { opacity: card.style.opacity, translate: '0 0' }],
+        { duration: 520, delay: i * 70, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'backwards' });
+    });
+  };
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => switchTo(tab.dataset.set));
+    tab.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+      next.focus();
+      switchTo(next.dataset.set);
+    });
+  });
+
+  scroller.addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', () => { layout(); aimThumb(selectedTab(), true); schedule(); });
+
+  // Keyboard users: focusing a card scrolls the deck to deal it to the front.
+  allCards.forEach((card) => card.addEventListener('focus', () => {
+    const i = cards.indexOf(card);
+    if (!animated || i < 0 || N < 2) return;
+    const range = track.offsetHeight - stage.offsetHeight;
+    scroller.scrollTo({ top: trackTop() + (range * i) / (N - 1), behavior: 'auto' });
+  }));
+
+  useSet('design');
+  layout();
+  update();
+  document.fonts.ready.then(() => aimThumb(selectedTab(), true));
+})();
+
+// WebGL sticker: a subdivided quad that curls around a cylinder from the grabbed edge, lifts, tilts and catches a holographic sheen.
+const StickerGL = (() => {
+  const PAD = 0.35, GRID = 32, RADIUS = 0.05, K = 170, C = 18;
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const VS = `
+    attribute vec2 aPos;
+    uniform float uPeel, uRadius, uLift, uPad;
+    uniform vec2 uDir, uTilt;
+    varying vec2 vUv;
+    varying vec3 vN;
+    vec3 rotX(vec3 v, float a) { float c = cos(a), s = sin(a); return vec3(v.x, v.y * c - v.z * s, v.y * s + v.z * c); }
+    vec3 rotY(vec3 v, float a) { float c = cos(a), s = sin(a); return vec3(v.x * c + v.z * s, v.y, -v.x * s + v.z * c); }
+    void main() {
+      vec2 p = aPos;
+      vec3 n = vec3(0.0, 0.0, 1.0);
+      float z = 0.0;
+      // Fold line sweeps in from the grabbed edge of the round sticker (radius 0.5); everything past it wraps over a cylinder and lies back face-up.
+      float maxS = 0.5;
+      float s = dot(p, uDir);
+      float s0 = maxS - uPeel;
+      if (uPeel > 0.0005 && s > s0) {
+        float u = s - s0;
+        float th = u / uRadius;
+        float s2;
+        if (th < 3.14159) { s2 = s0 + uRadius * sin(th); z = uRadius * (1.0 - cos(th)); n = vec3(-uDir * sin(th), cos(th)); }
+        else { s2 = s0 - (u - 3.14159 * uRadius); z = 2.0 * uRadius; n = vec3(0.0, 0.0, -1.0); }
+        p += uDir * (s2 - s);
+      }
+      vec3 q = rotY(rotX(vec3(p, z + uLift), uTilt.x), uTilt.y);
+      vN = rotY(rotX(n, uTilt.x), uTilt.y);
+      vec2 c = q.xy / (1.0 - q.z * 0.9) / (0.5 + uPad);
+      gl_Position = vec4(c.x, -c.y, -q.z * 0.5, 1.0);
+      vUv = aPos + 0.5;
+    }`;
+  const FS = `
+    precision highp float;
+    uniform sampler2D uTex;
+    uniform float uHolo;
+    uniform vec2 uTilt;
+    varying vec2 vUv;
+    varying vec3 vN;
+    void main() {
+      vec4 tex = texture2D(uTex, vUv);
+      if (tex.a < 0.01) discard;
+      vec3 N = normalize(vN);
+      if (!gl_FrontFacing) N = -N;
+      vec3 L = normalize(vec3(-0.35, -0.55, 1.0));
+      float diff = clamp(dot(N, L), 0.0, 1.0);
+      float spec = pow(clamp(dot(N, normalize(L + vec3(0.0, 0.0, 1.0))), 0.0, 1.0), 40.0);
+      vec3 col;
+      if (gl_FrontFacing) {
+        col = tex.rgb / tex.a * (0.78 + 0.22 * diff);
+        float band = vUv.x * 1.3 + vUv.y * 0.9 + uTilt.y * 1.8 - uTilt.x * 1.4;
+        vec3 holo = 0.5 + 0.5 * cos(6.2831 * (band + vec3(0.0, 0.33, 0.67)));
+        col = mix(col, col * 0.7 + holo * 0.5, 0.18 * uHolo);
+        col += spec * 0.35 * (0.4 + 0.6 * uHolo);
+      } else {
+        col = vec3(0.97, 0.96, 0.93) * (0.84 + 0.16 * diff);
+      }
+      gl_FragColor = vec4(col * tex.a, tex.a);
+    }`;
+
+  const compile = (gl, type, src) => {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh));
+    return sh;
+  };
+
+  // Paint the sticker art (white disc + logo at --fit) onto a 2D canvas to use as the texture.
+  const paintArt = (el, px) => new Promise((resolve, reject) => {
+    const url = (el.style.getPropertyValue('--img').match(/url\(['"]?([^'")]+)/) || [])[1];
+    const fit = (parseFloat(el.style.getPropertyValue('--fit')) || 93.3) / 100;
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = c.height = px;
+      const g = c.getContext('2d');
+      g.beginPath();
+      g.arc(px / 2, px / 2, px / 2 - 1, 0, Math.PI * 2);
+      g.fillStyle = '#fff';
+      g.fill();
+      g.clip();
+      const ar = (img.naturalWidth || 1) / (img.naturalHeight || 1);
+      const box = px * fit, w = ar >= 1 ? box : box * ar, h = ar >= 1 ? box / ar : box;
+      g.drawImage(img, (px - w) / 2, (px - h) / 2, w, h);
+      resolve(c);
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+
+  const attach = (el) => {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'sticker-canvas';
+    const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: true, depth: true });
+    const flatFallback = () => {
+      const flat = document.createElement('div');
+      flat.className = 'sticker-flat';
+      el.append(flat);
+      const noop = () => {};
+      return { hover: noop, leave: noop, grab: noop, move: noop, release: noop, lift: noop, refresh: noop };
+    };
+    if (!gl) return flatFallback();
+    el.append(canvas);
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl, gl.VERTEX_SHADER, VS));
+    gl.attachShader(prog, compile(gl, gl.FRAGMENT_SHADER, FS));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.remove(); return flatFallback(); }
+    gl.useProgram(prog);
+
+    const verts = [], idx = [];
+    for (let j = 0; j <= GRID; j++) for (let i = 0; i <= GRID; i++) verts.push(i / GRID - 0.5, j / GRID - 0.5);
+    for (let j = 0; j < GRID; j++) for (let i = 0; i < GRID; i++) {
+      const a = j * (GRID + 1) + i, b = a + 1, c = a + GRID + 1, d = c + 1;
+      idx.push(a, b, c, b, d, c);
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(prog, 'aPos');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(idx), gl.STATIC_DRAW);
+
+    const U = Object.fromEntries(['uPeel', 'uRadius', 'uLift', 'uPad', 'uDir', 'uTilt', 'uTex', 'uHolo'].map((n) => [n, gl.getUniformLocation(prog, n)]));
+    gl.uniform1f(U.uRadius, RADIUS);
+    gl.uniform1f(U.uPad, PAD);
+    gl.uniform1i(U.uTex, 0);
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.frontFace(gl.CW); // y is flipped into clip space, so the flat sticker winds clockwise
+
+    const tex = gl.createTexture();
+    let ready = false;
+
+    // Animated values and their targets, all spring-driven.
+    const keys = ['peel', 'lift', 'tx', 'ty', 'holo'];
+    const cur = { peel: 0, lift: 0, tx: 0, ty: 0, holo: 0 }, vel = { ...cur }, tgt = { ...cur };
+    let dir = [Math.SQRT1_2, -Math.SQRT1_2], held = false, raf = 0, prev = 0;
+
+    const render = () => {
+      if (!ready) return;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.uniform1f(U.uPeel, Math.max(0, cur.peel));
+      gl.uniform1f(U.uLift, cur.lift);
+      gl.uniform2f(U.uDir, dir[0], dir[1]);
+      gl.uniform2f(U.uTilt, cur.tx, cur.ty);
+      gl.uniform1f(U.uHolo, Math.max(0, cur.holo));
+      gl.drawElements(gl.TRIANGLES, idx.length, gl.UNSIGNED_SHORT, 0);
+      const lift = Math.max(0, cur.lift);
+      canvas.style.setProperty('--sh-y', `${(2 + lift * 70).toFixed(1)}px`);
+      canvas.style.setProperty('--sh-b', `${(3 + lift * 60).toFixed(1)}px`);
+      canvas.style.setProperty('--sh-a', (0.22 + lift * 0.6).toFixed(3));
+    };
+
+    const step = (now) => {
+      const dt = prev ? Math.min((now - prev) / 1000, 1 / 30) : 1 / 60;
+      prev = now;
+      if (held) { tgt.tx *= 0.9; tgt.ty *= 0.9; } // drag tilt eases off when the pointer stops
+      let moving = held;
+      for (const k of keys) {
+        if (reduceMotion) { cur[k] = tgt[k]; vel[k] = 0; continue; }
+        vel[k] += (-K * (cur[k] - tgt[k]) - C * vel[k]) * dt;
+        cur[k] += vel[k] * dt;
+        if (Math.abs(cur[k] - tgt[k]) > 0.0005 || Math.abs(vel[k]) > 0.0005) moving = true;
+      }
+      render();
+      if (moving) raf = requestAnimationFrame(step);
+      else { raf = 0; prev = 0; }
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(step); };
+
+    const aimAt = (lx, ly) => {
+      const len = Math.hypot(lx, ly);
+      if (len > 0.08) dir = [lx / len, ly / len];
+    };
+
+    const size = () => {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const px = Math.round(el.offsetWidth * (1 + 2 * PAD) * dpr);
+      if (canvas.width !== px) { canvas.width = canvas.height = px; render(); }
+    };
+
+    paintArt(el, 512).then((art) => {
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, art);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      ready = true;
+      size();
+      render();
+    }).catch(() => {});
+    new ResizeObserver(size).observe(el);
+
+    // Hover: the corner nearest the cursor lifts a touch and the sticker leans toward it.
+    const local = (e) => {
+      const r = el.getBoundingClientRect();
+      return [(e.clientX - (r.left + r.width / 2)) / el.offsetWidth, (e.clientY - (r.top + r.height / 2)) / el.offsetWidth];
+    };
+    el.addEventListener('pointermove', (e) => {
+      if (held || e.pointerType !== 'mouse') return;
+      const [lx, ly] = local(e);
+      api.hover(lx, ly);
+    });
+    el.addEventListener('pointerleave', (e) => { if (!held && e.pointerType === 'mouse') api.leave(); });
+
+    const api = {
+      hover(lx, ly) { aimAt(lx, ly); Object.assign(tgt, { peel: 0.06, lift: 0.02, tx: -ly * 0.5, ty: lx * 0.5, holo: 1 }); kick(); },
+      leave() { Object.assign(tgt, { peel: 0, lift: 0, tx: 0, ty: 0, holo: 0 }); kick(); },
+      grab(lx, ly) { held = true; aimAt(lx, ly); Object.assign(tgt, { peel: 0.36, lift: 0.14, holo: 1 }); kick(); },
+      move(dx, dy) {
+        tgt.ty = Math.max(-0.5, Math.min(0.5, tgt.ty + dx * 0.012));
+        tgt.tx = Math.max(-0.5, Math.min(0.5, tgt.tx - dy * 0.012));
+        kick();
+      },
+      release() { held = false; Object.assign(tgt, { peel: 0, lift: 0, tx: 0, ty: 0, holo: 0 }); kick(); },
+      lift() { Object.assign(tgt, { lift: 0.12, holo: 0.8 }); kick(); },
+      refresh() { size(); render(); },
+    };
+    return api;
+  };
+
+  return { attach };
+})();
+
+(() => {
+  const PEEL_THRESHOLD = 4, RETURN_DELAY = 5000, BASE_ROT = '-8.56deg';
+  const SURFACES = '.cs-card, .work-stage, .hero, .testimonials, main';
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let drag = null, suppressClick = false;
+
+  // Fly a sticker from wherever it was stuck back to its spot on its own card.
+  const returnHome = (el) => {
+    if (el.classList.contains('is-peeling') || el.parentElement === el.home && !el.style.left) return;
+    const from = el.getBoundingClientRect();
+    const fromRot = el.style.getPropertyValue('--rot') || BASE_ROT;
+    ['left', 'top', 'right', 'bottom', 'width', 'height', '--rot'].forEach((p) => el.style.removeProperty(p));
+    el.home.appendChild(el);
+    el.gl.refresh();
+    if (reduceMotion) return;
+    const to = el.getBoundingClientRect();
+    const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+    const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+    // Lifted in the renderer for the flight, pressed back down as it lands.
+    el.gl.lift();
+    setTimeout(() => el.gl.release(), 560);
+    el.animate([
+      { transform: `translate(${dx}px, ${dy}px) rotate(${fromRot})` },
+      { transform: `translate(${dx * 0.5}px, ${dy * 0.5 - 40}px) rotate(${BASE_ROT})`, offset: 0.45 },
+      { transform: `rotate(${BASE_ROT}) scale(0.97)`, offset: 0.85 },
+      { transform: `rotate(${BASE_ROT})` },
+    ], { duration: 800, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+  };
+
+  // Stickers in a parked (hidden) section get no WebGL renderer.
+  [...document.querySelectorAll('.cs-badge')].filter((el) => !el.closest('section[hidden]')).forEach((el) => {
+    el.classList.add('sticker');
+    el.home = el.parentElement;
+    el.gl = StickerGL.attach(el);
+    el.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      clearTimeout(el.returnTimer);
+      el.getAnimations().forEach((a) => a.finish());
+      drag = { el, id: e.pointerId, startX: e.clientX, startY: e.clientY, lastX: e.clientX, lastY: e.clientY, peeling: false };
+    });
+  });
+
+  const beginPeel = (e) => {
+    const { el } = drag;
+    const box = el.getBoundingClientRect();
+    const cx = box.left + box.width / 2, cy = box.top + box.height / 2;
+    drag.size = el.offsetWidth;
+    drag.grabX = drag.startX - cx;
+    drag.grabY = drag.startY - cy;
+    el.style.width = el.style.height = `${drag.size}px`;
+    el.style.left = `${cx - drag.size / 2}px`;
+    el.style.top = `${cy - drag.size / 2}px`;
+    el.style.right = el.style.bottom = 'auto';
+    // The edge you grab peels up first.
+    el.gl.grab(drag.grabX / drag.size, drag.grabY / drag.size);
+    document.body.appendChild(el);
+    el.classList.remove('is-sticking');
+    el.classList.add('is-peeling');
+    drag.peeling = true;
+  };
+
+  addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    if (!drag.peeling) {
+      if (Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < PEEL_THRESHOLD) return;
+      beginPeel(e);
+    }
+    const { el, size } = drag;
+    el.style.left = `${e.clientX - drag.grabX - size / 2}px`;
+    el.style.top = `${e.clientY - drag.grabY - size / 2}px`;
+    // Swing a little in the direction of travel.
+    const swing = Math.max(-14, Math.min(14, (e.clientX - drag.lastX) * 0.8));
+    el.style.setProperty('--rot', `${-8.56 + swing}deg`);
+    el.gl.move(e.clientX - drag.lastX, e.clientY - drag.lastY);
+    drag.lastX = e.clientX;
+    drag.lastY = e.clientY;
+  });
+
+  const drop = (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const { el, peeling, size } = drag;
+    drag = null;
+    if (!peeling) return;
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 0);
+
+    const box = el.getBoundingClientRect();
+    const cx = box.left + box.width / 2, cy = box.top + box.height / 2;
+    el.style.visibility = 'hidden';
+    const hit = document.elementFromPoint(cx, cy);
+    el.style.visibility = '';
+    const surface = hit?.closest(SURFACES) || document.querySelector('main');
+    if (getComputedStyle(surface).position === 'static') surface.style.position = 'relative';
+
+    const sb = surface.getBoundingClientRect();
+    const scale = sb.width / (surface.offsetWidth || sb.width);
+    el.classList.remove('is-peeling');
+    el.gl.release();
+    el.style.setProperty('--rot', `${-8.56 + (Math.random() * 16 - 8)}deg`);
+    el.style.left = `${(cx - sb.left) / scale - size / 2}px`;
+    el.style.top = `${(cy - sb.top) / scale - size / 2}px`;
+    surface.appendChild(el);
+    el.classList.add('is-sticking');
+    el.addEventListener('animationend', () => el.classList.remove('is-sticking'), { once: true });
+    clearTimeout(el.returnTimer);
+    el.returnTimer = setTimeout(() => returnHome(el), RETURN_DELAY);
+  };
+  addEventListener('pointerup', drop);
+  addEventListener('pointercancel', drop);
+
+  // A peel that ends over a card must not also open that card's link.
+  document.addEventListener('click', (e) => {
+    if (suppressClick || e.target.closest('.sticker')) { e.preventDefault(); e.stopPropagation(); suppressClick = false; }
+  }, true);
+})();
+// Doorbell pull-cord: verlet rope ported from pullcord (MIT) — see licenses/pullcord.txt.
+(() => {
+  const root = document.getElementById('pullcord');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const CFG = { gravity: 1250, damping: 0.94, iterations: 20, stretchMax: 26, stretchToggle: 20, maxVelocity: 22, sleepVelocity: 0.15 };
+  const W = 64, ANCHOR_X = W / 2, SVG_H = 340, SEGMENTS = 16, KNOB_R = 6.5, HIT = 46, PAN_THRESHOLD = 3;
+  // A shorter rope on phones keeps the knob clear of the headline.
+  const REST_Y = matchMedia('(max-width: 640px)').matches ? 96 : 176;
+  const REST_SEG = REST_Y / SEGMENTS;
+  const NS = 'http://www.w3.org/2000/svg';
+
+  const svgEl = (tag, attrs) => { const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; };
+  const inner = document.createElement('div');
+  inner.className = reduceMotion ? 'pullcord-inner' : 'pullcord-inner pullcord-inner--drop';
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${SVG_H}`, width: W, height: SVG_H, 'aria-hidden': 'true' });
+  svg.innerHTML = `<defs>
+      <linearGradient id="pc-knob" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#e7e7ec"/></linearGradient>
+      <filter id="pc-knob-sh" x="-70%" y="-70%" width="240%" height="240%"><feDropShadow dx="0" dy="1.4" stdDeviation="1.5" flood-color="rgba(0,0,0,0.32)"/></filter>
+    </defs>`;
+  const cord = svgEl('path', { stroke: 'rgba(127, 127, 127, 0.55)', 'stroke-width': 1.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', fill: 'none', 'vector-effect': 'non-scaling-stroke' });
+  const weight = svgEl('g', {});
+  const shadowed = svgEl('g', { filter: 'url(#pc-knob-sh)' });
+  shadowed.append(svgEl('circle', { cx: ANCHOR_X, cy: REST_Y, r: KNOB_R, fill: 'url(#pc-knob)', stroke: 'rgba(0,0,0,0.10)', 'stroke-width': 0.5 }));
+  weight.append(shadowed);
+  svg.append(cord, weight);
+  const knob = document.createElement('button');
+  knob.type = 'button';
+  knob.className = 'pullcord-knob';
+  knob.setAttribute('aria-label', 'Ring the doorbell');
+  knob.title = 'Ring the doorbell';
+  knob.style.left = `${ANCHOR_X - HIT / 2}px`;
+  knob.style.top = `${REST_Y - HIT / 2}px`;
+  inner.append(svg, knob);
+  root.append(inner);
+
+  // ── Doorbell: two bell strikes ("ding-dong") built from inharmonic partials, no audio file needed.
+  let audio = null, lastRing = 0;
+  const strike = (ctx, freq, at) => {
+    const out = ctx.createGain();
+    out.gain.setValueAtTime(0.0001, at);
+    out.gain.exponentialRampToValueAtTime(0.28, at + 0.008);
+    out.gain.exponentialRampToValueAtTime(0.0001, at + 1.8);
+    out.connect(ctx.destination);
+    [[1, 1], [2.76, 0.32], [5.4, 0.12], [8.93, 0.05]].forEach(([ratio, level]) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq * ratio;
+      g.gain.value = level;
+      osc.connect(g).connect(out);
+      osc.start(at);
+      osc.stop(at + 1.9);
+    });
+  };
+  const ring = () => {
+    const now = performance.now();
+    if (now - lastRing < 700) return;
+    lastRing = now;
+    audio ||= new (window.AudioContext || window.webkitAudioContext)();
+    audio.resume();
+    const t = audio.currentTime + 0.02;
+    strike(audio, 659.25, t);       // E5 — "ding"
+    strike(audio, 523.25, t + 0.42); // C5 — "dong"
+  };
+
+  // ── Rope simulation.
+  const makeNodes = () => Array.from({ length: SEGMENTS + 1 }, (_, i) => ({ x: ANCHOR_X, y: REST_SEG * i, ox: ANCHOR_X, oy: REST_SEG * i, fixed: i === 0 }));
+  const pts = makeNodes();
+  const last = pts.length - 1;
+  let target = { x: ANCHOR_X, y: REST_Y };
+  let dragging = false, didDrag = false, clicked = false, running = false, prevT = 0, prevDt = 0;
+
+  const buildPath = (p) => {
+    let d = `M ${p[0].x.toFixed(1)} ${p[0].y.toFixed(1)}`;
+    for (let i = 1; i < p.length - 1; i++) {
+      d += ` Q ${p[i].x.toFixed(1)} ${p[i].y.toFixed(1)} ${((p[i].x + p[i + 1].x) / 2).toFixed(1)} ${((p[i].y + p[i + 1].y) / 2).toFixed(1)}`;
+    }
+    return `${d} L ${p[last].x.toFixed(1)} ${p[last].y.toFixed(1)}`;
+  };
+  const render = () => {
+    cord.setAttribute('d', buildPath(pts));
+    weight.setAttribute('transform', `translate(${(pts[last].x - ANCHOR_X).toFixed(2)} ${(pts[last].y - REST_Y).toFixed(2)})`);
+  };
+
+  const step = (now) => {
+    const dt = prevT ? Math.min(0.04, Math.max(0.004, (now - prevT) / 1000)) : 1 / 60;
+    prevT = now;
+    const velCoef = (prevDt > 0 ? dt / prevDt : 1) * Math.pow(CFG.damping, dt * 60);
+    const accCoef = dt * dt;
+    pts[last].fixed = dragging;
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i];
+      if (p.fixed) continue;
+      const vx = p.x - p.ox, vy = p.y - p.oy;
+      p.ox = p.x; p.oy = p.y;
+      p.x += vx * velCoef;
+      p.y += vy * velCoef + CFG.gravity * accCoef;
+    }
+    pts[0].x = ANCHOR_X; pts[0].y = 0;
+    if (dragging) {
+      pts[last].ox = pts[last].x; pts[last].oy = pts[last].y;
+      pts[last].x = target.x; pts[last].y = target.y;
+    }
+    for (let k = 0; k < CFG.iterations; k++) {
+      for (let i = 0; i < last; i++) {
+        const a = pts[i], b = pts[i + 1];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.hypot(dx, dy) || 1e-4;
+        const diff = ((REST_SEG - dist) / dist) * 0.5;
+        if (!a.fixed) { a.x -= dx * diff; a.y -= dy * diff; }
+        if (!b.fixed) { b.x += dx * diff; b.y += dy * diff; }
+      }
+    }
+    prevDt = dt;
+    render();
+    let speed = 0;
+    for (let i = 1; i < pts.length; i++) speed += Math.abs(pts[i].x - pts[i].ox) + Math.abs(pts[i].y - pts[i].oy);
+    if (!dragging && speed < CFG.sleepVelocity * dt * 60) { running = false; return; }
+    requestAnimationFrame(step);
+  };
+  const wake = () => {
+    if (running) return;
+    running = true; prevT = 0; prevDt = 0;
+    requestAnimationFrame(step);
+  };
+
+  // Click / Enter: ring and give the weight a little tug.
+  const scriptedPull = () => {
+    ring();
+    if (reduceMotion) return;
+    pts[last].oy -= 22;
+    wake();
+  };
+
+  // Drag: the bell rings the moment the pull passes the detent, like a real pull-chain.
+  let pan = null;
+  knob.addEventListener('pointerdown', (e) => {
+    if (reduceMotion || e.button !== 0) return;
+    pan = { id: e.pointerId, x: e.clientX, y: e.clientY, started: false };
+    knob.setPointerCapture(e.pointerId);
+  });
+  knob.addEventListener('pointermove', (e) => {
+    if (!pan || e.pointerId !== pan.id) return;
+    const ox = e.clientX - pan.x, oy = e.clientY - pan.y;
+    if (!pan.started) {
+      if (Math.hypot(ox, oy) < PAN_THRESHOLD) return;
+      pan.started = true; dragging = true; didDrag = true; clicked = false;
+      wake();
+    }
+    const ry = REST_Y + oy;
+    const dist = Math.hypot(ox, ry) || 1e-4;
+    const maxD = REST_Y + CFG.stretchMax;
+    const k = dist > maxD ? maxD / dist : 1;
+    target = { x: ANCHOR_X + ox * k, y: ry * k };
+    if (!clicked && dist - REST_Y >= Math.min(CFG.stretchToggle, CFG.stretchMax - 1)) {
+      clicked = true;
+      ring();
+    }
+  });
+  const endPan = (e) => {
+    if (!pan || e.pointerId !== pan.id) return;
+    const started = pan.started;
+    pan = null;
+    if (!started) return;
+    dragging = false;
+    const p = pts[last];
+    const vx = p.x - p.ox, vy = p.y - p.oy, v = Math.hypot(vx, vy);
+    if (v > CFG.maxVelocity) { p.ox = p.x - (vx * CFG.maxVelocity) / v; p.oy = p.y - (vy * CFG.maxVelocity) / v; }
+    wake();
+    requestAnimationFrame(() => { didDrag = false; });
+  };
+  knob.addEventListener('pointerup', endPan);
+  knob.addEventListener('pointercancel', endPan);
+  knob.addEventListener('click', (e) => { if (!didDrag && e.detail !== 0) scriptedPull(); });
+  knob.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) { e.preventDefault(); scriptedPull(); }
+  });
+
+  // Entrance: the cord drops in, then hands its momentum to the rope so it swings and settles.
+  let dropped = reduceMotion;
+  const endDrop = () => {
+    if (dropped) return;
+    dropped = true;
+    inner.classList.remove('pullcord-inner--drop');
+    pts[last].oy -= 13; pts[last].ox -= 6;
+    wake();
+  };
+  inner.addEventListener('animationend', (e) => { if (e.animationName === 'pullcord-drop') endDrop(); });
+  setTimeout(endDrop, 1700);
+
+  render();
+})();
+(() => {
+  const scroller = document.querySelector('.frame-scroll');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Copy email
+  const copyBtn = document.querySelector('.footer-copy');
+  const status = document.querySelector('.footer-copied');
+  let statusTimer = 0;
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(copyBtn.dataset.copy);
+      status.textContent = 'Copied';
+    } catch {
+      status.textContent = 'Copy failed — select the address instead';
+    }
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(() => { status.textContent = ''; }, 2000);
+  });
+
+  document.querySelector('.footer-top:not(.footer-credits)').addEventListener('click', () => {
+    scroller.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+
+  // Credits dialog: opens from the footer; closes on ✕, Esc (native) or a click on the backdrop.
+  const credits = document.getElementById('credits');
+  document.querySelector('.footer-credits').addEventListener('click', () => credits.showModal());
+  credits.querySelector('.credits-close').addEventListener('click', () => credits.close());
+  credits.addEventListener('click', (e) => {
+    const r = credits.getBoundingClientRect();
+    const outside = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+    if (e.target === credits && outside) credits.close();
+  });
+
+  // Dictionary card: trails the cursor over the name; opens on focus or tap too.
+  const name = document.querySelector('.footer-name');
+  const card = document.getElementById('name-meaning');
+  const OFFSET = 18, EDGE = 12;
+  let target = { x: 0, y: 0 }, pos = null, raf = 0, open = false;
+
+  const clampToView = (x, y) => [
+    Math.min(Math.max(x, EDGE), innerWidth - card.offsetWidth - EDGE),
+    Math.min(Math.max(y, EDGE), innerHeight - card.offsetHeight - EDGE),
+  ];
+  // Prefer the card above-right of the cursor; it flips left/down near the edges.
+  const aim = (x, y) => {
+    const w = card.offsetWidth, h = card.offsetHeight;
+    const left = x + OFFSET + w > innerWidth - EDGE ? x - OFFSET - w : x + OFFSET;
+    const top = y - OFFSET - h < EDGE ? y + OFFSET : y - OFFSET - h;
+    target = { x: left, y: top };
+  };
+  const paint = () => { card.style.transform = `translate(${pos.x}px, ${pos.y}px)`; };
+  const follow = () => {
+    raf = 0;
+    if (!pos || reduceMotion) pos = { ...target };
+    else { pos.x += (target.x - pos.x) * 0.22; pos.y += (target.y - pos.y) * 0.22; }
+    const [x, y] = clampToView(pos.x, pos.y);
+    pos = { x, y };
+    paint();
+    if (open && Math.hypot(target.x - pos.x, target.y - pos.y) > 0.5) raf = requestAnimationFrame(follow);
+  };
+  const show = (x, y) => {
+    aim(x, y);
+    if (!open) { pos = null; open = true; card.classList.add('is-open'); }
+    if (!raf) raf = requestAnimationFrame(follow);
+  };
+  const hide = () => { open = false; card.classList.remove('is-open'); };
+
+  // The name's box is much taller than its capitals, so only react over the letters themselves.
+  const overLetters = (e) => {
+    const cs = getComputedStyle(name);
+    const ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    const m = ctx.measureText(name.textContent.toUpperCase());
+    const lineH = parseFloat(cs.lineHeight);
+    const baseline = (lineH - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent;
+    const r = name.getBoundingClientRect();
+    const top = r.top + baseline - m.actualBoundingBoxAscent;
+    const bottom = r.top + baseline + m.actualBoundingBoxDescent;
+    return e.clientY >= top && e.clientY <= bottom && e.clientX >= r.left && e.clientX <= r.right;
+  };
+  const track = (e) => {
+    if (e.pointerType !== 'mouse') return;
+    if (overLetters(e)) show(e.clientX, e.clientY);
+    else if (open) hide();
+  };
+  name.addEventListener('pointerenter', track);
+  name.addEventListener('pointermove', track);
+  name.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hide(); });
+  name.addEventListener('pointerup', (e) => {
+    if (e.pointerType === 'mouse') return;
+    if (open) hide();
+    else if (overLetters(e)) show(e.clientX, e.clientY);
+  });
+  document.addEventListener('pointerdown', (e) => { if (open && e.pointerType !== 'mouse' && e.target !== name) hide(); });
+  name.addEventListener('focus', () => {
+    const r = name.getBoundingClientRect();
+    show(r.left + r.width / 2 - card.offsetWidth / 2 - OFFSET, r.top + OFFSET);
+  });
+  name.addEventListener('blur', hide);
+  name.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
+  scroller.addEventListener('scroll', () => { if (open && document.activeElement !== name) hide(); }, { passive: true });
+})();
+// Work, option B: the frame stays still; each project's picture drops into it from the top as you scroll.
+(() => {
+  const section = document.getElementById('work-gallery');
+  if (section.hidden) return;
+  const track = section.querySelector('.wg-track');
+  const stage = section.querySelector('.wg-stage');
+  const pics = [...section.querySelectorAll('.wg-pic')];
+  const items = [...section.querySelectorAll('.wg-item')];
+  const scroller = document.querySelector('.frame-scroll');
+  const animated = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const N = pics.length;
+  let raf = 0, current = 0;
+
+  const clamp01 = (n) => Math.min(Math.max(n, 0), 1);
+  const smooth = (x) => x * x * (3 - 2 * x);
+  const navOffset = () => parseFloat(getComputedStyle(stage).top) || 0;
+  const range = () => track.offsetHeight - stage.offsetHeight;
+  const trackTop = () => scroller.scrollTop + track.getBoundingClientRect().top - scroller.getBoundingClientRect().top - navOffset();
+
+  const setActive = (i) => {
+    if (i === current) return;
+    current = i;
+    items.forEach((item, k) => item.classList.toggle('is-active', k === i));
+  };
+
+  const showStatic = (i) => {
+    pics.forEach((pic, k) => { pic.style.transform = k === i ? 'none' : 'translateY(-101%)'; pic.style.zIndex = k === i ? '1' : '0'; });
+    setActive(i);
+  };
+
+  const update = () => {
+    raf = 0;
+    const scrolled = scroller.getBoundingClientRect().top + navOffset() - track.getBoundingClientRect().top;
+    const t = clamp01(scrolled / range()) * (N - 1);
+    const k = Math.min(Math.floor(t), N - 1);
+    // Hold each picture for the first and last 15% of its scroll segment; the drop happens in between.
+    const e = k === N - 1 ? 0 : smooth(clamp01((t - k - 0.15) / 0.7));
+    pics.forEach((pic, i) => {
+      pic.style.zIndex = String(i);
+      if (i < k) {
+        pic.style.transform = 'scale(0.92)';
+        pic.style.filter = 'brightness(0.7)';
+      } else if (i === k) {
+        // The picture being covered sinks back like a card shifting down the queue.
+        pic.style.transform = `scale(${1 - 0.08 * e})`;
+        pic.style.filter = `brightness(${1 - 0.3 * e})`;
+      } else if (i === k + 1) {
+        pic.style.transform = `translateY(${(e - 1) * 101}%)`;
+        pic.style.filter = '';
+      } else {
+        pic.style.transform = 'translateY(-101%)';
+        pic.style.filter = '';
+      }
+    });
+    setActive(e > 0.5 ? k + 1 : k);
+  };
+
+  const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
+
+  // Faded titles jump to their project; the active title opens the case study.
+  items.forEach((item, i) => {
+    const link = item.querySelector('.wg-title a');
+    link.addEventListener('click', (e) => {
+      if (i === current) return;
+      e.preventDefault();
+      if (!animated) { showStatic(i); return; }
+      scroller.scrollTo({ top: trackTop() + (range() * i) / (N - 1), behavior: 'smooth' });
+    });
+  });
+
+  if (!animated) {
+    section.classList.add('wg--static');
+    current = -1;
+    showStatic(0);
+    return;
+  }
+  scroller.addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  update();
+})();
+// Hero "Currently" pill. Edit CURRENTLY to update it; `listening` shows an "On repeat" line when set.
+(() => {
+  const CURRENTLY = {
+    doing: 'Designer at BigBlockTheory',
+    listening: null, // e.g. { title: 'Song', artist: 'Artist' } — YouTube Music has no public now-playing feed, so this is by hand
+    timeZone: 'Asia/Kolkata',
+    zone: 'IST',
+  };
+  const pill = document.querySelector('.now-pill');
+  const time = pill.querySelector('.now-time');
+  pill.querySelector('.now-doing').textContent = CURRENTLY.doing;
+  if (CURRENTLY.listening) {
+    pill.querySelector('.now-song').textContent = `On repeat: ${CURRENTLY.listening.title} — ${CURRENTLY.listening.artist}`;
+    pill.querySelector('.now-music').hidden = false;
+  }
+  const fmt = new Intl.DateTimeFormat('en-US', { timeZone: CURRENTLY.timeZone, hour: 'numeric', minute: '2-digit' });
+  const hourFmt = new Intl.DateTimeFormat('en-US', { timeZone: CURRENTLY.timeZone, hour: 'numeric', hourCycle: 'h23' });
+  const tick = () => {
+    const now = new Date();
+    const hour = Number(hourFmt.format(now));
+    time.textContent = `${fmt.format(now)} ${CURRENTLY.zone}${hour < 7 ? ' · probably asleep' : ''}`;
+  };
+  tick();
+  setInterval(tick, 20000);
+})();
+
+// Hero work-experience tags: each tag is a damped pendulum hanging from its own pin. The cursor stirs a breeze,
+// tags can be grabbed and flicked, and hover (or tap) shows role and dates.
+(() => {
+  const wrap = document.querySelector('.hero-mobile');
+  const hero = wrap.closest('.hero');
+  const scroller = document.querySelector('.frame-scroll');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const PIN_Y = 14, GRAVITY = 2200, DAMPING = 1.5, MAX_ANGLE = 1.25, MAX_SPIN = 14;
+  const tags = [...wrap.querySelectorAll('.hm-tag')].map((el, i) => ({
+    el, card: el.querySelector('.hm-card'), t: Number(el.dataset.t),
+    x: 0, y: 0, len: 80,
+    a: reduceMotion ? 0 : (i % 2 ? -0.9 : 0.9), w: 0, // angle (rad, clockwise) and angular velocity
+    drag: null,
+  }));
+
+  // Pins sit in a row at fractions of the width; each tag's top is offset so its pin lands on the point.
+  const layout = () => {
+    const w = wrap.clientWidth;
+    const pinOffset = parseFloat(getComputedStyle(wrap).getPropertyValue('--pin-y')) || 11;
+    tags.forEach((g) => {
+      g.x = g.t * w;
+      g.y = PIN_Y + pinOffset;
+      g.len = g.el.offsetHeight * 0.5;
+      g.el.style.left = `${g.x}px`;
+      g.el.style.top = `${PIN_Y}px`;
+    });
+    draw();
+  };
+  const draw = () => tags.forEach((g) => { g.el.style.transform = `rotate(${g.a}rad)`; });
+
+  // ── Simulation, run only while something moves and the hero is on screen ──
+  let raf = 0, last = 0, visible = true;
+  const step = (now) => {
+    const dt = Math.min(1 / 30, (now - last) / 1000 || 1 / 60);
+    last = now;
+    let moving = false;
+    tags.forEach((g) => {
+      if (g.drag) { moving = true; return; }
+      const acc = -(GRAVITY / g.len) * Math.sin(g.a) - DAMPING * g.w;
+      g.w = Math.max(-MAX_SPIN, Math.min(MAX_SPIN, g.w + acc * dt));
+      g.a = Math.max(-MAX_ANGLE, Math.min(MAX_ANGLE, g.a + g.w * dt));
+      if (Math.abs(g.w) > 0.002 || Math.abs(g.a) > 0.002) moving = true;
+    });
+    draw();
+    raf = moving && visible ? requestAnimationFrame(step) : 0;
+  };
+  const wake = () => { if (!raf && visible) { last = 0; raf = requestAnimationFrame(step); } };
+
+  // Breeze: pointer movement across the hero nudges nearby tags in the direction of travel.
+  let px = null, pt = 0;
+  if (!reduceMotion) {
+    hero.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const now = performance.now();
+      if (px !== null && now - pt < 100) {
+        const vx = (e.clientX - px) / Math.max(1, now - pt); // px per ms
+        tags.forEach((g) => {
+          if (g.drag) return;
+          const r = g.card.getBoundingClientRect();
+          const d = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+          if (d < 220) { g.w -= vx * 0.9 * (1 - d / 220); wake(); }
+        });
+      }
+      px = e.clientX; pt = now;
+    });
+  }
+
+  // Grab and flick: while held the tag points at the pointer; on release it keeps the swing it was given.
+  tags.forEach((g) => {
+    const angleTo = (e) => {
+      const r = wrap.getBoundingClientRect();
+      const dx = e.clientX - (r.left + g.x), dy = e.clientY - (r.top + g.y);
+      return Math.max(-MAX_ANGLE, Math.min(MAX_ANGLE, Math.atan2(-dx, Math.max(8, dy))));
+    };
+    g.card.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      g.drag = { x: e.clientX, y: e.clientY, moved: false, t: performance.now(), a: g.a, id: e.pointerId };
+    });
+    g.card.addEventListener('pointermove', (e) => {
+      if (!g.drag) return;
+      if (!g.drag.moved && Math.hypot(e.clientX - g.drag.x, e.clientY - g.drag.y) < 5) return;
+      if (!g.drag.moved) {
+        g.drag.moved = true;
+        g.el.classList.add('is-dragging');
+        wake();
+        try { g.card.setPointerCapture(g.drag.id); } catch { /* pointer already gone */ }
+      }
+      if (reduceMotion) return;
+      const now = performance.now(), a = angleTo(e);
+      const dt = Math.max(0.008, (now - g.drag.t) / 1000);
+      g.w = 0.6 * g.w + 0.4 * ((a - g.drag.a) / dt);
+      g.drag.t = now; g.drag.a = a;
+      g.a = a;
+      draw();
+    });
+    const release = (e) => {
+      if (!g.drag) return;
+      const tapped = !g.drag.moved && e.type === 'pointerup';
+      g.drag = null;
+      g.el.classList.remove('is-dragging');
+      if (tapped) {
+        // Tap: show this tag's details (touch has no hover), and give it a little swing.
+        const open = !g.el.classList.contains('is-open');
+        tags.forEach((o) => o.el.classList.remove('is-open'));
+        g.el.classList.toggle('is-open', open);
+        if (!reduceMotion) g.w += 2.5;
+      }
+      wake();
+    };
+    g.card.addEventListener('pointerup', release);
+    g.card.addEventListener('pointercancel', release);
+  });
+  document.addEventListener('pointerdown', (e) => {
+    if (!wrap.contains(e.target)) tags.forEach((g) => g.el.classList.remove('is-open'));
+  });
+
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    if (visible) wake();
+  }, { root: scroller }).observe(wrap);
+  new ResizeObserver(layout).observe(wrap);
+  layout();
+  // Swing in once the loader has gone.
+  setTimeout(() => { wrap.classList.add('is-ready'); wake(); }, 500);
+})();
+
+// Tools: press a key on the Mac (or 1–6) to open that tool's window on the screen.
+(() => {
+  const section = document.getElementById('tools');
+  // `key` tints the backlight and legend; `invert` draws a black logo white on the black keycap.
+  const TOOLS = [{"id": "figma", "name": "Figma", "key": "#F24E1E", "img": "assets/tools/figma.png", "desc": "Where every product starts: flows, wireframes and final UI."}, {"id": "claude", "name": "Claude", "key": "#D97757", "img": "assets/tools/claude.png", "desc": "My build partner: turning designs into shipped code with Claude Code."}, {"id": "chatgpt", "name": "ChatGPT", "key": "#FFFFFF", "img": "assets/tools/chatgpt.png", "desc": "A quick thinking partner for research, copy and ideas.", "invert": true}, {"id": "gemini", "name": "Gemini", "key": "#3186FF", "img": "assets/tools/gemini.png", "desc": "Second opinions and deep research across docs."}, {"id": "framer", "name": "Framer", "key": "#0099FF", "img": "assets/tools/framer.png", "desc": "Interactive prototypes and live marketing sites."}, {"id": "adobe", "name": "Adobe", "key": "#EB1000", "img": "assets/tools/adobe.png", "desc": "Visuals, edits and brand assets."}];
+  const desk = section.querySelector('.desk');
+  const stage = section.querySelector('.desk-scale');
+  const row = section.querySelector('.kb-tools');
+  const screen = section.querySelector('.mac-screen');
+  const title = section.querySelector('.mw-title');
+  const logo = section.querySelector('.mw-logo');
+  const name = section.querySelector('.mw-name');
+  const desc = section.querySelector('.mw-desc');
+  const status = section.querySelector('.tools-status');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const W = 680, H = 570;
+  let audio = null, typing = 0, inView = false;
+
+  // A short mechanical "thock": a filtered noise click plus a falling low thump.
+  const thock = () => {
+    audio ||= new (window.AudioContext || window.webkitAudioContext)();
+    audio.resume();
+    const t = audio.currentTime;
+    const buf = audio.createBuffer(1, Math.round(audio.sampleRate * 0.05), audio.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+    const click = audio.createBufferSource();
+    click.buffer = buf;
+    const band = audio.createBiquadFilter();
+    band.type = 'bandpass'; band.frequency.value = 1700; band.Q.value = 0.9;
+    const cg = audio.createGain(); cg.gain.value = 0.35;
+    click.connect(band).connect(cg).connect(audio.destination);
+    click.start(t);
+    const thump = audio.createOscillator();
+    thump.frequency.setValueAtTime(140, t);
+    thump.frequency.exponentialRampToValueAtTime(60, t + 0.08);
+    const tg = audio.createGain();
+    tg.gain.setValueAtTime(0.3, t);
+    tg.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    thump.connect(tg).connect(audio.destination);
+    thump.start(t); thump.stop(t + 0.12);
+  };
+
+  const keys = TOOLS.map((tool, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tk';
+    b.setAttribute('aria-pressed', 'false');
+    b.setAttribute('aria-label', tool.name);
+    b.style.color = tool.key;
+    b.innerHTML = `<img src="${tool.img}" alt=""${tool.invert ? ' class="is-invert"' : ''}><span class="tk-label">${tool.name}</span><span class="tk-num">${i + 1}</span>`;
+    b.addEventListener('click', () => open(i));
+    row.append(b);
+    return b;
+  });
+
+  section.tools = TOOLS;
+  const open = (i) => {
+    const tool = TOOLS[i];
+    thock();
+    section.dispatchEvent(new CustomEvent('tool:open', { detail: { index: i } }));
+    keys.forEach((k, j) => k.setAttribute('aria-pressed', String(j === i)));
+    title.textContent = `${tool.name}.app`;
+    logo.src = tool.img;
+    name.textContent = tool.name;
+    status.textContent = `${tool.name}: ${tool.desc}`;
+    // Re-trigger the window pop, then type the line out.
+    screen.classList.remove('has-app');
+    void screen.offsetWidth;
+    screen.classList.add('has-app');
+    clearInterval(typing);
+    if (reduceMotion) { desc.textContent = tool.desc; return; }
+    let n = 0;
+    desc.textContent = '';
+    typing = setInterval(() => {
+      desc.textContent = tool.desc.slice(0, ++n);
+      if (n >= tool.desc.length) clearInterval(typing);
+    }, 22);
+  };
+
+  // Number keys 1–6 press the matching key while the section is on screen.
+  new IntersectionObserver(([e]) => { inView = e.isIntersecting; }, { root: document.querySelector('.frame-scroll'), threshold: 0.4 }).observe(desk);
+  addEventListener('keydown', (e) => {
+    if (!inView || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+    const i = Number(e.key) - 1;
+    if (!(i >= 0 && i < keys.length)) return;
+    keys[i].classList.add('is-down');
+    setTimeout(() => keys[i].classList.remove('is-down'), 120);
+    open(i);
+  });
+
+  // Live clocks in the visitor's own timezone.
+  const tick = () => {
+    const now = new Date();
+    section.querySelector('.mac-clock').textContent = now.toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' });
+    section.querySelector('.ip-time').textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: false });
+    section.querySelector('.ip-date').textContent = now.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' });
+  };
+  tick();
+  setInterval(tick, 20000);
+
+  // Scale the drawn desk to the available width.
+  const fit = () => {
+    const w = desk.clientWidth, h = desk.clientHeight;
+    const k = Math.min(w / W, h / H);
+    stage.style.transform = `translate(${(w - W * k) / 2}px, ${(h - H * k) / 2}px) scale(${k})`;
+  };
+  new ResizeObserver(fit).observe(desk);
+  fit();
+})();
+</script>
+
+<script type="module">
+// Tools: a 3D MacBook (assets/models/macbook.glb) laid over the CSS Mac when WebGL is available.
+// The lid opens when the section comes into view, the 1–6 keys carry the tool keycaps, and the
+// screen is a live canvas showing the same app window as the CSS version. Drag to turn it.
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const section = document.getElementById('tools');
+const desk = section.querySelector('.desk');
+const mac = section.querySelector('.mac');
+const buttons = [...section.querySelectorAll('.tk')];
+const TOOLS = section.tools;
+const scroller = document.querySelector('.frame-scroll');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Measured from the model (units are cm, scene origin under the middle of the base).
+const LID_NODE = 'VCQqxpxkUlzqcJI_62', SCREEN_MESH = 'Object_123';
+const HINGE = new THREE.Vector3(0, 0.25, -12.55);
+const LID_CLOSED = 1.93;
+const KEY_XS = [-10.74, -8.94, -7.15, -5.35, -3.55, -1.75], KEY_Y = 0.36, KEY_Z = -6.82, KEY_SIZE = 1.66;
+// The open laptop is fitted to the desk box; the canvas bleeds past the box by BLEED for the shadow and drag.
+const BLEED = 0.25, FOV = 26, ELEVATION = 0.92, REST_YAW = 0;
+
+const MONO = '"Geist Mono", ui-monospace, monospace';
+const DISPLAY = '"Paralucent Condensed", Paralucent, sans-serif';
+const UI = 'Paralucent, system-ui, sans-serif';
+
+// A damped spring on one number.
+const spring = (s, target, k, c, dt) => {
+  s.v += (k * (target - s.x) - c * s.v) * dt;
+  s.x += s.v * dt;
+};
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+
+let renderer = null;
+try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); } catch { /* keep the CSS Mac */ }
+if (renderer && TOOLS) init();
+
+function init() {
+  desk.classList.add('desk--3d');
+  const canvas = renderer.domElement;
+  canvas.className = 'mac-3d';
+  canvas.setAttribute('aria-hidden', 'true');
+  desk.append(canvas);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setClearColor(0x000000, 0);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+  const fallBack = (err) => {
+    console.warn('3D Mac unavailable, showing the CSS version.', err);
+    desk.classList.remove('desk--3d');
+    canvas.remove();
+  };
+
+  const scene = new THREE.Scene();
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+  const camera = new THREE.PerspectiveCamera(FOV, 1, 1, 500);
+  const rig = new THREE.Group();     // turned by hover and drag
+  const content = new THREE.Group(); // model space, offset so the rig turns about the laptop's middle
+  rig.add(content);
+  scene.add(rig);
+
+  // Soft contact shadow under the base.
+  const shadowCanvas = Object.assign(document.createElement('canvas'), { width: 256, height: 256 });
+  const sh = shadowCanvas.getContext('2d');
+  const shGrad = sh.createRadialGradient(128, 128, 0, 128, 128, 128);
+  shGrad.addColorStop(0, 'rgba(13, 30, 80, 0.42)');
+  shGrad.addColorStop(0.55, 'rgba(13, 30, 80, 0.16)');
+  shGrad.addColorStop(1, 'rgba(13, 30, 80, 0)');
+  sh.fillStyle = shGrad;
+  sh.fillRect(0, 0, 256, 256);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(50, 38), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shadowCanvas), transparent: true, depthWrite: false }));
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.set(0, -1.08, -1);
+  content.add(shadow);
+
+  // ── Screen: a canvas texture drawn like the CSS screen ──
+  const SW = 1645, SH = 1000;
+  const sc = Object.assign(document.createElement('canvas'), { width: SW, height: SH });
+  const g = sc.getContext('2d');
+  const screenTex = new THREE.CanvasTexture(sc);
+  screenTex.colorSpace = THREE.SRGBColorSpace;
+  screenTex.anisotropy = 4;
+  const screenMat = new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false });
+  const wallpaper = g.createLinearGradient(0, 0, 0, SH);
+  [[0, '#2D38B8'], [0.75, '#006CFA'], [0.84, '#4C97FB'], [0.93, '#B3D3FD'], [1, '#FFFFFF']].forEach(([o, c]) => wallpaper.addColorStop(o, c));
+  const logos = TOOLS.map((t) => Object.assign(new Image(), { src: t.img }));
+  // decode() can reject in background tabs; fall back to the load event so the 3D Mac still builds.
+  const loaded = (img) => (img.complete ? Promise.resolve() : new Promise((res) => { img.onload = img.onerror = res; }));
+  const logosReady = Promise.all(logos.map((img) => img.decode().catch(() => loaded(img))));
+  // Draw a logo centred in a square box, keeping its aspect; optionally recoloured white.
+  const drawLogo = (ctx, img, cx, cy, box, white) => {
+    const s = box / Math.max(img.naturalWidth, img.naturalHeight);
+    const w = img.naturalWidth * s, h = img.naturalHeight * s;
+    let src = img;
+    if (white) {
+      src = Object.assign(document.createElement('canvas'), { width: img.naturalWidth, height: img.naturalHeight });
+      const c = src.getContext('2d');
+      c.drawImage(img, 0, 0);
+      c.globalCompositeOperation = 'source-in';
+      c.fillStyle = '#fff';
+      c.fillRect(0, 0, src.width, src.height);
+    }
+    ctx.drawImage(src, cx - w / 2, cy - h / 2, w, h);
+  };
+
+  let tool = -1, typeStart = 0, dirty = true, caretOn = true, minute = -1;
+  const pop = { x: 0, v: 0 };
+  const descLines = (text, maxW) => {
+    g.font = `400 34px ${MONO}`;
+    const lines = [];
+    let line = '';
+    for (const word of text.split(' ')) {
+      const next = line ? `${line} ${word}` : word;
+      if (line && g.measureText(next).width > maxW) { lines.push(line); line = word; } else line = next;
+    }
+    return line ? [...lines, line] : lines;
+  };
+  const roundRect = (x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+
+  const drawScreen = (now) => {
+    g.fillStyle = wallpaper;
+    g.fillRect(0, 0, SW, SH);
+    g.fillStyle = 'rgba(255, 255, 255, 0.22)';
+    g.fillRect(0, 0, SW, 46);
+    g.fillStyle = '#fff';
+    g.font = `500 22px ${UI}`;
+    g.textBaseline = 'middle';
+    g.textAlign = 'left';
+    g.fillText("Avish's MacBook", 30, 24);
+    g.textAlign = 'right';
+    g.fillText(new Date().toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' }), SW - 30, 24);
+
+    if (pop.x < 0.99) {
+      g.globalAlpha = clamp01(1 - pop.x * 1.5);
+      g.textAlign = 'center';
+      g.font = `400 36px ${MONO}`;
+      g.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      g.fillText(`Press a tool key ${caretOn ? '_' : ' '}`, SW / 2, SH / 2);
+      g.globalAlpha = 1;
+    }
+
+    if (tool >= 0 && pop.x > 0.01) {
+      const t = TOOLS[tool];
+      const w = 1040, h = 420, x = -w / 2, y = -h / 2;
+      g.save();
+      g.globalAlpha = clamp01(pop.x * 1.5);
+      g.translate(SW / 2, SH * 0.52);
+      g.scale(0.88 + 0.12 * pop.x, 0.88 + 0.12 * pop.x);
+      g.shadowColor = 'rgba(13, 30, 80, 0.35)';
+      g.shadowBlur = 70;
+      g.shadowOffsetY = 26;
+      g.fillStyle = 'rgba(255, 255, 255, 0.94)';
+      roundRect(x, y, w, h, 30);
+      g.fill();
+      g.shadowColor = 'transparent';
+      g.fillStyle = '#EBEBEB';
+      g.fillRect(x, y + 64, w, 2);
+      ['#ff5f57', '#febc2e', '#28c840'].forEach((c, k) => { g.fillStyle = c; g.beginPath(); g.arc(x + 42 + k * 34, y + 32, 11, 0, Math.PI * 2); g.fill(); });
+      g.fillStyle = '#646464';
+      g.font = `500 24px ${MONO}`;
+      g.textAlign = 'center';
+      g.fillText(`${t.name}.app`, 0, y + 33);
+      drawLogo(g, logos[tool], x + 139, y + 64 + (h - 64) / 2, 150, false);
+      g.textAlign = 'left';
+      g.textBaseline = 'alphabetic';
+      g.fillStyle = '#212121';
+      g.font = `600 88px ${DISPLAY}`;
+      g.fillText(t.name, x + 270, y + 190);
+      const typed = reduceMotion ? Infinity : Math.floor((now - typeStart) / 22);
+      let left = typed;
+      g.fillStyle = '#646464';
+      descLines(t.desc, w - 320).forEach((line, k) => {
+        if (left <= 0) return;
+        g.fillText(line.slice(0, left), x + 270, y + 250 + k * 46);
+        left -= line.length + 1;
+      });
+      g.restore();
+    }
+    screenTex.needsUpdate = true;
+  };
+
+  // ── Tool keycaps over keys 1–6, each with a backlight that glows in the tool's colour ──
+  const capGeo = new RoundedBoxGeometry(KEY_SIZE, 0.3, KEY_SIZE, 3, 0.15);
+  const capMat = new THREE.MeshStandardMaterial({ color: 0x1e2026, roughness: 0.55, metalness: 0.1 });
+  const glowCanvas = Object.assign(document.createElement('canvas'), { width: 128, height: 128 });
+  const gg = glowCanvas.getContext('2d');
+  gg.filter = 'blur(12px)';
+  gg.fillStyle = '#fff';
+  gg.beginPath();
+  gg.roundRect(28, 28, 72, 72, 14);
+  gg.fill();
+  const glowTex = new THREE.CanvasTexture(glowCanvas);
+  const caps = TOOLS.map((t, i) => {
+    const decal = Object.assign(document.createElement('canvas'), { width: 256, height: 256 });
+    const decalTex = new THREE.CanvasTexture(decal);
+    decalTex.colorSpace = THREE.SRGBColorSpace;
+    decalTex.anisotropy = 4;
+
+    const group = new THREE.Group();
+    group.position.set(KEY_XS[i], KEY_Y, KEY_Z);
+    const body = new THREE.Group();
+    const cap = new THREE.Mesh(capGeo, capMat);
+    cap.position.y = 0.1;
+    const top = new THREE.Mesh(new THREE.PlaneGeometry(KEY_SIZE * 0.94, KEY_SIZE * 0.94), new THREE.MeshBasicMaterial({ map: decalTex, transparent: true, toneMapped: false }));
+    top.rotation.x = -Math.PI / 2;
+    top.position.y = 0.252;
+    // An invisible tap target covering the whole key pitch, so small keys are easy to hit.
+    const hit = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 2.2), new THREE.MeshBasicMaterial({ visible: false }));
+    hit.rotation.x = -Math.PI / 2;
+    hit.position.y = 0.26;
+    hit.userData.index = i;
+    body.add(cap, top, hit);
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(KEY_SIZE * 1.7, KEY_SIZE * 1.7), new THREE.MeshBasicMaterial({ map: glowTex, color: t.key, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+    glow.rotation.x = -Math.PI / 2;
+    glow.position.y = 0.06;
+    group.add(glow, body);
+    content.add(group);
+    // Painted once the logos and fonts have loaded.
+    const paint = () => {
+      const d = decal.getContext('2d');
+      drawLogo(d, logos[i], 128, 112, 120, t.invert);
+      d.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      d.font = `500 24px ${MONO}`;
+      d.textBaseline = 'alphabetic';
+      d.fillText(t.name.toUpperCase(), 22, 234);
+      d.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      d.textAlign = 'right';
+      d.fillText(String(i + 1), 234, 42);
+      decalTex.needsUpdate = true;
+    };
+    return { body, glow, press: { x: 0, v: 0 }, light: { x: 0, v: 0 }, hit, paint };
+  });
+  const hitTargets = caps.map((c) => c.hit);
+
+  // ── State ──
+  const lid = { x: reduceMotion ? 0 : LID_CLOSED, v: 0 };
+  let lidTarget = lid.x, pivot = null;
+  const yaw = { x: REST_YAW, v: 0 }, pitch = { x: 0, v: 0 };
+  let yawTarget = REST_YAW, pitchTarget = 0;
+  let hovered = -1, focused = -1, ready = false, visible = false;
+
+  section.addEventListener('tool:open', (e) => {
+    const i = e.detail.index;
+    tool = i;
+    typeStart = performance.now();
+    pop.x = reduceMotion ? 1 : 0;
+    pop.v = 0;
+    caps[i].press.x = -0.14;
+    caps[i].press.v = 0;
+    lidTarget = 0;
+    dirty = true;
+  });
+  buttons.forEach((b, i) => {
+    b.addEventListener('focus', () => { focused = i; });
+    b.addEventListener('blur', () => { if (focused === i) focused = -1; });
+  });
+
+  // ── Pointer: hover tilt, drag to turn, tap a keycap to press it ──
+  const ray = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+  const capAt = (e) => {
+    const r = canvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(hitTargets, false)[0];
+    return hit ? hit.object.userData.index : -1;
+  };
+  let drag = null;
+  canvas.addEventListener('pointerdown', (e) => {
+    drag = { x: e.clientX, yaw: yaw.x, moved: false, id: e.pointerId };
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    const r = canvas.getBoundingClientRect();
+    if (drag) {
+      const dx = e.clientX - drag.x;
+      if (!drag.moved && Math.abs(dx) > 6) {
+        drag.moved = true;
+        canvas.setPointerCapture(drag.id);
+        canvas.classList.add('is-dragging');
+      }
+      if (drag.moved) yawTarget = Math.max(-1.3, Math.min(1.3, drag.yaw + dx * 0.008));
+      return;
+    }
+    if (e.pointerType === 'mouse' && !reduceMotion) {
+      yawTarget = REST_YAW + ((e.clientX - r.left) / r.width - 0.5) * 0.3;
+      pitchTarget = ((e.clientY - r.top) / r.height - 0.5) * 0.08;
+    }
+    hovered = capAt(e);
+    canvas.style.cursor = hovered >= 0 ? 'pointer' : '';
+  });
+  const endDrag = (e) => {
+    if (!drag) return;
+    if (!drag.moved && e.type === 'pointerup') {
+      const i = capAt(e);
+      if (i >= 0) buttons[i].click();
+    }
+    drag = null;
+    canvas.classList.remove('is-dragging');
+    yawTarget = REST_YAW;
+  };
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+  canvas.addEventListener('pointerleave', () => {
+    hovered = -1;
+    if (!drag) { yawTarget = REST_YAW; pitchTarget = 0; }
+  });
+
+  // ── Size: the canvas sits exactly over the (scaled) CSS Mac ──
+  // Fit the open laptop's box corners to the desk: the closest camera distance at which their projected extent fits,
+  // plus where that extent's centre lands (in NDC) so the view can be shifted to centre it.
+  let corners = [];
+  const probe = new THREE.PerspectiveCamera(FOV, 1, 1, 1000);
+  const v = new THREE.Vector3();
+  const extent = (d, aspect) => {
+    probe.aspect = aspect;
+    probe.updateProjectionMatrix();
+    probe.position.set(0, Math.sin(ELEVATION) * d, Math.cos(ELEVATION) * d);
+    probe.lookAt(0, 0, 0);
+    probe.updateMatrixWorld();
+    const e = { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity };
+    corners.forEach((c) => {
+      v.copy(c).project(probe);
+      e.x0 = Math.min(e.x0, v.x); e.x1 = Math.max(e.x1, v.x);
+      e.y0 = Math.min(e.y0, v.y); e.y1 = Math.max(e.y1, v.y);
+    });
+    return e;
+  };
+  const fit = (aspect) => {
+    if (!corners.length) return { dist: 80, cx: 0, cy: 0 };
+    let lo = 5, hi = 500;
+    for (let k = 0; k < 32; k++) {
+      const mid = (lo + hi) / 2, e = extent(mid, aspect);
+      if (e.x1 - e.x0 <= 1.94 && e.y1 - e.y0 <= 1.94) hi = mid; else lo = mid;
+    }
+    const e = extent(hi, aspect);
+    return { dist: hi, cx: (e.x0 + e.x1) / 2, cy: (e.y0 + e.y1) / 2 };
+  };
+
+  // The camera is fitted to the desk box, then the field of view widens to cover the bleed at the same scale.
+  const place = () => {
+    const w = desk.clientWidth, h = desk.clientHeight;
+    if (!w) return;
+    const bw = Math.round(w * BLEED), bh = Math.round(h * BLEED);
+    canvas.style.left = `${-bw}px`;
+    canvas.style.top = `${-bh}px`;
+    renderer.setSize(w + 2 * bw, h + 2 * bh);
+    camera.aspect = (w + 2 * bw) / (h + 2 * bh);
+    const tanHalf = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
+    const { dist, cx, cy } = fit(w / h);
+    camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(tanHalf * (h + 2 * bh) / h));
+    camera.position.set(0, Math.sin(ELEVATION) * dist, Math.cos(ELEVATION) * dist);
+    camera.lookAt(0, 0, 0);
+    // Shift the view so the laptop's projected outline is centred in the desk box.
+    const cw = w + 2 * bw, ch = h + 2 * bh;
+    camera.setViewOffset(cw, ch, (cx * w) / 2, (-cy * h) / 2, cw, ch);
+    camera.updateProjectionMatrix();
+  };
+  new ResizeObserver(() => requestAnimationFrame(place)).observe(desk);
+
+  // ── Frame loop, only while the section is on screen ──
+  let raf = 0, last = 0;
+  const frame = (now) => {
+    raf = requestAnimationFrame(frame);
+    const dt = Math.min(1 / 30, (now - last) / 1000 || 1 / 60);
+    last = now;
+    spring(lid, lidTarget, 40, 11, dt);
+    spring(yaw, yawTarget, drag ? 300 : 60, drag ? 30 : 11, dt);
+    spring(pitch, pitchTarget, 60, 12, dt);
+    if (pivot) pivot.rotation.x = lid.x;
+    rig.rotation.set(pitch.x, yaw.x, 0);
+    screenMat.color.setScalar(0.12 + 0.88 * clamp01(1 - lid.x / 1.3));
+    caps.forEach((c, i) => {
+      spring(c.press, 0, 320, 16, dt);
+      c.body.position.y = c.press.x;
+      spring(c.light, i === tool ? 1 : i === focused ? 0.7 : i === hovered ? 0.4 : 0, 120, 18, dt);
+      c.glow.material.opacity = clamp01(c.light.x);
+    });
+    if (tool >= 0 && pop.x < 0.999 || Math.abs(pop.v) > 0.001) { spring(pop, 1, 170, 16, dt); dirty = true; }
+    if (tool >= 0 && !reduceMotion && now - typeStart < TOOLS[tool].desc.length * 22 + 60) dirty = true;
+    const caret = Math.floor(now / 500) % 2 === 0;
+    if (caret !== caretOn && pop.x < 0.99) { caretOn = caret; dirty = true; }
+    const m = new Date().getMinutes();
+    if (m !== minute) { minute = m; dirty = true; }
+    if (dirty) { drawScreen(now); dirty = false; }
+    renderer.render(scene, camera);
+  };
+  const run = (on) => {
+    if (on && !raf && ready) { last = 0; raf = requestAnimationFrame(frame); }
+    if (!on && raf) { cancelAnimationFrame(raf); raf = 0; }
+  };
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    if (visible && e.intersectionRatio > 0.3) lidTarget = 0;
+    run(visible);
+  }, { root: scroller, threshold: [0, 0.3, 0.6] }).observe(desk);
+
+  // ── Load the model when the section is getting close ──
+  const load = async () => {
+    const [gltf] = await Promise.all([
+      new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync('assets/models/macbook.glb'),
+      document.fonts.load(`600 88px ${DISPLAY}`),
+      document.fonts.load(`400 34px ${MONO}`),
+      logosReady,
+    ]);
+    caps.forEach((c) => c.paint());
+    const model = gltf.scene;
+    content.add(model);
+    model.updateMatrixWorld(true);
+    const lidNode = model.getObjectByName(LID_NODE);
+    const screen = model.getObjectByName(SCREEN_MESH);
+    if (!lidNode || !screen) throw new Error('model parts not found');
+    screen.material = screenMat;
+    // Hinge the lid: a pivot on the hinge line, attached keeping the lid where it is.
+    pivot = new THREE.Group();
+    pivot.position.copy(HINGE);
+    content.add(pivot);
+    content.updateMatrixWorld(true);
+    pivot.attach(lidNode);
+    // Measure the laptop with its lid open, centre it on the rig's pivot, and keep the box corners for fitting.
+    pivot.rotation.x = 0;
+    content.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(model).expandByObject(pivot); // the lid now lives on the pivot
+    const mid = box.getCenter(new THREE.Vector3());
+    content.position.copy(mid).negate();
+    box.translate(content.position);
+    corners = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => new THREE.Vector3(k & 1 ? box.max.x : box.min.x, k & 2 ? box.max.y : box.min.y, k & 4 ? box.max.z : box.min.z));
+    // Shape the desk box to the laptop's outline from this camera angle, so it fills the box both ways.
+    const e = extent(fit(1).dist, 1);
+    desk.style.setProperty('--desk-ar', Math.min(1.8, Math.max(0.9, (e.x1 - e.x0) / (e.y1 - e.y0))).toFixed(3));
+    pivot.rotation.x = lid.x;
+    ready = true;
+    place();
+    drawScreen(performance.now());
+    canvas.classList.add('is-ready');
+    run(visible);
+  };
+  const near = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting) return;
+    near.disconnect();
+    load().catch(fallBack);
+  }, { root: scroller, rootMargin: '1200px 0px' });
+  near.observe(desk);
+}
+</script>
+</body>
+</html>
