@@ -186,6 +186,8 @@ Rules: animate only `transform`, `opacity`, `filter`, `clip-path`. Every animati
 - **Sticker** — WebGL-rendered round sticker (white disc + logo). Hover: the edge nearest the cursor lifts slightly and the sticker leans toward it with a holographic sheen. Grab: a flap curls over a cylinder from the grabbed edge to show the paper backing, the sticker lifts (shadow grows) and tilts with drag speed. Drop anywhere to stick; returns home after 5s. Springs drive every value; flat CSS fallback without WebGL.
 - **Work, option B (gallery frame)** — *live; option A (card deck, `#work`) is temporarily shown above it and will be removed later.* Pinned stage: a still gold frame (`assets/gold-frame.png`, opening insets 18.52 / 15.9 / 16.96 / 15.9 %) beside a project list. Scrolling drops the next picture in from the top *inside* the opening while the current one sinks back (scale 0.92, brightness 0.7). The active project unfolds glass tags, a 54px gradient title and description; the rest stay as faded 36px titles that scroll to their project on click.
 - **Tools desk** (`#tools`) — laid out like the Work stage: a giant centred "MY TOOLS" (`--title` size, `--grad-display`) with the MacBook overlapping its lower part (desk `margin-top: -0.62 × --title`) and the mono hint underneath. The iPhone is parked (`hidden`). The desk box takes the laptop's outline from the camera angle (`--desk-ar`, set by the 3D script; 1.19 for the CSS Mac fallback) and is capped at 1000px / 76svh tall. The 3D canvas bleeds 25% past the desk so the shadow and drag never hit its edge; the section clips sideways overflow. The camera is fitted to the open laptop's measured box and view-offset to centre it. Six tool keycaps (Figma, Claude, ChatGPT, Gemini, Framer, Adobe) use the supplied logo images in `assets/tools/*.png` (256px; ChatGPT's black mark is drawn white on keys). Pressing a key (click, tap or 1–6 while in view) plays a Web Audio "thock" and springs an app window onto the screen whose mono description types out (instant under reduced motion; announced via a polite live region). **3D Mac:** when WebGL is available, a three.js render of `assets/models/macbook.glb` (Sketchfab model by jackbaeten, CC BY 4.0, credited in the Credits dialog; compressed with gltf-transform meshopt + WebP, 10.6MB → 1.2MB) sits exactly over the CSS Mac, which stays invisible underneath so its buttons still work for keyboard and screen readers (a focused button lights its 3D key). Camera is square-on and high (~53°) so the keyboard reads from above while the screen still faces the viewer. It loads 1200px before the section, the lid springs open on first view, the screen is a live canvas drawing the same app window, tool keycaps with brand-colour backlights sit on keys 1–6 (full-pitch invisible tap targets), hover tilts it slightly and dragging turns it, springing back on release. Renders only while on screen; the CSS Mac returns if loading fails.
+- **Work, option D (spatial glass windows)** — *prototype* (`#work-spatial`, above the deck and the gallery for comparison), on a faded-in glass world. Pinned stage with the giant "MY WORK" behind; each project is a floating glass window (tier-2 bezel around a 16:10 screen, visionOS-style grab bar) at its own depth. Scroll progress p sets each window's depth d = i − p: waiting windows (d > 0) are pushed back, drift to their own offset, blur 3.5px and dim 14% per step; the front window tilts slightly toward the cursor; a passing window (d < 0) rushes toward the viewer and fades. Motion eases toward the scroll position. One tier-3 glass details panel at the bottom swaps to the front project (tags, linked title ↗, description; inactive panels are `inert`). Reduced motion: windows crossfade in place. LoanMonk shows the real product shot (`cs-loanmonk.jpg`) over its hills scene; the others still show icon placeholders.
+- **Glass world fade** — `.glass-world` fades in from the white page and back out over `--world-fade` (160–260px) at each edge via a mask on the backdrop, blobs and grain; padding keeps content on solid blue. Uses `overflow: clip` (not hidden) so pinned stages inside it stay sticky.
 - **Testimonial card** — paper, avatar + name/role header, dashed divider, mono quote.
 - **About popover** — slides from behind the notch.
 - **Pull-cord** — doorbell.
@@ -194,6 +196,26 @@ Rules: animate only `transform`, `opacity`, `filter`, `clip-path`. Every animati
 - **Name card** — dictionary entry on paper (word, part of speech, numbered senses with emoji, mono definition). Trails the cursor on hover, opens on tap or keyboard focus, closes on leave, Esc, outside tap or scroll.
 
 ---
+
+## 9a. Liquid glass system (in progress)
+
+**Direction (decided):** the whole site becomes one liquid-glass world, so every section speaks the same material instead of mixing glass, paper, gold and product renders.
+
+- **World:** a deep-blue backdrop behind everything (`--world-base` + `--world-vignette` + grain), with soft blue colour fields drifting slowly (`.gw-blob`, radial gradients, frozen under reduced motion) so glass always has something to bend. White type throughout (`--ink-glass`, `--ink-glass-muted`, `--ink-glass-subtle`); headings use `--grad-display-glass`.
+- **Tier 1, chrome** (notch, pills, toggle, keycaps, buttons): full refraction, the `.gp-layers` recipe. Frosted fallback where SVG backdrop refraction isn't supported (Safari, Firefox, iOS).
+- **Tier 2, panels** (cards, footer): `.glass-panel`, blur + tint + rim + top specular streak, no refraction (costly on big areas, hurts legibility). The navy under-tint in `--glass-panel-bg` keeps white text readable over light parts of the world.
+- **Tier 3, overlays** (popovers, dialogs, tooltips): `.glass-overlay`, heavier frost.
+
+**Plan, one step at a time with a review after each:**
+0. Restore point: local commit `8c82ed4` on branch `v2-redesign` (done).
+1. World + tokens + component, trialled on Testimonials only (done, awaiting review).
+2. Make the world global (fixed behind the scroll), then convert Hero, Work, Tools, Footer + popovers in turn.
+   - Work: build **both** a glass card deck and the gallery with a glass frame, then choose one.
+   - Tools: keep the 3D MacBook as the one solid object; its app window and keycaps become glass.
+   - Stickers → removed or holographic glass; pull-cord knob → glass bead; footer "AVISH" → glass lettering.
+3. Cleanup, Safari / phone / contrast / performance pass, update this file.
+
+Open (story, not styling): the one sentence a visitor should remember, and which projects were designed **and** shipped.
 
 ## 10. Decisions log
 
