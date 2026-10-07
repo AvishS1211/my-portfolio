@@ -59,6 +59,7 @@ Body copy is never pure `#000`. **[applied]** testimonial quotes `#000` → `--i
 | Token | Value | Used for |
 |---|---|---|
 | `--grain` | SVG fractal-noise tile, 220px, 16% opacity, `overlay` blend | Hero gradient (under the copy) |
+| `--grain` (page) | same tile, 8% opacity, normal blend, on `.frame::before` behind all content | Light paper grain over the whole white page background (cards and images stay clean) |
 
 **Rules:** one accent hue only; no new blues outside this scale; text that must be read uses an ink token, never a light blue.
 
@@ -119,7 +120,7 @@ Three families maximum. No serif, no fourth face.
 | Token | Value | Used for |
 |---|---|---|
 | `--r-xs` | 4 | Media inside a card |
-| `--r-sm` | 8 | Case-study card, avatar top-left notch |
+| `--r-sm` | 8 | Avatar top-left notch |
 | `--r-md` | 12 | Frame, CTA, glass pill, avatar |
 | `--r-lg` | 18 | Testimonial card |
 | `--r-xl` | 24 (×scale) | About popover |
@@ -177,45 +178,21 @@ Rules: animate only `transform`, `opacity`, `filter`, `clip-path`. Every animati
 - **Frame** — fixed rounded window, all content scrolls inside it.
 - **Notch nav** — liquid-glass, draggable, returns after 5s, tooltips.
 - **Section heading** — 1–3 words, Condensed 700, UPPERCASE, `--grad-display` text fill (`display-l` for pinned stages, `heading-l` elsewhere), followed by a mono `body-l` subline in `--ink-muted`. Never a full sentence in the fading gradient.
-- **"Currently" pill** — light liquid-glass pill pinned top-left of the hero (joins the flow, centred above the headline, below 1080px): pulsing green live dot, what I'm doing, and my local time (Asia/Kolkata, "IST"; adds "probably asleep" before 7 AM). Optional "On repeat" song with animated equaliser bars. Content lives in the `CURRENTLY` object in the script (edited by hand; YouTube Music has no public now-playing feed).
-- **Work-experience tags** — a paper tag per company in the lower hero, in date order (AthrVEd → ForeignAdmits → BigBlockTheory), each hanging from its own glossy blue pushpin (pins in a row at 20 / 50 / 80% of the width; no connecting line — tried and rejected). Tag: round logo (blue Condensed monogram until a real logo exists), company in Condensed 600, years in mono, green dot on the current one; dark tooltip with role and exact dates on hover, or tap on touch. Each tag is a damped pendulum about its pin: swings in on load, the cursor's movement stirs a breeze, tags can be grabbed and flicked. Runs only while moving and on screen; static under reduced motion.
+- **"Now" pill (my day)** — light liquid-glass pill pinned top-left of the hero (joins the flow, centred above the headline, below 1080px). Shows the current slot of my daily timetable in IST plus the time ("Building with AI · 8:04 PM IST"): pulsing green dot, or a dim still dot while asleep. Not interactive (a dropdown listing the whole day was tried and removed). The 8 slots (7 AM gym → 11 PM onwards sleeping) live in `SCHEDULE` in the script.
+- **Work-experience tags** — *PARKED (`hidden`), code kept.* a paper tag per company in the lower hero, in date order (ForeignAdmits → BigBlockTheory; AthrVEd removed at the user's request), each hanging from its own glossy blue pushpin (pins in a row at 33 / 67% of the width; no connecting line — tried and rejected). Tag: round logo (ForeignAdmits badge; BigBlockTheory's cube mark cropped from its wordmark, on white), company in Condensed 600, years in mono, green dot on the current one; dark tooltip with role and exact dates on hover, or tap on touch. Each tag is a damped pendulum about its pin: swings in on load, the cursor's movement stirs a breeze, tags can be grabbed and flicked. Runs only while moving and on screen; static under reduced motion.
 - **Hero CTA** — white→blue-100 gradient, Condensed 700 uppercase, blue-600 text.
 - **Glass pill** — section label.
-- **Work toggle** — liquid-glass segmented control (Design Work / AI Work), centred at the bottom of the pinned Work stage (the deck reserves room for it). The thumb is liquid glass with the notch's layer recipe (softer `#thumb-glass` distortion, blur, white tint, rim, shine) and acts as a lens above the labels, showing a 1.12× magnified blue copy of the text beneath; a spring drives its position and width, it stretches and squashes with speed, swells to 1.1× while held, and can be dragged — it snaps to the nearest tab on release. ARIA tablist; ← → switch; switching restarts the deck on the new set.
-- **Case-study card** — paper, notched image mask, mono kicker/year, gradient title, mono description, peelable sticker.
-- **Sticker** — WebGL-rendered round sticker (white disc + logo). Hover: the edge nearest the cursor lifts slightly and the sticker leans toward it with a holographic sheen. Grab: a flap curls over a cylinder from the grabbed edge to show the paper backing, the sticker lifts (shadow grows) and tilts with drag speed. Drop anywhere to stick; returns home after 5s. Springs drive every value; flat CSS fallback without WebGL.
-- **Work, option B (gallery frame)** — *live; option A (card deck, `#work`) is temporarily shown above it and will be removed later.* Pinned stage: a still gold frame (`assets/gold-frame.png`, opening insets 18.52 / 15.9 / 16.96 / 15.9 %) beside a project list. Scrolling drops the next picture in from the top *inside* the opening while the current one sinks back (scale 0.92, brightness 0.7). The active project unfolds glass tags, a 54px gradient title and description; the rest stay as faded 36px titles that scroll to their project on click.
+- **Work (gallery frame)** — *the only Work section; the card deck (`#work`, with the Design/AI toggle and peelable WebGL stickers) was removed — recoverable from git commit `7740feb`.* Pinned stage: a still carved glass frame (`assets/glass-frame.webp`, 1600×2000; the white mat inside it is cut away at the frame's carved inner edge, x 308–1322, y 296–1682, with a two-layer CSS mask, so only the glass frame and the thumbnail show — the thumbnail fills the opening and runs slightly under the carving, as with the old gold frame; the drop shadow sits on `.wg-frame` so the mask can't clip it; the old `gold-frame.png` is unused) beside a project list. Scrolling drops the next picture in from the top *inside* the opening while the current one sinks back (scale 0.92, brightness 0.7). The active project unfolds glass tags, a 54px gradient title and description; the rest stay as faded 36px titles that scroll to their project on click.
 - **Tools desk** (`#tools`) — laid out like the Work stage: a giant centred "MY TOOLS" (`--title` size, `--grad-display`) with the MacBook overlapping its lower part (desk `margin-top: -0.62 × --title`) and the mono hint underneath. The iPhone is parked (`hidden`). The desk box takes the laptop's outline from the camera angle (`--desk-ar`, set by the 3D script; 1.19 for the CSS Mac fallback) and is capped at 1000px / 76svh tall. The 3D canvas bleeds 25% past the desk so the shadow and drag never hit its edge; the section clips sideways overflow. The camera is fitted to the open laptop's measured box and view-offset to centre it. Six tool keycaps (Figma, Claude, ChatGPT, Gemini, Framer, Adobe) use the supplied logo images in `assets/tools/*.png` (256px; ChatGPT's black mark is drawn white on keys). Pressing a key (click, tap or 1–6 while in view) plays a Web Audio "thock" and springs an app window onto the screen whose mono description types out (instant under reduced motion; announced via a polite live region). **3D Mac:** when WebGL is available, a three.js render of `assets/models/macbook.glb` (Sketchfab model by jackbaeten, CC BY 4.0, credited in the Credits dialog; compressed with gltf-transform meshopt + WebP, 10.6MB → 1.2MB) sits exactly over the CSS Mac, which stays invisible underneath so its buttons still work for keyboard and screen readers (a focused button lights its 3D key). Camera is square-on and high (~53°) so the keyboard reads from above while the screen still faces the viewer. It loads 1200px before the section, the lid springs open on first view, the screen is a live canvas drawing the same app window, tool keycaps with brand-colour backlights sit on keys 1–6 (full-pitch invisible tap targets), hover tilts it slightly and dragging turns it, springing back on release. Renders only while on screen; the CSS Mac returns if loading fails.
-- **Work, option D (spatial glass windows)** — *prototype* (`#work-spatial`, above the deck and the gallery for comparison), on a faded-in glass world. Pinned stage with the giant "MY WORK" behind; each project is a floating glass window (tier-2 bezel around a 16:10 screen, visionOS-style grab bar) at its own depth. Scroll progress p sets each window's depth d = i − p: waiting windows (d > 0) are pushed back, drift to their own offset, blur 3.5px and dim 14% per step; the front window tilts slightly toward the cursor; a passing window (d < 0) rushes toward the viewer and fades. Motion eases toward the scroll position. One tier-3 glass details panel at the bottom swaps to the front project (tags, linked title ↗, description; inactive panels are `inert`). Reduced motion: windows crossfade in place. LoanMonk shows the real product shot (`cs-loanmonk.jpg`) over its hills scene; the others still show icon placeholders.
-- **Glass world fade** — `.glass-world` fades in from the white page and back out over `--world-fade` (160–260px) at each edge via a mask on the backdrop, blobs and grain; padding keeps content on solid blue. Uses `overflow: clip` (not hidden) so pinned stages inside it stay sticky.
 - **Testimonial card** — paper, avatar + name/role header, dashed divider, mono quote.
 - **About popover** — slides from behind the notch.
-- **Pull-cord** — doorbell.
+- **Pull-cord** — doorbell. Every finished pull (drag past the detent, click, or Enter) rings the bell and then opens the doorbell note.
+- **Doorbell note** — the Credits card style as a native modal `<dialog>` titled "You rang?": message (required), optional name and email (used as reply-to), hidden spam-trap field, Send button with sending / delivered / error states (error offers a mailto fallback). Opens 600ms after the pull so the ding rings out; keeps an unsent draft, clears old errors on reopen. Notes are emailed to `closerharveyspecter@gmail.com` via FormSubmit's AJAX endpoint (no backend; the inbox owner must click "Activate Form" in FormSubmit's first email before anything is delivered).
 - **Footer** — "Say hello" mono label, email in Condensed 600 with a Copy button (status announced politely), mono uppercase links with ↗, base line (© · "Built with Claude Code" · back to top), then a giant "AVISH" wordmark in the section-heading treatment, sized to the frame's inner width and cropped by its bottom edge.
 - **Credits dialog** — "Credits" text button in the footer base line opens a native modal `<dialog>` on paper (gradient Condensed title, ✕ button, dashed-divider list of item + mono attribution with blue links). Closes on ✕, Esc or a click outside; springs in, plain under reduced motion. Add every third-party asset here.
 - **Name card** — dictionary entry on paper (word, part of speech, numbered senses with emoji, mono definition). Trails the cursor on hover, opens on tap or keyboard focus, closes on leave, Esc, outside tap or scroll.
 
 ---
-
-## 9a. Liquid glass system (in progress)
-
-**Direction (decided):** the whole site becomes one liquid-glass world, so every section speaks the same material instead of mixing glass, paper, gold and product renders.
-
-- **World:** a deep-blue backdrop behind everything (`--world-base` + `--world-vignette` + grain), with soft blue colour fields drifting slowly (`.gw-blob`, radial gradients, frozen under reduced motion) so glass always has something to bend. White type throughout (`--ink-glass`, `--ink-glass-muted`, `--ink-glass-subtle`); headings use `--grad-display-glass`.
-- **Tier 1, chrome** (notch, pills, toggle, keycaps, buttons): full refraction, the `.gp-layers` recipe. Frosted fallback where SVG backdrop refraction isn't supported (Safari, Firefox, iOS).
-- **Tier 2, panels** (cards, footer): `.glass-panel`, blur + tint + rim + top specular streak, no refraction (costly on big areas, hurts legibility). The navy under-tint in `--glass-panel-bg` keeps white text readable over light parts of the world.
-- **Tier 3, overlays** (popovers, dialogs, tooltips): `.glass-overlay`, heavier frost.
-
-**Plan, one step at a time with a review after each:**
-0. Restore point: local commit `8c82ed4` on branch `v2-redesign` (done).
-1. World + tokens + component, trialled on Testimonials only (done, awaiting review).
-2. Make the world global (fixed behind the scroll), then convert Hero, Work, Tools, Footer + popovers in turn.
-   - Work: build **both** a glass card deck and the gallery with a glass frame, then choose one.
-   - Tools: keep the 3D MacBook as the one solid object; its app window and keycaps become glass.
-   - Stickers → removed or holographic glass; pull-cord knob → glass bead; footer "AVISH" → glass lettering.
-3. Cleanup, Safari / phone / contrast / performance pass, update this file.
-
-Open (story, not styling): the one sentence a visitor should remember, and which projects were designed **and** shipped.
 
 ## 10. Decisions log
 
