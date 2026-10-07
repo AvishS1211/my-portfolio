@@ -158,10 +158,10 @@
 
   /* "Now" pill: light liquid glass on the hero blue, pinned top-left (joins the flow above the headline when the frame
      is too narrow to clear the notch). Shows the current slot of my day. */
-  .hero > .now { position: absolute; z-index: 3; top: var(--space-5); left: var(--space-5); max-width: calc(50% - 190px); }
+  .hero > .now { position: absolute; z-index: 3; top: 14px; left: 14px; max-width: calc(50% - 190px); }
   .now-pill {
     position: relative; display: inline-flex; align-items: center; gap: var(--space-2); max-width: 100%; padding: 8px 14px;
-    border-radius: var(--r-pill); box-shadow: 0 4px 14px rgb(13 30 80 / 0.18);
+    border-radius: 6px; box-shadow: 0 4px 14px rgb(13 30 80 / 0.18);
     font: 500 13px/1.2 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-on-blue); white-space: nowrap;
   }
   .now-pill .gp-tint { background: linear-gradient(135deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.1)); }
@@ -251,6 +251,102 @@
   .tools .framed { display: block; padding: 0.096em; background: var(--surface); }
   .tools .framed img { display: block; width: 100%; height: 100%; border-radius: 0.31em; }
   @media (max-width: 480px) { .about-card { --s: 1; } }
+
+  /* ─── Work, idea A: Liquid Glass project viewer (prototype) ─── */
+  .wa-track {
+    --nav: 88px;
+    --stage-h: max(560px, calc(100svh - 2 * var(--gutter) - 2px - var(--nav)));
+    --title: clamp(56px, min(11vw, 13svh), 150px);
+    position: relative; height: calc(var(--stage-h) * var(--n));
+  }
+  .wa-stage { position: sticky; top: var(--nav); height: var(--stage-h); }
+  .wa .wa-title {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%); margin: 0; white-space: nowrap;
+    font: 700 var(--title)/1.2 var(--font-display); letter-spacing: var(--track-tight); text-transform: uppercase;
+    background: var(--grad-display); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  /* The content layer: a rounded media panel tucked over the lower part of the title. */
+  .wa-media {
+    --r: 28px;
+    position: absolute; left: 50%; top: calc(var(--title) * 0.66); bottom: var(--space-5);
+    width: min(1180px, calc(100% - 2 * var(--page-x))); transform: translateX(-50%);
+    border-radius: var(--r); overflow: hidden; background: #0c0c0d; box-shadow: var(--shadow-3); isolation: isolate;
+  }
+  .wa-scenes, .wa-scene { position: absolute; inset: 0; }
+  .wa-scene { display: grid; place-items: center; background: var(--media-bg, #0c0c0d); will-change: opacity, transform; }
+  .wa-scene > .wa-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); transform-origin: 50% 100%; }
+  .wa-scene > .wa-shot { position: absolute; left: 50%; top: 46%; height: 78%; width: auto; max-width: 86%; object-fit: contain; transform: translate(-50%, -50%); border-radius: 18px; box-shadow: 0 30px 60px rgb(0 0 0 / 0.35); }
+  /* Placeholder scenes (until real screens): the project's mark large on its colour, with its name. */
+  .wa-scene > .wa-mark { position: absolute; left: 50%; top: 40%; width: clamp(96px, 16%, 180px); height: auto; transform: translate(-50%, -50%); filter: drop-shadow(0 20px 40px rgb(0 0 0 / 0.4)); }
+  .wa-scene > .wa-scene-name { position: absolute; left: 0; right: 0; top: 58%; text-align: center; font: 700 clamp(28px, 4vw, 56px)/1 var(--font-display); letter-spacing: var(--track-tight); color: rgb(255 255 255 / 0.9); }
+  /* Apple's guidance for clear glass over bright media: a soft dark dimming band where the controls sit. */
+  .wa-dim { position: absolute; inset: auto 0 0; height: 34%; pointer-events: none; background: linear-gradient(to top, rgb(0 0 0 / 0.35), transparent); }
+
+  /* Glass layer — the floating project bar. Its selection is a liquid droplet that stretches toward the next tab. */
+  .wa-bar {
+    position: absolute; z-index: 3; left: 50%; bottom: var(--space-5); transform: translateX(-50%);
+    display: flex; align-items: center; height: 56px; padding: 6px; border-radius: var(--r-pill); box-shadow: 0 10px 30px rgb(0 0 0 / 0.28);
+    transition: width 520ms var(--ease-spring); overflow: hidden;
+  }
+  .wa-bar > .gp-layers .gp-tint, .wa-info > .gp-layers .gp-tint { background: linear-gradient(135deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.06)), rgb(0 0 0 / 0.12); }
+  .wa-tabs { position: relative; z-index: 2; display: flex; gap: 2px; transition: opacity 220ms ease; }
+  .wa-tab {
+    height: 44px; padding: 0 18px; border: none; border-radius: var(--r-pill); background: none; cursor: pointer; white-space: nowrap;
+    font: 600 17px/1 var(--font-display); letter-spacing: var(--track-snug); color: rgb(255 255 255 / 0.72); text-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+    transition: color 200ms ease;
+  }
+  .wa-tab:hover { color: #fff; }
+  .wa-tab[aria-current="true"] { color: #fff; }
+  .wa-tab:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+  .wa-drop { position: absolute; z-index: 1; top: 6px; left: 0; height: 44px; width: 0; border-radius: var(--r-pill); pointer-events: none; will-change: transform, width; }
+  .wa-drop .gp-tint { background: linear-gradient(135deg, rgb(255 255 255 / 0.42), rgb(255 255 255 / 0.18)); }
+  .wa-drop .gp-rim { box-shadow: inset 1.5px 1.5px 1px rgb(255 255 255 / 0.8), inset -1px -1px 1px rgb(255 255 255 / 0.4), 0 4px 12px rgb(0 0 0 / 0.18); }
+  /* Minimised (scrolling down): the bar recedes to a compact pill naming the current project. */
+  .wa-mini {
+    position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; white-space: nowrap; pointer-events: none;
+    font: 600 15px/1 var(--font-mono); letter-spacing: var(--track-tight); color: #fff; text-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+    opacity: 0; transition: opacity 220ms ease;
+  }
+  .wa-bar.is-min .wa-tabs, .wa-bar.is-min .wa-drop { opacity: 0; pointer-events: none; }
+  .wa-bar.is-min .wa-mini { opacity: 1; transition-delay: 120ms; }
+  .wa-bar.is-min { cursor: pointer; }
+
+  /* Glass layer — the info button, which morphs into the details panel (and back). */
+  .wa-info {
+    position: absolute; z-index: 4; right: var(--space-5); bottom: var(--space-5); width: 56px; height: 56px; border-radius: 28px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.28); color: #fff; overflow: hidden;
+    transition: width 560ms var(--ease-spring), height 560ms var(--ease-spring), border-radius 560ms var(--ease-spring);
+  }
+  .wa-info .gp-tint { transition: background 400ms ease; }
+  .wa-info.is-open .gp-tint { background: linear-gradient(135deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.06)), rgb(8 12 30 / 0.55); }
+  .wa-info-btn { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; border: none; border-radius: inherit; background: none; color: inherit; cursor: pointer; transition: opacity 180ms ease; }
+  .wa-info-btn svg { width: 22px; height: 22px; filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.35)); }
+  .wa-info-btn:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
+  .wa-info.is-open .wa-info-btn { opacity: 0; pointer-events: none; }
+  .wa-panel { position: absolute; z-index: 3; right: 0; bottom: 0; width: var(--panel-w, 420px); padding: var(--space-5); opacity: 0; visibility: hidden; transition: opacity 200ms ease, visibility 0s linear 200ms; }
+  .wa-info.is-open .wa-panel { opacity: 1; visibility: visible; transition: opacity 260ms ease 220ms; }
+  .wa-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid rgb(255 255 255 / 0.25); border-radius: 50%; background: rgb(255 255 255 / 0.1); color: #fff; cursor: pointer; font-size: 12px; }
+  .wa-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .wa-panel-body { display: flex; flex-direction: column; gap: var(--space-2); transition: opacity 200ms ease; }
+  .wa-panel-body.is-swapping { opacity: 0; }
+  .wa-tags { display: flex; flex-wrap: wrap; gap: 6px; padding-right: 40px; }
+  .wa-tags li { list-style: none; padding: 4px 10px; border-radius: var(--r-pill); background: rgb(255 255 255 / 0.14); border: 1px solid rgb(255 255 255 / 0.2); font: 500 12px/1.2 var(--font-mono); letter-spacing: var(--track-tight); text-transform: uppercase; }
+  .wa-name { margin: var(--space-1) 0 0; font: 600 28px/1.1 var(--font-display); letter-spacing: var(--track-snug); }
+  .wa-desc { font: 400 14px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: rgb(255 255 255 / 0.8); }
+  .wa-link { align-self: flex-start; margin-top: var(--space-2); padding: 10px 16px; border-radius: var(--r-pill); background: #fff; color: var(--ink-strong); font: 700 15px/1 var(--font-display); text-transform: uppercase; text-decoration: none; }
+  .wa-link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+  @media (max-width: 760px) {
+    .wa-media { --r: 22px; width: calc(100% - 2 * var(--space-4)); }
+    .wa-bar { bottom: 84px; height: 48px; padding: 4px; }
+    .wa-tab { height: 40px; padding: 0 12px; font-size: 14px; }
+    .wa-drop { top: 4px; height: 40px; }
+    .wa-info { right: var(--space-4); bottom: var(--space-4); width: 48px; height: 48px; }
+    .wa-panel { width: var(--panel-w, calc(100vw - 64px)); padding: var(--space-4); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wa-bar, .wa-info { transition: none; }
+  }
 
   /* ─── Work, option B: a still gold frame whose picture drops in from the top as you scroll ─── */
   .wg { scroll-margin-top: calc(-1 * var(--section-y)); }
@@ -709,6 +805,38 @@
 
 
 
+
+  <!-- Work, idea A (Liquid Glass project viewer) — PROTOTYPE to compare with the gallery below.
+       Content layer: the project's imagery, edge to edge in a rounded media panel. Glass layer (only three pieces, per
+       Apple's HIG): a floating project bar with a liquid selection droplet, and an info button that morphs into a details
+       panel. Scenes, tabs and details are built by the script from its PROJECTS list. -->
+  <section id="work-a" class="wa" aria-labelledby="wa-title">
+    <div class="wa-track" style="--n: 4">
+      <div class="wa-stage">
+        <h2 id="wa-title" class="wa-title">My Work</h2>
+        <div class="wa-media">
+          <div class="wa-scenes" aria-hidden="true"></div>
+          <div class="wa-dim" aria-hidden="true"></div>
+          <nav class="wa-bar" aria-label="Projects">
+            <span class="gp-layers" aria-hidden="true"><span class="gp-distort"></span><span class="gp-tint"></span><span class="gp-rim"></span><span class="gp-shine"></span></span>
+            <span class="wa-drop" aria-hidden="true"><span class="gp-layers" aria-hidden="true"><span class="gp-distort"></span><span class="gp-tint"></span><span class="gp-rim"></span><span class="gp-shine"></span></span></span>
+            <div class="wa-tabs"></div>
+            <span class="wa-mini" aria-hidden="true"></span>
+          </nav>
+          <div class="wa-info">
+            <span class="gp-layers" aria-hidden="true"><span class="gp-distort"></span><span class="gp-tint"></span><span class="gp-rim"></span><span class="gp-shine"></span></span>
+            <button type="button" class="wa-info-btn" aria-expanded="false" aria-controls="wa-panel" aria-label="About this project">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.5" r="1.4" fill="currentColor"/><path d="M10 9v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <div class="wa-panel" id="wa-panel" role="region" aria-label="Project details">
+              <button type="button" class="wa-close" aria-label="Close details">✕</button>
+              <div class="wa-panel-body"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Work, option B (gallery frame) — live. -->
   <section id="work-gallery" class="wg" aria-label="Selected work">
@@ -1497,6 +1625,208 @@
   name.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
   scroller.addEventListener('scroll', () => { if (open && document.activeElement !== name) hide(); }, { passive: true });
 })();
+// Work, idea A: Liquid Glass project viewer. Scroll moves through projects (pinned stage); the content layer crossfades
+// between project scenes, a glass bar's droplet stretches between tabs (leading edge on a stiff spring, trailing edge on
+// a soft one), the bar minimises while scrolling down, and the info button morphs into a details panel.
+(() => {
+  const section = document.getElementById('work-a');
+  if (!section) return;
+  const PROJECTS = [
+    { name: 'LoanMonk', title: 'LoanMonk - Simplifying Education Loans', href: 'https://www.figma.com/design/A86DOoD0vwsy7bmCpTnhIs/LoanMonk?node-id=1-2102&t=oJBl6TXTApUuZJvi-1',
+      tags: ['Ed-tech', '2024', '0 → 1', 'ForeignAdmits'], desc: 'A mobile application that simplifies the process of finding and applying for education loans for students planning to study abroad.',
+      bg: 'assets/cs-loanmonk-hills.jpg', shot: 'assets/cs-loanmonk.jpg' },
+    { name: 'Coding Judge', title: 'Coding Judge - Learn Coding & AI the Right Way', href: 'https://www.figma.com/design/OuNIb2khirIPRZ3FH2Jl5B/Coding-Judge?node-id=54-11&t=ZssSQCR24Sl3CayA-1',
+      tags: ['Ed-tech', '2025', 'Web App'], desc: 'An edtech platform designed for college students to learn coding and AI through a structured, hands-on experience. Led the end-to-end product design — from information architecture to high-fidelity UI.',
+      mark: 'assets/icon-codingjudge.svg', color: 'radial-gradient(120% 90% at 50% 20%, #0B3A86, #001A41 55%, #0c0c0d)' },
+    { name: 'SmartCue', title: 'SmartCue - Interactive Product Demos', href: 'https://www.getsmartcue.com/',
+      tags: ['B2B SaaS', '2024', 'Landing Page'], desc: 'A landing page for SmartCue, an interactive demo platform that helps businesses create personalized, no-code product demos to engage visitors, qualify leads, and accelerate sales cycles.',
+      mark: 'assets/icon-smartcue.svg', color: 'radial-gradient(120% 90% at 50% 20%, #33406E, #151D33 55%, #0c0c0d)' },
+    { name: 'Fluff', title: 'Fluff - Everything Your Pet Needs', href: 'https://www.figma.com/design/TVjwYS9EnreTuBEw0HJEWc/Assignment--3---Fluff---Avish-Shetty?node-id=325-3052&t=xMDA3gTcWlvoN5CD-1',
+      tags: ['Pet tech', '2024', 'Mobile App'], desc: 'A pet shopping app designed to help pet parents easily find and buy food, accessories, and care essentials for their furry friends.',
+      mark: 'assets/icon-fluff.svg', color: 'radial-gradient(120% 90% at 50% 20%, #5A2A22, #22100F 55%, #0c0c0d)' },
+  ];
+  const N = PROJECTS.length;
+  const track = section.querySelector('.wa-track');
+  const stage = section.querySelector('.wa-stage');
+  const media = section.querySelector('.wa-media');
+  const scenesEl = section.querySelector('.wa-scenes');
+  const bar = section.querySelector('.wa-bar');
+  const tabsEl = section.querySelector('.wa-tabs');
+  const drop = section.querySelector('.wa-drop');
+  const mini = section.querySelector('.wa-mini');
+  const info = section.querySelector('.wa-info');
+  const infoBtn = section.querySelector('.wa-info-btn');
+  const panel = section.querySelector('.wa-panel');
+  const body = section.querySelector('.wa-panel-body');
+  const scroller = document.querySelector('.frame-scroll');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+  // Build scenes and tabs.
+  const scenes = PROJECTS.map((p) => {
+    const el = document.createElement('div');
+    el.className = 'wa-scene';
+    if (p.shot) {
+      el.innerHTML = `<img class="wa-bg" src="${p.bg}" alt="" loading="lazy" draggable="false"><img class="wa-shot" src="${p.shot}" alt="" loading="lazy" draggable="false">`;
+    } else {
+      el.style.setProperty('--media-bg', p.color);
+      el.innerHTML = `<img class="wa-mark" src="${p.mark}" alt="" draggable="false"><p class="wa-scene-name">${esc(p.name)}</p>`;
+    }
+    scenesEl.append(el);
+    return el;
+  });
+  const tabs = PROJECTS.map((p, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wa-tab';
+    b.textContent = p.name;
+    b.addEventListener('click', () => goTo(i));
+    tabsEl.append(b);
+    return b;
+  });
+
+  // ── Scroll → project ──
+  let p = 0, target = 0, active = -1, raf = 0;
+  const trackTop = () => track.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
+  const range = () => track.offsetHeight - stage.offsetHeight;
+  const progress = () => Math.min(1, Math.max(0, (scroller.scrollTop - trackTop()) / range())) * (N - 1);
+  const goTo = (i) => scroller.scrollTo({ top: trackTop() + (range() * i) / (N - 1) + 1, behavior: reduceMotion ? 'auto' : 'smooth' });
+
+  // ── Droplet: two springs, one per edge ──
+  const L = { x: 0, v: 0 }, R = { x: 0, v: 0 };
+  let tl = 0, tr = 0, dir = 0;
+  const spring = (s, t, k, c, dt) => { s.v += (k * (t - s.x) - c * s.v) * dt; s.x += s.v * dt; };
+  const measureTarget = () => {
+    const t = tabs[Math.max(0, active)];
+    tl = t.offsetLeft + tabsEl.offsetLeft;
+    tr = tl + t.offsetWidth;
+  };
+
+  const setActive = (i) => {
+    if (i === active) return;
+    dir = active < 0 ? 0 : Math.sign(i - active);
+    active = i;
+    tabs.forEach((t, k) => t.setAttribute('aria-current', String(k === i)));
+    mini.textContent = `${i + 1}/${N} · ${PROJECTS[i].name}`;
+    measureTarget();
+    if (dir === 0 || reduceMotion) { L.x = tl; R.x = tr; L.v = R.v = 0; }
+    fillPanel(true);
+    sizeBar();
+  };
+
+  // ── Bar size: full (all tabs) or minimised (one label) ──
+  let minimised = false;
+  const sizeBar = () => {
+    const full = tabsEl.offsetWidth + 12;
+    mini.style.width = 'auto';
+    const m = Math.ceil(mini.scrollWidth) + 40;
+    bar.style.width = `${minimised ? m : full}px`;
+  };
+  const setMin = (on) => {
+    if (on === minimised) return;
+    minimised = on;
+    bar.classList.toggle('is-min', on);
+    sizeBar();
+  };
+  bar.addEventListener('pointerenter', () => setMin(false));
+  bar.addEventListener('focusin', () => setMin(false));
+  bar.addEventListener('click', () => { if (minimised) setMin(false); });
+
+  // ── Info: morph the button into the details panel ──
+  const fillPanel = (swap) => {
+    const pr = PROJECTS[active];
+    const html = `<ul class="wa-tags" aria-label="Details">${pr.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+      <h3 class="wa-name">${esc(pr.title)}</h3><p class="wa-desc">${esc(pr.desc)}</p>
+      <a class="wa-link" href="${pr.href.replace(/&/g, '&amp;')}" target="_blank" rel="noopener">Open project ↗</a>`;
+    if (!swap || !info.classList.contains('is-open') || reduceMotion) { body.innerHTML = html; if (info.classList.contains('is-open')) sizeInfo(); return; }
+    body.classList.add('is-swapping');
+    setTimeout(() => { body.innerHTML = html; body.classList.remove('is-swapping'); sizeInfo(); }, 180);
+  };
+  const panelWidth = () => Math.min(440, media.clientWidth - 32);
+  const sizeInfo = () => {
+    if (!info.classList.contains('is-open')) return;
+    const w = panelWidth();
+    panel.style.setProperty('--panel-w', `${w}px`);
+    info.style.width = `${w}px`;
+    info.style.height = `${panel.scrollHeight}px`;
+  };
+  const openInfo = () => {
+    info.classList.add('is-open');
+    infoBtn.setAttribute('aria-expanded', 'true');
+    info.style.borderRadius = '24px';
+    sizeInfo();
+    setTimeout(() => panel.querySelector('.wa-close').focus(), reduceMotion ? 0 : 300);
+  };
+  const closeInfo = (refocus) => {
+    if (!info.classList.contains('is-open')) return;
+    info.classList.remove('is-open');
+    infoBtn.setAttribute('aria-expanded', 'false');
+    info.style.width = info.style.height = info.style.borderRadius = '';
+    if (refocus) infoBtn.focus();
+  };
+  infoBtn.addEventListener('click', openInfo);
+  panel.querySelector('.wa-close').addEventListener('click', () => closeInfo(true));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeInfo(true); });
+  document.addEventListener('pointerdown', (e) => { if (!info.contains(e.target)) closeInfo(false); });
+
+  // ── Frame ──
+  let last = 0;
+  const frame = (now) => {
+    raf = 0;
+    const dt = Math.min(1 / 30, (now - last) / 1000 || 1 / 60);
+    last = now;
+    p += (target - p) * (reduceMotion ? 1 : 0.18);
+    if (Math.abs(target - p) < 0.0005) p = target;
+    scenes.forEach((el, i) => {
+      const d = Math.abs(i - p);
+      const o = Math.max(0, 1 - d * 1.8);
+      el.style.opacity = o.toFixed(3);
+      el.style.transform = reduceMotion ? '' : `scale(${(1 + Math.min(d, 1) * 0.06).toFixed(4)})`;
+      el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
+    });
+    setActive(Math.round(p));
+    // Leading edge (the one travelling toward the new tab) is quick; the trailing edge lags, so the droplet stretches.
+    const quick = [520, 34], slow = [180, 21];
+    const lead = dir >= 0 ? R : L, trail = dir >= 0 ? L : R;
+    spring(lead, lead === R ? tr : tl, quick[0], quick[1], dt);
+    spring(trail, trail === R ? tr : tl, slow[0], slow[1], dt);
+    const w = Math.max(10, R.x - L.x);
+    const natural = tr - tl;
+    const squash = Math.min(0.14, Math.max(0, (w - natural) / natural) * 0.12);
+    drop.style.width = `${w.toFixed(1)}px`;
+    drop.style.transform = `translateX(${L.x.toFixed(1)}px) scaleY(${(1 - squash).toFixed(3)})`;
+    const moving = p !== target || Math.abs(L.v) + Math.abs(R.v) > 0.5 || Math.abs(L.x - tl) + Math.abs(R.x - tr) > 0.3;
+    if (moving) raf = requestAnimationFrame(frame);
+  };
+  const wake = () => { if (!raf) raf = requestAnimationFrame(frame); };
+
+  // Scrolling down minimises the bar; scrolling up brings it back (Apple's tab-bar behaviour). Arriving here means
+  // scrolling down, so it also comes back once scrolling settles, or the full bar would rarely be seen.
+  let lastTop = scroller.scrollTop, travel = 0, settle = 0;
+  scroller.addEventListener('scroll', () => {
+    const top = scroller.scrollTop, dy = top - lastTop;
+    lastTop = top;
+    const r = stage.getBoundingClientRect(), s = scroller.getBoundingClientRect();
+    const inView = r.bottom > s.top && r.top < s.bottom;
+    if (inView) {
+      travel = Math.sign(dy) === Math.sign(travel) ? travel + dy : dy;
+      if (travel > 60) setMin(true);
+      if (travel < -30) setMin(false);
+      clearTimeout(settle);
+      settle = setTimeout(() => setMin(false), 700);
+    }
+    target = progress();
+    wake();
+  }, { passive: true });
+  addEventListener('resize', () => { measureTarget(); L.x = tl; R.x = tr; sizeBar(); sizeInfo(); target = progress(); wake(); });
+
+  target = p = progress();
+  setActive(Math.round(p));
+  frame(performance.now());
+  // Fonts change tab widths: re-measure once they're in.
+  document.fonts.ready.then(() => { measureTarget(); L.x = tl; R.x = tr; sizeBar(); wake(); });
+})();
+
 // Work, option B: the frame stays still; each project's picture drops into it from the top as you scroll.
 (() => {
   const section = document.getElementById('work-gallery');
