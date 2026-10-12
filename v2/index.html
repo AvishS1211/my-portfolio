@@ -8,9 +8,6 @@
 <link rel="icon" type="image/png" href="../favicon - 256.png">
 <!-- Only Chromium can run an SVG filter over a blurred backdrop (the liquid-glass refraction). Safari, Firefox and iOS get a tuned frosted glass instead. -->
 <script>if (!window.chrome) document.documentElement.classList.add('no-svg-glass');</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   @font-face { font-family: 'Paralucent'; src: url('../Paralucent_Light.otf') format('opentype'); font-weight: 300; font-display: swap; }
   @font-face { font-family: 'Paralucent'; src: url('../Paralucent_Text_Book.otf') format('opentype'); font-weight: 400; font-display: swap; }
@@ -29,6 +26,8 @@
     --surface: #FFFFFF; --paper: #FEFAEF; --paper-shade: #E9E4D6; --line: #EBEBEB;
     /* Blue holds to 78% so the hero copy always sits on blue that passes 4.5:1 with white text. */
     --grad-hero: linear-gradient(to bottom, var(--blue-900) 0%, var(--blue-600) 75%, #4C97FB 84%, #B3D3FD 93%, var(--surface) 100%);
+    /* Story backdrop: fixed on the frame, so it stays put while the story scrolls over it (Figma 2687:27). */
+    --grad-frame: linear-gradient(to bottom, var(--blue-900) 0%, var(--blue-500) 66.935%, var(--surface) 100%);
     --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     --grad-display: linear-gradient(to bottom, var(--blue-600), var(--blue-50));
     --grad-title: linear-gradient(to bottom, var(--blue-600), var(--blue-300));
@@ -36,9 +35,20 @@
 
     /* Type §3 */
     --font-display: 'Paralucent Condensed', 'Paralucent', sans-serif;
-    --font-mono: 'Geist Mono', ui-monospace, monospace;
-    --font-ui: 'Paralucent', system-ui, sans-serif;
+    /* Everything is set in Paralucent Condensed now; the old mono / UI roles keep their names so rules stay readable. */
+    --font-mono: var(--font-display);
+    --font-ui: var(--font-display);
     --track-tight: -0.04em; --track-snug: -0.02em;
+    /* Type scale (all Paralucent Condensed). One size per role, used across every section:
+       display = section headings · lead = the line under a heading · title = card / block titles · name = people
+       body = card text · meta = links, roles, buttons · small = labels, pills, fine print (never smaller). */
+    --fs-display: clamp(56px, 7.55vw, 160px);
+    --fs-lead: clamp(22px, 2.25vw, 36px);
+    --fs-title: clamp(30px, 3.3vw, 48px);
+    --fs-name: clamp(22px, 1.8vw, 26px);
+    --fs-body: clamp(17px, 1.45vw, 21px);
+    --fs-meta: 17px;
+    --fs-small: 15px;
 
     /* Spacing §4 */
     --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
@@ -83,25 +93,126 @@
   html, body { height: 100%; }
   body { overflow: hidden; }
   .frame-shell { --gutter: 16px; position: fixed; inset: 0; padding: var(--gutter); background: var(--surface); }
-  .frame { position: relative; isolation: isolate; height: 100%; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; background: var(--surface); box-shadow: var(--shadow-1); }
-  /* Light paper grain over the whole page background, behind all content (isolation keeps it above the frame's white). */
-  .frame::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--grain) 0 0 / 220px; opacity: 0.08; }
-  .frame-scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; scroll-behavior: smooth; scroll-padding-top: 88px; scrollbar-width: none; }
+  .frame { position: relative; isolation: isolate; height: 100%; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; background: var(--grad-frame); box-shadow: var(--shadow-1); }
+  /* Grain over the fixed gradient, behind all content (isolation keeps it above the frame's background): a light flat
+     layer that shows on the white end, and an overlay layer that makes the blue read as printed, not a flat digital fade. */
+  .frame::before, .frame::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--grain) 0 0 / 220px; opacity: 0.12; }
+  .frame::after { opacity: 0.3; mix-blend-mode: overlay; }
+  .frame-scroll { --frame-h: max(600px, calc(100svh - 2 * var(--gutter) - 2px)); height: 100%; overflow-y: auto; overscroll-behavior: contain; scroll-behavior: smooth; scroll-padding-top: 88px; scrollbar-width: none; }
   .frame-scroll::-webkit-scrollbar { display: none; }
   @media (prefers-reduced-motion: reduce) { .frame-scroll { scroll-behavior: auto; } }
 
+  /* Hero (Figma 2687:26): greeting on the left, portrait on the right, both on the frame's fixed gradient.
+     Two equal columns inside the 48px page margin; the portrait sits a little low so it clears the notch. */
+  /* Three beats while the hero stays pinned: (1) the greeting and my portrait; (2) the greeting fades up and away for my
+     description, the portrait crossfades to a video of me working; (3) the description gives way to "Products I use to
+     Design & Ship" and the video to my tools, stuck on one by one. Then it fades away where it stands while Work fades
+     in over it. The track is the scroll room: three frames for the beats, 0.4 for the fade (plus the frame itself). */
+  .hero-track { position: relative; height: calc(var(--frame-h) * 4.4); }
   .hero {
-    position: relative; overflow: hidden;
-    --frame-h: max(600px, calc(100svh - 2 * var(--gutter) - 2px));
+    position: sticky; top: 0;
     min-height: var(--frame-h);
-    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-    padding: max(110px, calc(var(--frame-h) * 0.2338)) 24px 80px;
-    background: var(--grad-hero);
-    text-align: center; color: var(--ink-on-blue);
+    display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 20px;
+    padding: 138px var(--page-x) 0;
+    color: var(--ink-on-blue);
   }
-  /* Film grain over the gradient so it reads as printed, not a flat digital fade. Sits under the hero copy. */
-  .hero::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--grain) 0 0 / 220px; opacity: 0.16; mix-blend-mode: overlay; }
   .hero > * { position: relative; }
+  /* Sized to fill the left column: the longest line ("I am Avish Shetty") is ~5.85em wide, so the font is whatever
+     leaves a 48px gap before the portrait (whose width is the --portrait-w below). */
+  .hero { container-type: inline-size; --portrait-w: min(calc((100cqw - 20px) / 2), calc((var(--frame-h) - 171px) * 566 / 629)); }
+  /* Top-aligned with the portrait: each beat's text starts on the portrait's top line. */
+  .hero-intro { grid-area: 1 / 1; height: calc(var(--portrait-w) * 629 / 566); display: grid; align-items: start; } /* the portrait's height */
+  /* The greeting sits in the vertical middle of the portrait; the later beats stay top-aligned. */
+  .hero-intro > h1 { align-self: center; }
+  .hero-intro > * { grid-area: 1 / 1; will-change: opacity, transform; }
+  .hero h1 {
+    font: 700 clamp(48px, calc((100cqw - var(--portrait-w) - 48px) / 5.85), 160px)/1 var(--font-display); letter-spacing: -0.04em;
+    text-shadow: 0 4px 8px rgb(0 0 0 / 0.15); white-space: nowrap;
+  }
+  .hero-sub {
+    margin-top: var(--space-5); max-width: 30em;
+    font: 500 var(--fs-lead)/1.2 var(--font-display); letter-spacing: -0.01em;
+    color: rgb(255 255 255 / 0.88); text-shadow: 0 1px 2px rgb(0 0 0 / 0.12); text-wrap: pretty;
+  }
+  .hero-sub b { font-weight: 700; color: var(--ink-on-blue); }
+  /* My About, the second beat: takes the greeting's place (hidden until the script fades it in). */
+  .hero-paras { display: flex; flex-direction: column; gap: var(--space-6); opacity: 0; }
+  .hero-paras > .hero-sub { margin: 0; }
+  /* TRIAL: the description set like the greeting (heavy, white, shadow), as large as fits beside the portrait. The
+     greeting's own ~109px doesn't fit two sentences on one screen; ~72px at 1440×900 is the largest that does. */
+  .hero-paras { gap: var(--space-6); }
+  .hero-paras > .hero-sub {
+    font: 700 clamp(36px, min(5vw, 8svh), 110px)/1.02 var(--font-display); letter-spacing: -0.03em;
+    color: var(--ink-on-blue); text-shadow: 0 4px 8px rgb(0 0 0 / 0.15);
+  }
+  .hero-paras > .hero-sub b { color: inherit; }
+  .hero-portrait {
+    grid-area: 1 / 2; position: relative; justify-self: end; overflow: hidden; margin: 0;
+    width: var(--portrait-w); aspect-ratio: 566 / 629;
+    border: 1px solid #DEDEDE; border-radius: 24px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+  }
+  /* Beat one: the portrait, same crop as the Figma frame (zoomed in a touch, face slightly right of centre).
+     Beat two: the video of me working fades in over it with the description (opacity driven by the script). */
+  .hero-portrait img { position: absolute; left: -16.85%; top: -18.63%; width: 116.93%; height: 140.29%; max-width: none; }
+  .hero-portrait video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+  /* Beat three is centred: the heading on one line across the top, the lid big in the middle under it. --tools-fs is
+     the heading size (smaller than the greeting's so the lid can be big); the lid takes the height that's left. */
+  .hero { --tools-fs: clamp(40px, min(5vw, 8svh), 96px); }
+  .hero-tools-title {
+    grid-area: 1 / 1 / 2 / -1; justify-self: center; margin: 0; opacity: 0; will-change: opacity, transform;
+    font: 700 var(--tools-fs)/1 var(--font-display); letter-spacing: -0.04em; text-align: center; white-space: nowrap;
+    text-shadow: 0 4px 8px rgb(0 0 0 / 0.15);
+  }
+  /* Beat three: a MacBook lid (the outside, rendered from assets/models/macbook.glb) takes the portrait's place and my
+     tool stickers get slapped onto it one by one, each landing with a little squash from above (the .is-on class,
+     toggled by the script as you scroll past its turn). They can then be dragged around the lid. */
+  .hero-lid {
+    grid-area: 1 / 1 / 2 / -1; justify-self: center; position: relative; aspect-ratio: 1600 / 1059; opacity: 0; pointer-events: none;
+    margin-top: calc(var(--tools-fs) + 32px);
+    width: min(72%, calc((var(--frame-h) - 138px - var(--tools-fs) - 32px - 40px) * 1600 / 1059));
+  }
+  .hero-lid-img { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 18px 30px rgb(13 30 80 / 0.28)); user-select: none; -webkit-user-drag: none; }
+  .hero-stickers { position: absolute; inset: 0; list-style: none; }
+  .hero-sticker {
+    position: absolute; left: var(--x); top: var(--y); width: 20%; rotate: var(--r);
+    translate: calc(-50% + var(--dx, 0px)) calc(-50% + var(--dy, 0px)); /* --dx/--dy: where you've dragged it */
+    opacity: 0; scale: 1.5; filter: drop-shadow(0 18px 18px rgb(0 0 0 / 0.18));
+    transition: opacity 0.12s ease, scale 0.18s ease-in, filter 0.18s ease-in;
+  }
+  .hero-sticker img { display: block; width: 100%; height: auto; -webkit-user-drag: none; user-select: none; }
+  /* Once stuck, each sticker can be picked up and placed anywhere in the hero: it lifts (bigger, tilted, deeper
+     shadow) while held and presses back down where you let go. */
+  .hero-sticker.is-on { pointer-events: auto; cursor: grab; touch-action: none; }
+  .hero-sticker.is-held { cursor: grabbing; transform: scale(1.08) rotate(-3deg); filter: drop-shadow(0 22px 22px rgb(0 0 0 / 0.24)); transition: transform 0.2s var(--ease-spring), filter 0.2s ease; }
+  .hero-sticker.is-dropped { transition: transform 0.3s var(--ease-spring), filter 0.3s ease; }
+  .hero-sticker.is-on { opacity: 1; scale: 1; filter: drop-shadow(0 3px 4px rgb(0 0 0 / 0.22)); animation: sticker-slap 0.42s var(--ease-spring) both; }
+  @keyframes sticker-slap { 0% { scale: 1.5; } 45% { scale: 0.94; } 100% { scale: 1; } }
+  /* Spread around the lid, clear of the Apple logo in the middle. */
+  .hero-sticker:nth-child(1) { --x: 19%; --y: 30%; --r: -12deg; }
+  .hero-sticker:nth-child(2) { --x: 82%; --y: 27%; --r: 9deg; width: 14%; }
+  .hero-sticker:nth-child(3) { --x: 24%; --y: 73%; --r: 7deg; width: 14%; }
+  .hero-sticker:nth-child(4) { --x: 76%; --y: 72%; --r: -9deg; }
+  .hero-sticker:nth-child(5) { --x: 50%; --y: 20%; --r: 13deg; width: 17%; }
+  @media (prefers-reduced-motion: reduce) { .hero-sticker, .hero-sticker.is-on { scale: 1; animation: none; } }
+  /* Narrow or tall screens (phones, portrait tablets): the same three pinned beats, stacked — each beat's text on top
+     (they share row 1), the portrait / video / lid filling the space below (row 2). The hero is exactly one frame tall
+     so nothing scrolls inside a beat. */
+  @media (max-width: 820px), (orientation: portrait) and (max-width: 1100px) {
+    .hero {
+      height: var(--frame-h); min-height: 0; grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr);
+      align-items: start; gap: var(--space-5); padding: 150px var(--page-x) var(--space-5);
+    }
+    .hero h1 { font-size: clamp(36px, 11vw, 72px); white-space: normal; }
+    .hero-portrait { grid-area: 2 / 1; justify-self: center; align-self: center; width: auto; height: 100%; max-width: 100%; }
+    .hero-tools-title { grid-area: 1 / 1; justify-self: start; text-align: left; white-space: normal; font-size: clamp(32px, 9vw, 56px); }
+    .hero-lid { grid-area: 2 / 1; justify-self: center; align-self: center; width: 100%; margin-top: 0; }
+    /* Each beat's text sits right above the picture (bottom of row 1), and the description is sized for a phone. */
+    .hero-intro { height: auto; align-items: end; }
+    .hero-intro > h1 { align-self: end; }
+    .hero-tools-title { align-self: end; }
+    .hero-paras { gap: var(--space-4); }
+    .hero-paras > .hero-sub { font-size: clamp(22px, 6.4vw, 34px); line-height: 1.12; }
+  }
 
   .dock { position: absolute; z-index: var(--z-nav); top: -1px; left: 50%; transform: translateX(-50%); transform-origin: 50% 0; width: 315px; height: 88px; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; will-change: transform; }
   .dock.dragging, .dock.dragging a { cursor: grabbing; }
@@ -123,7 +234,7 @@
     padding: var(--space-2) var(--space-3); border-radius: var(--r-sm); white-space: nowrap; pointer-events: none;
     background: rgba(13, 21, 38, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    font: 500 13px/1.2 var(--font-ui); letter-spacing: var(--track-snug); color: var(--surface);
+    font: 500 var(--fs-small)/1.2 var(--font-ui); letter-spacing: 0.01em; color: var(--surface);
     opacity: 0; transform: translate(-50%, -6px) scale(0.85); transform-origin: 50% 0;
     transition: opacity 0.15s ease, transform 0.35s var(--ease-spring);
   }
@@ -134,50 +245,46 @@
   .dock.dragging a::after, #about-trigger[aria-expanded="true"]::after { opacity: 0; transform: translate(-50%, -6px) scale(0.85); transition-delay: 0s; }
   .dock a img { display: block; width: 100%; height: 100%; }
 
-  .hero h1 {
-    font-family: var(--font-display); font-weight: 700;
-    font-size: clamp(2.5rem, 12vw, 7.5rem); line-height: 1; letter-spacing: var(--track-tight);
-    text-shadow: var(--text-shadow);
-  }
-  .hero-sub {
-    margin-top: var(--space-5); max-width: 596px;
-    font-family: var(--font-mono); font-weight: 400;
-    font-size: clamp(0.95rem, 1.4vw, 1.125rem); line-height: 1.5; letter-spacing: var(--track-tight);
-    text-shadow: var(--text-shadow);
-  }
-  .hero-cta {
-    margin-top: var(--space-6); padding: var(--space-3) var(--space-5); border-radius: var(--r-md);
-    border: 1px solid var(--surface); background: var(--grad-cta);
-    box-shadow: var(--shadow-2);
-    font-family: var(--font-display); font-weight: 700;
-    font-size: 28px; line-height: 1.2; text-transform: uppercase; color: var(--blue-600);
-    transition: transform 0.3s var(--ease-spring), box-shadow 0.3s;
-  }
-  .hero-cta:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
-  .hero-cta:active { transform: translateY(0) scale(0.98); box-shadow: var(--shadow-2); transition-duration: var(--dur-fast); }
-  .hero-cta:focus-visible { outline: 2px solid var(--ink-on-blue); outline-offset: 3px; }
 
-  /* "Now" pill: light liquid glass on the hero blue, pinned top-left (joins the flow above the headline when the frame
-     is too narrow to clear the notch). Shows the current slot of my day. */
+  /* Job pill: light liquid glass on the hero blue, pinned top-left (joins the flow above the headline when the frame
+     is too narrow to clear the notch). Shows my current job; clicking it drops down the jobs I've had. */
   .hero > .now { position: absolute; z-index: 3; top: 14px; left: 14px; max-width: calc(50% - 190px); }
   .now-pill {
-    position: relative; display: inline-flex; align-items: center; gap: var(--space-2); max-width: 100%; padding: 8px 14px;
+    position: relative; display: inline-flex; align-items: center; gap: var(--space-2); max-width: 100%; padding: 8px 12px 8px 14px;
+    width: var(--now-w, auto); /* matched to the dropdown's width by the script, so the two line up */
+    border: 0; background: none; cursor: pointer;
     border-radius: 6px; box-shadow: 0 4px 14px rgb(13 30 80 / 0.18);
-    font: 500 13px/1.2 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-on-blue); white-space: nowrap;
+    font: 500 var(--fs-small)/1.2 var(--font-mono); letter-spacing: 0.01em; color: var(--ink-on-blue); white-space: nowrap;
   }
   .now-pill .gp-tint { background: linear-gradient(135deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.1)); }
   .now-pill > :not(.gp-layers) { position: relative; }
   .now-doing { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-  .now-sep { opacity: 0.6; }
+  .now-chev { flex: none; margin-left: auto; width: 10px; height: 10px; opacity: 0.8; transition: transform var(--dur-base) var(--ease-out); }
+  .now-pill[aria-expanded="true"] .now-chev { transform: rotate(180deg); }
+  .now-pill:focus-visible { outline: 2px solid var(--ink-on-blue); outline-offset: 3px; }
+  /* The dropdown: the same glass, a short list of role / company / years, current job first. */
+  .now-jobs {
+    position: absolute; top: calc(100% + 8px); left: 0; width: var(--now-w, max-content); max-width: min(360px, calc(100vw - 48px));
+    padding: 6px; border-radius: 10px; box-shadow: 0 10px 30px rgb(13 30 80 / 0.25); color: var(--ink-on-blue);
+    transform-origin: 0 0; animation: now-drop 220ms var(--ease-out);
+  }
+  .now-jobs[hidden] { display: none; }
+  .now-jobs .gp-tint { background: linear-gradient(160deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.14)); }
+  @keyframes now-drop { from { opacity: 0; transform: translateY(-4px) scale(0.97); } }
+  .now-jobs ol { position: relative; list-style: none; margin: 0; padding: 0; }
+  .now-jobs li { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px var(--space-5); padding: 10px 12px; border-radius: 6px; }
+  .now-jobs li + li { border-top: 1px solid rgb(255 255 255 / 0.18); border-radius: 0 0 6px 6px; }
+  .job-role { font: 600 var(--fs-meta)/1.15 var(--font-display); letter-spacing: -0.01em; }
+  .job-co { grid-column: 1; font: 500 var(--fs-small)/1.2 var(--font-display); letter-spacing: 0.01em; opacity: 0.8; }
+  .job-yrs { grid-column: 2; grid-row: 1 / span 2; align-self: center; font: 500 var(--fs-small)/1 var(--font-display); letter-spacing: 0.01em; opacity: 0.8; white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) { .now-jobs { animation: none; } .now-chev { transition: none; } }
   .now-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #3DDC84; box-shadow: 0 0 0 0 rgb(61 220 132 / 0.6); animation: now-pulse 2s ease-out infinite; }
   @keyframes now-pulse { 70% { box-shadow: 0 0 0 7px rgb(61 220 132 / 0); } 100% { box-shadow: 0 0 0 0 rgb(61 220 132 / 0); } }
-  /* Asleep: a dim, still dot. */
-  .now.is-asleep .now-dot { background: #A9B6D6; animation: none; }
 
-  @media (max-width: 1080px) {
-    .hero > .now { position: relative; top: auto; left: auto; max-width: 100%; margin-bottom: var(--space-5); }
+  @media (max-width: 900px) {
+    .hero > .now { top: 96px; left: var(--page-x); max-width: calc(100% - 2 * var(--page-x)); }
   }
-  @media (max-width: 420px) { .now-pill { gap: 6px; padding: 7px 12px; font-size: 11.5px; } }
+  @media (max-width: 420px) { .now-pill { gap: 6px; padding: 7px 12px; font-size: 13px; } }
   @media (prefers-reduced-motion: reduce) { .now-dot { animation: none; } }
 
   /* Work-experience tags: each paper tag hangs from its own pushpin in the lower hero. The script places the pins
@@ -243,7 +350,7 @@
   .about-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .about-text { display: flex; flex-direction: column; gap: calc(5px * var(--s)); }
   .about-card h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: calc(24px * var(--s)); line-height: 1.2; letter-spacing: var(--track-tight); color: var(--ink-strong); }
-  .about-card p { font-family: var(--font-mono); font-weight: 400; font-size: max(13px, calc(12px * var(--s))); line-height: 1.45; letter-spacing: var(--track-tight); color: var(--ink-subtle); }
+  .about-card p { font-family: var(--font-mono); font-weight: 400; font-size: max(16px, calc(13px * var(--s))); line-height: 1.4; letter-spacing: 0; color: var(--ink-subtle); }
   .about-card b { font-weight: 600; color: var(--ink-strong); }
   .tools { display: inline-flex; vertical-align: -0.25em; margin: 0 0.06em 0 0.19em; }
   .tools > * { width: 1.27em; height: 1.27em; border-radius: 0.31em; filter: drop-shadow(0 1.564px 1.564px rgba(0, 0, 0, 0.15)); transform: rotate(-2deg); }
@@ -257,8 +364,18 @@
   .wt-track {
     --nav: 88px;
     --stage-h: max(560px, calc(100svh - 2 * var(--gutter) - 2px - var(--nav)));
-    position: relative; height: calc(var(--stage-h) * (var(--n) + 1.2)); /* +1.2 stage heights for the intro */
+    --outro: 0; /* stage heights at the end where the stage fades out in place (desktop: Testimonials fades in) */
+    position: relative; height: calc(var(--stage-h) * (var(--n) + 1.2 + var(--outro))); /* +1.2 stage heights for the intro */
   }
+  /* The tickets and frame wait off-screen before sliding in; clip (not hidden) so the page cannot scroll sideways and the sticky stage still works. */
+  .wt { overflow-x: clip; }
+  /* Work starts underneath the end of the hero's pin, so its stage pins and fades in exactly where the hero fades out
+     (no scrolling up). Its track begins 3 frames into the hero track; the anchor lands once it has faded in. */
+  .wt { margin-top: calc(-1.4 * var(--frame-h) - var(--section-y)); scroll-margin-top: calc(-1 * var(--section-y) - 0.5 * var(--frame-h)); }
+  /* It overlaps the hero, so only the stage itself takes clicks (and not until it has faded in; see the script). */
+  .wt, .wt-track { pointer-events: none; }
+  .wt-stage { pointer-events: auto; }
+  .wt-track { --outro: 0.4; }
   .wt-stage { position: sticky; top: var(--nav); height: var(--stage-h); display: grid; place-items: center; container-type: inline-size; }
   /* Full width to the page margin; height keeps the Figma proportion (1152 × 521) but never exceeds the stage. */
   .wt-row { display: grid; grid-template-columns: 468fr 664fr; gap: 20px; width: calc(100% - 2 * var(--page-x)); height: min(calc(var(--stage-h) - 48px), calc((100cqw - 2 * var(--page-x)) * 521 / 1152)); }
@@ -273,21 +390,6 @@
   .wt-row { position: relative; z-index: 1; }
   .wt-frame { will-change: transform; }
 
-  /* Opening a project: a white sheet slides up out of the ticket, grows to fill the screen, names the project, then
-     the page goes to the project. */
-  .wt-paper {
-    position: fixed; z-index: 1000; display: grid; place-items: center; overflow: hidden; pointer-events: none;
-    background: var(--grain) 0 0 / 220px, #fff; background-blend-mode: soft-light; border-radius: 18px;
-    box-shadow: 0 24px 60px rgb(13 30 80 / 0.22), 0 2px 8px rgb(13 30 80 / 0.1);
-  }
-  .wt-paper-title {
-    max-width: min(80vw, 900px); margin: 0; padding: 0 24px; text-align: center; opacity: 0; transform: translateY(10px);
-    font: 600 clamp(32px, 5vw, 64px)/1.05 var(--font-display); letter-spacing: -0.02em; text-wrap: balance;
-    background: var(--grad-title); -webkit-background-clip: text; background-clip: text; color: transparent;
-    transition: opacity 320ms ease, transform 420ms var(--ease-out);
-  }
-  .wt-paper.is-full .wt-paper-title { opacity: 1; transform: none; }
-
   /* The ticket: a paper body and a stub split by a perforation with half-circle notches (each piece masks a quarter
      circle at its corner, so together they cut a half circle). */
   /* One ticket per project, stacked; the script slides each in from the left over the one before. */
@@ -298,19 +400,20 @@
     -webkit-mask-composite: source-in; mask-composite: intersect;
   }
   .wt-body {
-    position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-5);
+    position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5);
     border-radius: 18px 18px 0 0; box-shadow: inset 1px 0 0 var(--line), inset -1px 0 0 var(--line), inset 0 1px 0 var(--line);
     -webkit-mask: radial-gradient(circle var(--notch) at 0 100%, transparent 98%, #000 100%), radial-gradient(circle var(--notch) at 100% 100%, transparent 98%, #000 100%);
     mask: radial-gradient(circle var(--notch) at 0 100%, transparent 98%, #000 100%), radial-gradient(circle var(--notch) at 100% 100%, transparent 98%, #000 100%);
+    -webkit-mask-composite: source-in; mask-composite: intersect; /* after the shorthand, which resets it */
     transition: opacity 220ms ease;
   }
   /* Perforation: 8px dashes every 16px along the body's bottom edge, between the notches. */
   .wt-body::after { content: ''; position: absolute; left: var(--notch); right: var(--notch); bottom: 0; height: 2px; background: repeating-linear-gradient(90deg, #E2E2E2 0 8px, transparent 8px 16px) 4px 0; }
   .wt .wt-name {
-    margin: 0; font: 600 48px/1 var(--font-display); letter-spacing: -0.02em; text-wrap: balance;
+    margin: 0; font: 600 var(--fs-title)/1 var(--font-display); letter-spacing: -0.02em; text-wrap: balance;
     background: var(--grad-title); -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .wt-desc { font: 500 16px/1.4 var(--font-ui); letter-spacing: -0.02em; color: var(--ink-muted); }
+  .wt-desc { max-width: 40em; font: 500 var(--fs-body)/1.35 var(--font-ui); letter-spacing: 0; color: var(--ink-muted); }
 
   .wt-slot { position: relative; height: var(--stub); flex: none; }
   /* The stub is a 3D stage. At rest it shows one whole face; while tearing it shows --n vertical slices of the same
@@ -327,6 +430,7 @@
     box-shadow: inset 1px 0 0 var(--line), inset -1px 0 0 var(--line), inset 0 -1px 0 var(--line);
     -webkit-mask: radial-gradient(circle var(--notch) at 0 0, transparent 98%, #000 100%), radial-gradient(circle var(--notch) at 100% 0, transparent 98%, #000 100%);
     mask: radial-gradient(circle var(--notch) at 0 0, transparent 98%, #000 100%), radial-gradient(circle var(--notch) at 100% 0, transparent 98%, #000 100%);
+    -webkit-mask-composite: source-in; mask-composite: intersect; /* after the shorthand, which resets it */
     font: 600 32px/1 var(--font-display); letter-spacing: -0.04em; text-transform: uppercase; color: #444; white-space: nowrap;
   }
   .wt-face::before { content: ''; position: absolute; left: var(--notch); right: var(--notch); top: 0; height: 2px; background: repeating-linear-gradient(90deg, #E2E2E2 0 8px, transparent 8px 16px) 4px 0; }
@@ -347,7 +451,7 @@
   /* Under the stub: what's left once it has been torn off. */
   .wt-opened {
     position: absolute; inset: 0; display: grid; place-items: center; text-decoration: none;
-    font: 500 14px/1.2 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-subtle); visibility: hidden;
+    font: 500 var(--fs-meta)/1.2 var(--font-mono); letter-spacing: 0.01em; color: var(--ink-subtle); visibility: hidden;
   }
   .wt-ticket.is-torn .wt-opened { visibility: visible; }
   .wt-opened:hover { color: var(--blue-600); }
@@ -359,18 +463,19 @@
   .wt-pic { position: absolute; inset: 0; overflow: hidden; display: grid; place-items: center; background: var(--media-bg, #BFD1DC); }
   .wt-pic > .wt-scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
   .wt-pic > .wt-phone { position: absolute; left: 50%; bottom: 0; width: 128.9%; height: auto; transform: translateX(-50%); max-width: none; }
+  .wt-pic > .wt-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .wt-pic > .wt-mark { width: clamp(90px, 18%, 160px); height: auto; filter: drop-shadow(0 20px 40px rgb(0 0 0 / 0.4)); }
   /* Dust: the outgoing picture, drawn in WebGL, crumbling into grains that drift away to reveal the next one. */
   .wt-dust { position: absolute; inset: 0; z-index: 15; width: 100%; height: 100%; pointer-events: none; visibility: hidden; }
 
-  @media (max-width: 820px) {
+  @media (max-width: 820px), (orientation: portrait) and (max-width: 1100px) {
     .wt-row { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; gap: 12px; height: calc(var(--stage-h) - 32px); }
     .wt-frame { order: -1; }
     .wt-tickets { height: 236px; }
     .wt-ticket { --stub: 64px; }
     .wt-body { padding: var(--space-4); }
     .wt .wt-name { font-size: 28px; }
-    .wt-desc { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .wt-desc { font-size: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .wt-face { font-size: 22px; }
   }
   @media (prefers-reduced-motion: reduce) { .wt-stub { transition: opacity 200ms ease; } .wt-stub.is-hint, .wt-stub.is-growing { animation: none; } }
@@ -546,14 +651,70 @@
   .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   /* ─── Testimonials ─── */
-  .testimonials { padding-top: var(--section-y); padding-bottom: var(--section-y); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 48px; }
-  .t-intro { flex: 1 1 320px; max-width: 532px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-  /* Section heading: same treatment as "My Work" — short, uppercase, blue fade. */
-  .testimonials .t-title {
-    margin: 0; font: 700 clamp(3rem, 6.25vw, 5rem)/1 var(--font-display); letter-spacing: var(--track-tight); text-transform: uppercase;
-    background: var(--grad-display); -webkit-background-clip: text; background-clip: text; color: transparent;
+  /* ─── Project cards (Figma 2723:96): a row of tear-off project cards, two on screen at a time. The stage pins and
+     fades in where Work fades out (the section starts underneath Work's last stretch), then scrolling down slides the
+     row right to left, then it fades out as Testimonials fades in. The script sets the track's length to fit. ─── */
+  .pc { padding: 0; overflow-x: clip; }
+  .pc-track { position: relative; }
+  /* Centred in the space below the notch. */
+  .pc-stage { position: sticky; top: 0; height: var(--frame-h); display: flex; align-items: center; overflow: hidden; padding: 88px 0 var(--space-4); }
+  .pc-row {
+    --cw: min(calc((100cqw - 2 * var(--page-x) - 24px) / 2), calc((var(--frame-h) - 150px) * 566 / 643));
+    display: flex; gap: 24px; padding: 0 var(--page-x); will-change: transform;
   }
-  .t-sub { max-width: 40ch; font: 400 clamp(0.95rem, 1.4vw, 1.125rem)/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .pc-stage { container-type: inline-size; }
+  .pc-card { --notch: 10px; --stub: calc(var(--cw) * 70 / 566); flex: none; width: var(--cw); display: flex; flex-direction: column; filter: drop-shadow(0 2px 6px rgb(13 30 80 / 0.12)); }
+  .pc-body { background: var(--paper); -webkit-mask-composite: source-in; mask-composite: intersect; }
+  /* Body: 24px top corners, half-circle notches at the bottom corners; stub: notches at the top, 24px bottom corners. */
+  .pc-body {
+    position: relative; flex: 1; display: flex; flex-direction: column; gap: var(--space-2); padding: 16px; border-radius: 24px 24px 0 0; /* fills, so stubs line up */
+    box-shadow: inset 1px 0 0 var(--line), inset -1px 0 0 var(--line), inset 0 1px 0 var(--line);
+    -webkit-mask: radial-gradient(circle var(--notch) at 0 100%, transparent 98%, #000 100%), radial-gradient(circle var(--notch) at 100% 100%, transparent 98%, #000 100%);
+    mask: radial-gradient(circle var(--notch) at 0 100%, transparent 98%, #000 100%), radial-gradient(circle var(--notch) at 100% 100%, transparent 98%, #000 100%);
+    -webkit-mask-composite: source-in; mask-composite: intersect; /* after the shorthand, which resets it */
+    color: inherit; text-decoration: none;
+  }
+  .pc-body::after { content: ''; position: absolute; left: var(--notch); right: var(--notch); bottom: 0; height: 2px; background: repeating-linear-gradient(90deg, #E2E2E2 0 8px, transparent 8px 16px) 4px 0; }
+  .pc-media { position: relative; overflow: hidden; aspect-ratio: 534 / 367; border-radius: 16px; background: var(--media-bg, var(--paper-shade)); margin-bottom: var(--space-2); }
+  .pc-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease-out); }
+  .pc-media .pc-mark { inset: auto; left: 50%; top: 50%; width: 26%; height: auto; translate: -50% -50%; object-fit: contain; }
+  .pc-media .pc-phone { object-fit: contain; object-position: 50% 100%; }
+  .pc-card:hover .pc-media img { transform: scale(1.03); }
+  .pc .pc-name {
+    margin: 0; font: 600 var(--fs-title)/1 var(--font-display); letter-spacing: -0.02em; text-wrap: balance;
+    background: var(--grad-title); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .pc-desc { margin: 0 0 var(--space-2); font: 500 clamp(16px, 1.25vw, 19px)/1.4 var(--font-ui); letter-spacing: 0; color: var(--ink-muted); }
+  /* The stub is the Work ticket's tearable stub (.wt-slot / .wt-stub / .wt-face, same tear), sized for the card. */
+  .pc-card .wt-stub, .pc-card .wt-face { border-radius: 0 0 24px 24px; }
+  .pc-card .wt-face { font-size: clamp(24px, 2.5vw, 36px); }
+  .pc-card.is-torn .wt-opened { visibility: visible; }
+  .pc-body:focus-visible { outline: 2px solid var(--blue-600); outline-offset: -4px; }
+  .pc { margin-top: calc(-1.4 * (var(--frame-h) - 88px) - var(--section-y)); pointer-events: none; }
+  .pc-stage { opacity: 0; }
+  @media (max-width: 820px) { .pc-row { --cw: min(calc(100cqw - 2 * var(--page-x)), calc((var(--frame-h) - 150px) * 566 / 643)); } }
+
+  /* Pinned like the sections above: the stage fills the frame and fades in in place over the project cards' last
+     stretch (the section starts underneath it), holds, then scrolls on. Its track: the frame, the fade, a short hold. */
+  .tm { padding: 0; overflow-x: clip; }
+  /* Once the stage has faded in, the cards swipe in from the right one by one (top row first, left to right; the
+     script sets each card's --i). Scrolling back out sends them off again. */
+  .t-card { transition: transform 0.75s var(--ease-out), opacity 0.4s ease; transition-delay: calc(var(--i, 0) * 0.14s); }
+  .tm-stage:not(.is-in) .t-card { transform: translateX(min(110vw, 1600px)) rotate(4deg); opacity: 0; transition-delay: 0s; transition-duration: 0.35s; }
+  @media (prefers-reduced-motion: reduce) { .tm-stage:not(.is-in) .t-card { transform: none; } }
+  .tm-track { position: relative; height: calc(var(--frame-h) * 1.7); } /* the script fits it: stage + fade + a hold */
+  .tm-stage { position: sticky; top: 0; min-height: var(--frame-h); display: grid; align-items: center; padding: 104px 0 var(--space-7); }
+  .tm { margin-top: calc(-1 * var(--frame-h) - 0.4 * (var(--frame-h) - 88px)); pointer-events: none; scroll-margin-top: calc(-0.4 * var(--frame-h)); }
+  .tm-stage { opacity: 0; }
+  /* Full width between the page margins: intro on the left, the cards filling the rest in two columns. */
+  .testimonials { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); align-items: start; gap: 48px; padding: 0 var(--page-x); }
+  .t-intro { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+  /* Section heading: white on the blue, like the hero's. */
+  .testimonials .t-title {
+    margin: 0; font: 700 var(--fs-display)/0.95 var(--font-display); letter-spacing: -0.04em; text-transform: uppercase;
+    color: var(--ink-on-blue); text-shadow: 0 4px 8px rgb(0 0 0 / 0.15);
+  }
+  .t-sub { max-width: 40ch; font: 500 var(--fs-lead)/1.2 var(--font-display); letter-spacing: -0.01em; color: rgb(255 255 255 / 0.88); text-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
 
   /* Liquid glass pill: same layer recipe as the notch, on a rounded rect so overflow clipping is enough. */
   .glass-pill { position: relative; display: inline-flex; padding: 10px 20px; border-radius: var(--r-md); box-shadow: var(--shadow-2); }
@@ -569,22 +730,21 @@
   .gp-rim { box-shadow: inset 2px 2px 1px rgba(255, 255, 255, 0.64), inset -1px -1px 1px rgba(255, 255, 255, 0.38), inset 0 0 24px rgba(255, 255, 255, 0.08); }
   .gp-layers .gp-shine { inset: 0 20% auto; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent); }
   .glass-pill .gp-text { position: relative; font: 600 20px/1.2 var(--font-display); letter-spacing: var(--track-tight); text-transform: uppercase; color: var(--blue-600); }
+  .testimonials .glass-pill .gp-text { color: var(--ink-on-blue); }
 
-  .t-grid { display: flex; align-items: flex-start; gap: 12px; }
-  .t-col { width: 304px; display: flex; flex-direction: column; gap: 12px; }
+  .t-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 16px; }
+  .t-col { display: flex; flex-direction: column; gap: 16px; }
   .t-card { margin: 0; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); filter: drop-shadow(0 2px 4px rgb(13 30 80 / 0.06)); }
-  .t-head { display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 2px dashed var(--line); }
-  .t-avatar { flex: none; width: 48px; height: 48px; object-fit: cover; border-radius: var(--r-sm) var(--r-md) var(--r-md) var(--r-md); }
+  .t-head { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-bottom: 2px dashed var(--line); }
+  .t-avatar { flex: none; width: 56px; height: 56px; object-fit: cover; border-radius: var(--r-sm) var(--r-md) var(--r-md) var(--r-md); }
   .t-person { display: flex; flex-direction: column; gap: 2px; }
-  .t-name { font: 600 20px/1.2 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-strong); }
-  .t-role { display: flex; align-items: center; gap: 2px; font: 500 14px/1.2 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-muted); }
-  .t-role img { height: 16px; width: auto; }
-  .t-card blockquote { margin: 0; padding: 12px; font: 400 16px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-strong); }
+  .t-name { font: 600 var(--fs-name)/1.15 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-strong); }
+  .t-role { display: flex; align-items: center; gap: 4px; font: 500 var(--fs-meta)/1.2 var(--font-display); letter-spacing: 0.01em; color: var(--ink-muted); }
+  .t-role img { height: 19px; width: auto; }
+  .t-card blockquote { margin: 0; padding: 16px 20px 20px; font: 500 var(--fs-body)/1.35 var(--font-mono); letter-spacing: 0; color: var(--ink-strong); }
 
-  @media (max-width: 700px) {
-    .t-grid { flex-direction: column; width: 100%; }
-    .t-col { width: 100%; }
-  }
+  @media (max-width: 1024px) { .testimonials { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .t-grid { grid-template-columns: 1fr; } }
 
   /* ─── Doorbell pull-cord (ported from pullcord, MIT — see licenses/pullcord.txt) ─── */
   .pullcord {
@@ -610,42 +770,45 @@
 
   /* ─── Footer: contact row, base line, giant name with a dictionary card on hover ─── */
   .site-footer { padding-top: var(--section-y); overflow: hidden; }
+  /* Full width to the page margin, like the sections above (not capped at --max). */
+  .site-footer > .wrap { max-width: none; }
   .footer-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: var(--space-6); }
-  .footer-label { margin-bottom: var(--space-3); font: 500 14px/1.2 var(--font-mono); letter-spacing: var(--track-tight); text-transform: uppercase; color: var(--ink-muted); }
+  .footer-label { margin-bottom: var(--space-3); font: 500 var(--fs-small)/1.2 var(--font-mono); letter-spacing: 0.02em; text-transform: uppercase; color: rgb(255 255 255 / 0.78); }
   .footer-email-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
   .footer-email {
-    font: 600 clamp(28px, 4.5vw, 48px)/1 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-strong);
+    font: 600 var(--fs-title)/1 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-on-blue); text-shadow: 0 2px 6px rgb(0 0 0 / 0.12);
     text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 0.12em; text-decoration-thickness: 2px;
     transition: color var(--dur-base) ease, text-decoration-color var(--dur-base) ease;
   }
-  .footer-email:hover { color: var(--blue-600); text-decoration-color: currentColor; }
+  .footer-email:hover { text-decoration-color: currentColor; }
   .footer-copy, .footer-top {
-    font: 500 13px/1 var(--font-mono); letter-spacing: var(--track-tight); text-transform: uppercase; color: var(--ink-muted); cursor: pointer;
+    font: 500 var(--fs-small)/1 var(--font-mono); letter-spacing: 0.02em; text-transform: uppercase; color: rgb(255 255 255 / 0.78); cursor: pointer;
     transition: color var(--dur-base) ease, border-color var(--dur-base) ease, transform var(--dur-fast) ease;
   }
-  .footer-copy { padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); }
+  .footer-copy { padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); color: var(--ink-muted); }
   .footer-copy:hover { color: var(--blue-600); border-color: var(--blue-600); }
   .footer-copy:active, .footer-top:active { transform: scale(0.97); }
-  .footer-copied { font: 500 13px/1 var(--font-mono); letter-spacing: var(--track-tight); color: var(--blue-600); }
-  .footer-links { list-style: none; display: flex; gap: var(--space-5); font: 500 16px/1.2 var(--font-mono); letter-spacing: var(--track-tight); text-transform: uppercase; }
-  .footer-links a { color: var(--ink-strong); transition: color var(--dur-base) ease; }
-  .footer-links a:hover { color: var(--blue-600); }
-  .site-footer a:focus-visible, .site-footer button:focus-visible, .footer-name:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 4px; border-radius: var(--r-xs); }
+  .footer-copied { font: 500 var(--fs-small)/1 var(--font-mono); letter-spacing: 0.01em; color: var(--ink-on-blue); }
+  .footer-links { list-style: none; display: flex; gap: var(--space-5); font: 500 var(--fs-meta)/1.2 var(--font-mono); letter-spacing: 0.02em; text-transform: uppercase; }
+  .footer-links a { color: var(--ink-on-blue); transition: opacity var(--dur-base) ease; }
+  .footer-links a:hover { opacity: 0.75; }
+  .site-footer a:focus-visible, .site-footer button:focus-visible, .footer-name:focus-visible { outline: 2px solid var(--ink-on-blue); outline-offset: 4px; border-radius: var(--r-xs); }
   /* Sits above the wordmark, whose tall box reaches up over this line. */
   .footer-base {
     position: relative; z-index: 1;
     display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3);
-    margin-top: var(--space-8); padding-top: var(--space-4); border-top: 1px solid var(--line);
-    font: 400 13px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted);
+    margin-top: var(--space-8); padding-top: var(--space-4); border-top: 1px solid rgb(255 255 255 / 0.3);
+    font: 500 var(--fs-small)/1.5 var(--font-mono); letter-spacing: 0.01em; color: rgb(255 255 255 / 0.78);
   }
   .footer-top { padding: 0; border: none; background: none; }
-  .footer-top:hover { color: var(--blue-600); }
+  .footer-top:hover { color: var(--ink-on-blue); }
   /* "AVISH" measures 2.07em wide; this makes it 85% of the frame's inner width. */
   .footer-name {
     display: block; width: fit-content; margin: var(--space-5) auto -0.1em; cursor: default; user-select: none; -webkit-user-select: none;
-    font: 700 calc((100vw - 2 * var(--gutter) - 2px - 2 * var(--page-x)) / 2.07 * 0.85)/0.82 var(--font-display);
+    font: 700 calc((100vw - 2 * var(--gutter) - 2px - 2 * var(--page-x)) / 2.07)/0.82 var(--font-display); /* fills margin to margin */
     letter-spacing: var(--track-tight); text-transform: uppercase;
-    background: var(--grad-display); -webkit-background-clip: text; background-clip: text; color: transparent;
+    /* White like the headings, with their soft shadow so the bottom still reads where the frame fades to white. */
+    color: var(--ink-on-blue); text-shadow: 0 4px 12px rgb(13 30 80 / 0.18);
   }
 
   /* Credits: native modal dialog on paper, opened from the footer. */
@@ -661,28 +824,40 @@
   @keyframes credits-fade { from { opacity: 0; } }
   .credits-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
   .credits h2 { margin: 0; font: 700 32px/1 var(--font-display); letter-spacing: var(--track-tight); text-transform: uppercase; background: var(--grad-display); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .credits-close { width: 32px; height: 32px; border: 1px solid var(--line); border-radius: var(--r-full); background: var(--surface); color: var(--ink-muted); cursor: pointer; font-size: 13px; transition: color var(--dur-base) ease, border-color var(--dur-base) ease; }
-  .credits-close:hover { color: var(--blue-600); border-color: var(--blue-600); }
+  /* Close: a macOS-style red "traffic light" — a 14px red dot whose ✕ shows on hover / focus. The button itself is a
+     28px hit area around it. Shared by the Credits and note dialogs. */
+  .credits-close {
+    position: relative; isolation: isolate; flex: none; display: grid; place-items: center; width: 28px; height: 28px;
+    padding: 0; border: 0; border-radius: var(--r-full); background: none; cursor: pointer;
+    font: 800 9px/1 system-ui, sans-serif; color: transparent; transition: color var(--dur-fast) ease;
+  }
+  .credits-close::before {
+    content: ''; position: absolute; z-index: -1; left: 50%; top: 50%; width: 14px; height: 14px; translate: -50% -50%;
+    border-radius: 50%; background: #FF5F57; box-shadow: inset 0 0 0 0.5px #E0443E;
+  }
+  .credits-close:hover, .credits-close:focus-visible { color: rgb(77 0 0 / 0.75); }
+  .credits-close:active::before { background: #BF4943; }
   .credits-close:focus-visible, .credits a:focus-visible, .footer-credits:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 2px; }
-  .credits-intro { margin: var(--space-2) 0 var(--space-4); font: 400 14px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .credits-intro { margin: var(--space-2) 0 var(--space-4); font: 500 var(--fs-meta)/1.4 var(--font-mono); letter-spacing: 0; color: var(--ink-muted); }
   .credits-list { list-style: none; margin: 0; padding: 0; }
   .credits-list li { display: flex; flex-direction: column; gap: 2px; padding: var(--space-3) 0; border-top: 1px dashed var(--paper-shade); }
   .credits-what { font: 600 18px/1.2 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-strong); }
-  .credits-who { font: 400 13px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .credits-who { font: 500 var(--fs-small)/1.45 var(--font-mono); letter-spacing: 0.01em; color: var(--ink-muted); }
   .credits-who a { color: var(--blue-600); text-underline-offset: 2px; }
 
   /* Doorbell note: the credits card, holding a short form. */
   .note { width: min(520px, calc(100vw - 32px)); }
   .note-form { display: flex; flex-direction: column; gap: var(--space-3); }
+  .note-form[hidden] { display: none; }
   .note .credits-intro { margin: var(--space-2) 0 var(--space-1); }
   .note-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
   @media (max-width: 520px) { .note-row { grid-template-columns: 1fr; } }
   .note-field { display: flex; flex-direction: column; gap: 6px; }
-  .note-label { font: 500 12px/1.2 var(--font-mono); letter-spacing: var(--track-tight); text-transform: uppercase; color: var(--ink-muted); }
+  .note-label { font: 500 var(--fs-small)/1.2 var(--font-mono); letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-muted); }
   .note-label i { font-style: normal; text-transform: none; color: var(--ink-subtle); }
   .note-field textarea, .note-field input {
     width: 100%; padding: 10px 12px; border: 1px solid var(--paper-shade); border-radius: var(--r-sm); background: var(--surface);
-    font: 400 15px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-strong); resize: vertical;
+    font: 500 var(--fs-meta)/1.45 var(--font-mono); letter-spacing: 0; color: var(--ink-strong); resize: vertical;
     transition: border-color var(--dur-base) ease, box-shadow var(--dur-base) ease;
   }
   .note-field textarea { min-height: 120px; }
@@ -691,7 +866,7 @@
   .note-field [aria-invalid="true"] { border-color: #D93025; }
   .note-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   .note-actions { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-1); }
-  .note-status { flex: 1; min-height: 1.4em; font: 400 13px/1.4 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .note-status { flex: 1; min-height: 1.4em; font: 500 var(--fs-small)/1.4 var(--font-mono); letter-spacing: 0.01em; color: var(--ink-muted); }
   .note-status.is-error { color: #D93025; }
   .note-status a { color: var(--blue-600); }
   .note-send {
@@ -703,10 +878,12 @@
   .note-send:active { transform: scale(0.98); }
   .note-send:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 3px; }
   .note-send:disabled { opacity: 0.6; cursor: progress; transform: none; }
-  .note-done { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); padding-top: var(--space-3); }
+  /* Sent: the note goes blank (same size, no heading or form) with just the message in the middle; the red dot closes it. */
+  .note-done { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-2); text-align: center; }
   .note-done[hidden] { display: none; }
-  .note-done-title { font: 600 24px/1.2 var(--font-display); letter-spacing: var(--track-snug); color: var(--ink-strong); }
-  .note-done .note-send { margin-top: var(--space-2); }
+  .note-done-title { margin: 0; font: 700 var(--fs-title)/1 var(--font-display); letter-spacing: -0.02em; background: var(--grad-title); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .note-done .credits-intro { margin: 0; }
+  .note.is-sent #note-title { visibility: hidden; }
   @media (prefers-reduced-motion: reduce) { .credits[open], .credits[open]::backdrop { animation: none; } }
 
   .name-card {
@@ -720,18 +897,16 @@
   .name-card.is-open .name-card-inner { transform: none; }
   .nc-head { display: flex; align-items: baseline; gap: var(--space-2); padding-bottom: var(--space-3); margin-bottom: var(--space-3); border-bottom: 2px dashed var(--line); }
   .nc-word { font: 700 32px/1 var(--font-display); letter-spacing: var(--track-tight); color: var(--ink-strong); }
-  .nc-pos { font: italic 400 13px/1 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-muted); }
+  .nc-pos { font: italic 500 var(--fs-small)/1 var(--font-mono); letter-spacing: 0.01em; color: var(--ink-muted); }
   .nc-senses { list-style: none; display: flex; flex-direction: column; gap: var(--space-1); margin-bottom: var(--space-3); counter-reset: sense; }
   .nc-senses li { counter-increment: sense; font: 600 20px/1.2 var(--font-display); letter-spacing: var(--track-snug); color: var(--blue-600); }
   .nc-senses li::before { content: counter(sense) ". "; font: 500 14px/1 var(--font-mono); color: var(--ink-muted); }
-  .nc-def { font: 400 14px/1.5 var(--font-mono); letter-spacing: var(--track-tight); color: var(--ink-strong); }
+  .nc-def { font: 500 var(--fs-meta)/1.4 var(--font-mono); letter-spacing: 0; color: var(--ink-strong); }
   @media (prefers-reduced-motion: reduce) { .name-card-inner { transition: none; transform: none; } }
   @media (max-width: 640px) { .footer-links { gap: var(--space-4); font-size: 14px; } }
 
   @media (max-width: 640px) {
     .frame-shell { --gutter: 8px; }
-    .hero { padding: 110px 16px 64px; }
-    .hero-cta { font-size: 22px; }
   }
 </style>
 </head>
@@ -783,28 +958,52 @@
           </filter>
         </svg>
         <ul>
-          <li><a href="#work-ticket" aria-label="My Work" data-label="My Work" draggable="false"><img src="assets/icon-work.png" alt="" draggable="false"></a></li>
           <li><a href="#about" id="about-trigger" aria-label="About Me" data-label="About Me" aria-haspopup="dialog" aria-expanded="false" aria-controls="about-card" draggable="false"><img src="assets/icon-about.png" alt="" draggable="false"></a></li>
+          <li><a href="#work-ticket" aria-label="My Work" data-label="My Work" draggable="false"><img src="assets/icon-work.png" alt="" draggable="false"></a></li>
           <li><a href="../Avish_Shetty_Resume.pdf" target="_blank" rel="noopener" aria-label="Resume (PDF)" data-label="Resume" draggable="false"><img src="assets/icon-resume.png" alt="" draggable="false"></a></li>
         </ul>
       </nav>
 
     <div class="frame-scroll">
     <main id="top">
+    <div class="hero-track">
     <header class="hero">
-      <!-- "Now" pill: what I'm doing right now, from my day's time slots (IST). Edit SCHEDULE in the script. -->
+      <!-- Job pill: my current job; opens a dropdown of the jobs I've had (edit the list below). -->
       <div class="now">
-        <p class="now-pill">
+        <button type="button" class="now-pill" aria-expanded="false" aria-controls="now-jobs">
           <span class="gp-layers" aria-hidden="true"><span class="gp-distort"></span><span class="gp-tint"></span><span class="gp-rim"></span><span class="gp-shine"></span></span>
           <span class="now-dot" aria-hidden="true"></span>
-          <span class="now-doing"></span>
-          <span class="now-sep" aria-hidden="true">·</span>
-          <span class="now-time"></span>
-        </p>
+          <span class="now-doing">Designer at BigBlockTheory</span>
+          <svg class="now-chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="now-jobs" id="now-jobs" hidden>
+          <span class="gp-layers" aria-hidden="true"><span class="gp-distort"></span><span class="gp-tint"></span><span class="gp-rim"></span><span class="gp-shine"></span></span>
+          <ol aria-label="Where I've worked">
+            <li><span class="job-role">Designer</span><span class="job-co">BigBlockTheory</span><span class="job-yrs">2024 – Now</span></li>
+            <li><span class="job-role">Product Designer</span><span class="job-co">ForeignAdmits</span><span class="job-yrs">2022 – 2024</span></li>
+          </ol>
+        </div>
       </div>
-      <h1>Product Designer<br>who ships with AI</h1>
-      <p class="hero-sub">Figma to shipped product — using Claude Code and Next.js to build what I design.</p>
-      <a href="#work-ticket" class="hero-cta">Jump to Work</a>
+      <div class="hero-intro">
+        <h1>Namaskara <span aria-hidden="true">👋🏻</span>,<br>I am Avish Shetty</h1>
+        <div class="hero-paras">
+          <p class="hero-sub">I design <b>product interfaces</b>, then get impatient waiting for someone else to build them, so I <b>push it with AI</b>.</p>
+          <p class="hero-sub">I'd rather give you an <b>unambiguous opinion</b> and be wrong than a safe one that's useless.</p>
+        </div>
+      </div>
+      <!-- Me at work: IMG_7244.MOV cropped to the frame's 566:629 and re-encoded as H.264 (no audio); poster is its first frame. -->
+      <figure class="hero-portrait"><img src="assets/hero-portrait.jpg" alt="Avish Shetty in a green kurta and cream shawl, smiling outdoors" width="1100" height="1466" fetchpriority="high" draggable="false"><video src="assets/hero-video.mp4" poster="assets/hero-video-poster.jpg" muted loop playsinline preload="auto" aria-label="Avish at work" disablepictureinpicture></video></figure>
+      <h2 class="hero-tools-title">Products I use to Design &amp; Ship</h2>
+      <div class="hero-lid">
+      <img class="hero-lid-img" src="assets/macbook-lid.png" alt="" width="1600" height="1059" loading="lazy" draggable="false">
+      <ul class="hero-stickers" aria-label="Tools I use">
+        <li class="hero-sticker"><img src="assets/sticker-chatgpt.png" alt="ChatGPT" width="519" height="520" loading="lazy" draggable="false"></li>
+        <li class="hero-sticker"><img src="assets/sticker-framer.png" alt="Framer" width="364" height="520" loading="lazy" draggable="false"></li>
+        <li class="hero-sticker"><img src="assets/sticker-figma.png" alt="Figma" width="357" height="520" loading="lazy" draggable="false"></li>
+        <li class="hero-sticker"><img src="assets/sticker-gemini.png" alt="Gemini" width="520" height="518" loading="lazy" draggable="false"></li>
+        <li class="hero-sticker"><img src="assets/sticker-claude.png" alt="Claude" width="517" height="520" loading="lazy" draggable="false"></li>
+      </ul>
+      </div>
 
       <!-- Work experience tags — PARKED for now; remove `hidden` to bring them back (CSS and script kept). -->
       <div class="hero-mobile" hidden>
@@ -828,6 +1027,7 @@
         </ol>
       </div>
     </header>
+    </div>
 
 
 
@@ -838,7 +1038,7 @@
        to open the project in a new tab; a fresh stub grows back. Content comes from PROJECTS in the script. -->
   <section id="work-ticket" class="wt" aria-labelledby="wt-title">
     <h2 id="wt-title" class="visually-hidden">My work</h2>
-    <div class="wt-track" style="--n: 4">
+    <div class="wt-track" style="--n: 5">
       <div class="wt-stage">
         <p class="wt-intro" aria-hidden="true">My Work</p>
         <div class="wt-row">
@@ -921,13 +1121,17 @@
   </section>
 
 
-  <section id="testimonials" class="wrap testimonials">
+  <!-- Project cards (Figma 2723:96): built from the Work section's PROJECTS by the script. -->
+  <section id="work-cards" class="pc" aria-labelledby="pc-title">
+    <h2 id="pc-title" class="visually-hidden">Projects</h2>
+    <div class="pc-track"><div class="pc-stage"><div class="pc-row"></div></div></div>
+  </section>
+
+  <!-- Testimonials: pins and fades in where the project cards fade out (desktop), then scrolls on to the footer. -->
+  <section id="testimonials" class="tm" aria-labelledby="t-title">
+    <div class="tm-track"><div class="tm-stage"><div class="testimonials">
     <div class="t-intro">
-      <p class="glass-pill">
-        <span class="gp-layers" aria-hidden="true"><span class="gp-distort"></span><span class="gp-tint"></span><span class="gp-rim"></span><span class="gp-shine"></span></span>
-        <span class="gp-text">Testimonial</span>
-      </p>
-      <h2 class="t-title">Kind words</h2>
+      <h2 class="t-title" id="t-title">Kind words</h2>
       <p class="t-sub">From people I have worked with.</p>
       <svg width="0" height="0" style="position:absolute" aria-hidden="true">
         <filter id="pill-glass" x="-40%" y="-40%" width="180%" height="180%" filterUnits="objectBoundingBox">
@@ -965,6 +1169,7 @@
         </figure>
       </div>
     </div>
+    </div></div></div>
   </section>
 
 </main>
@@ -1009,10 +1214,6 @@
       <span class="credits-what">Doorbell pull-cord</span>
       <span class="credits-who">ported from <a href="https://github.com/mortspace/feralui" target="_blank" rel="noopener">pullcord</a> by iisac · <a href="licenses/pullcord.txt" target="_blank" rel="noopener">MIT</a></span>
     </li>
-    <li>
-      <span class="credits-what">Geist Mono typeface</span>
-      <span class="credits-who">by <a href="https://vercel.com/font" target="_blank" rel="noopener">Vercel</a> · SIL Open Font License</span>
-    </li>
   </ul>
 </dialog>
 
@@ -1048,7 +1249,6 @@
   <div class="note-done" hidden>
     <p class="note-done-title">Note delivered 🛎️</p>
     <p class="credits-intro">Thanks for ringing. I read every one of these.</p>
-    <button type="button" class="note-send note-ok">Close</button>
   </div>
 </dialog>
 
@@ -1074,6 +1274,181 @@
 </div>
 
 <script>
+// Coming back to the home page without a smooth glide down through the hero:
+// - Back from a project page: the page scrolls inside .frame-scroll (not the window), so the browser doesn't restore
+//   the spot itself; we save it on the way out and put it back on the way in.
+// - Arriving with a #hash (a "Back to work" link opened fresh): jump straight there.
+// Smooth scrolling comes back for in-page links afterwards.
+(() => {
+  const scroller = document.querySelector('.frame-scroll');
+  const KEY = 'v2-scroll';
+  addEventListener('pagehide', () => { try { sessionStorage.setItem(KEY, String(scroller.scrollTop)); } catch {} });
+  const nav = performance.getEntriesByType('navigation')[0];
+  let saved = null;
+  try { saved = sessionStorage.getItem(KEY); } catch {}
+  const target = location.hash && document.querySelector(location.hash);
+  const back = nav && nav.type === 'back_forward' && saved !== null;
+  if (!back && !target) return;
+  scroller.style.scrollBehavior = 'auto';
+  const jump = () => {
+    if (back) scroller.scrollTop = Number(saved);
+    else target.scrollIntoView({ block: 'start' });
+    scroller.dispatchEvent(new Event('scroll'));
+  };
+  jump();
+  // Again once everything (track lengths set by the scripts below, images) is in place.
+  addEventListener('load', () => { jump(); setTimeout(() => { scroller.style.scrollBehavior = ''; }, 100); }, { once: true });
+})();
+
+// Testimonials: on desktop the stage fades in where it stands as you scroll into its pin (Work fades out underneath at
+// the same time); it takes clicks only once fully in. The track is sized to the stage plus the fade and a short hold,
+// so a stage taller than the screen (phones) pins for the fade, then scrolls on to show the rest.
+(() => {
+  const track = document.querySelector('.tm-track');
+  const stage = document.querySelector('.tm-stage');
+  const scroller = document.querySelector('.frame-scroll');
+  if (!track || !stage) return;
+  let raf = 0;
+  const measure = () => {
+    const H = scroller.clientHeight;
+    track.style.height = `${Math.round(stage.offsetHeight + 0.4 * (H - 88) + 0.3 * H)}px`;
+  };
+  const render = () => {
+    raf = 0;
+    const top = track.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+    const fadeLen = 0.4 * (scroller.clientHeight - 88);
+    const e = Math.min(1, Math.max(0, (-top / fadeLen - 0.5) / 0.5)); // second half: Work has faded out by then
+    stage.style.opacity = e.toFixed(3);
+    stage.style.pointerEvents = e >= 1 ? 'auto' : 'none';
+    stage.classList.toggle('is-in', e >= 1);
+  };
+  // Swipe order: reading order (top row first, then left to right).
+  [...stage.querySelectorAll('.t-card')]
+    .map((el) => ({ el, r: el.getBoundingClientRect() }))
+    .sort((a, b) => Math.round(a.r.top / 40) - Math.round(b.r.top / 40) || a.r.left - b.r.left)
+    .forEach(({ el }, i) => el.style.setProperty('--i', i));
+  const queue = () => { if (!raf) raf = requestAnimationFrame(render); };
+  scroller.addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', () => { measure(); queue(); });
+  document.fonts.ready.then(measure);
+  measure();
+  render();
+})();
+
+// Hero beats, scrubbed by scrolling the pinned hero (stateless in scroll position, so scrolling back reverses it):
+//   1. greeting + portrait → 2. description + video of me working → 3. "Products I use…" + tool stickers, one by one.
+// The video only plays while it shows (never for reduced motion). Narrow screens play the same beats, stacked (CSS).
+// Stuck stickers can be dragged anywhere within the hero; the last one picked up goes on top.
+(() => {
+  const track = document.querySelector('.hero-track');
+  const scroller = document.querySelector('.frame-scroll');
+  const h1 = document.querySelector('.hero h1');
+  const paras = document.querySelector('.hero-paras');
+  const title = document.querySelector('.hero-tools-title');
+  const figure = document.querySelector('.hero-portrait');
+  const video = figure && figure.querySelector('video');
+  const stickers = [...document.querySelectorAll('.hero-sticker')];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  if (!track || !h1 || !paras || !title || !figure) return;
+  const ease = (t) => t * t * (3 - 2 * t);
+  const span = (p, a, b) => ease(Math.min(1, Math.max(0, (p - a) / (b - a))));
+  // Where in the track (0–1) each thing happens.
+  const H1_OUT = [0.04, 0.14], DESC_IN = [0.14, 0.22], DESC_OUT = [0.54, 0.62], TOOLS_IN = [0.62, 0.7];
+  const WORDS = [0.2, 0.48]; // the description's words light up one by one over this stretch
+  const STICK_FROM = 0.7, STICK_STEP = 0.055; // sticker i lands at STICK_FROM + i * STICK_STEP
+
+  // Split the description into words (keeping the bold runs) so each can light up on its own; they start dim.
+  const DIM = 0.2;
+  const words = [];
+  const walker = document.createTreeWalker(paras, NodeFilter.SHOW_TEXT);
+  const texts = [];
+  while (walker.nextNode()) if (walker.currentNode.textContent.trim()) texts.push(walker.currentNode);
+  texts.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    node.textContent.split(/(\s+)/).forEach((part) => {
+      if (!part) return;
+      if (/^\s+$/.test(part)) { frag.append(part); return; }
+      const w = document.createElement('span');
+      w.className = 'hero-word';
+      w.textContent = part;
+      words.push(w);
+      frag.append(w);
+    });
+    node.replaceWith(frag);
+  });
+  const BEATS = 3, HERO_OUT = [3, 3.14]; // in frame heights scrolled: beats play over the first 3, then the hero fades
+  const lid = document.querySelector('.hero-lid');
+  const heroBody = [document.querySelector('.hero-intro')];
+  const fade = (el, o, dy) => {
+    el.style.opacity = o.toFixed(3);
+    el.style.transform = `translateY(${(reduce.matches ? 0 : dy).toFixed(1)}px)`;
+  };
+  let raf = 0;
+  const render = () => {
+    raf = 0;
+    const f = (scroller.scrollTop - track.offsetTop) / document.querySelector('.hero').offsetHeight; // frames scrolled
+    const p = Math.min(1, Math.max(0, f / BEATS));
+    const h1Out = span(p, ...H1_OUT), descIn = span(p, ...DESC_IN), descOut = span(p, ...DESC_OUT), toolsIn = span(p, ...TOOLS_IN);
+    fade(h1, 1 - h1Out, -h1Out * 40);
+    fade(paras, descIn * (1 - descOut), (1 - descIn) * 40 - descOut * 40);
+    // Word by word: a reading front sweeps through the words; each brightens from DIM to full as it passes.
+    const front = Math.min(1, Math.max(0, (p - WORDS[0]) / (WORDS[1] - WORDS[0]))) * words.length;
+    words.forEach((w, i) => { w.style.opacity = (DIM + (1 - DIM) * Math.min(1, Math.max(0, front - i))).toFixed(3); });
+    figure.style.opacity = (1 - descOut).toFixed(3);
+    const heroOut = span(f, ...HERO_OUT);
+    fade(title, toolsIn * (1 - heroOut), (1 - toolsIn) * 40); // in with the lid, out with it before Work
+    heroBody.forEach((el) => { if (el) el.style.opacity = heroOut > 0 ? (1 - heroOut).toFixed(3) : ''; });
+    if (lid) lid.style.opacity = (toolsIn * (1 - heroOut)).toFixed(3); // the lid comes in with the tools heading
+    stickers.forEach((el, i) => el.classList.toggle('is-on', p >= STICK_FROM + i * STICK_STEP));
+    if (video) {
+      const showing = descIn > 0 && descOut < 1;
+      video.style.opacity = descIn.toFixed(3);
+      if (showing && video.paused && !reduce.matches) video.play().catch(() => {});
+      else if (!showing && !video.paused) { video.pause(); if (descIn === 0) video.currentTime = 0; }
+    }
+  };
+  const queue = () => { if (!raf) raf = requestAnimationFrame(render); };
+
+  // Pick and place: drag offset is kept in --dx/--dy, clamped so the sticker's centre stays on the lid.
+  let top = stickers.length;
+  stickers.forEach((el) => {
+    let drag = null;
+    el.addEventListener('pointerdown', (e) => {
+      if (!el.classList.contains('is-on') || e.button > 0) return;
+      e.preventDefault();
+      const r = el.getBoundingClientRect(), h = lid.getBoundingClientRect(); // stickers stay on the lid
+      const dx = parseFloat(el.style.getPropertyValue('--dx')) || 0, dy = parseFloat(el.style.getPropertyValue('--dy')) || 0;
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, dx, dy,
+        minX: dx + h.left - cx, maxX: dx + h.right - cx, minY: dy + h.top - cy, maxY: dy + h.bottom - cy };
+      try { el.setPointerCapture(e.pointerId); } catch {}
+      el.style.zIndex = ++top;
+      el.classList.remove('is-dropped');
+      el.classList.add('is-held');
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+      el.style.setProperty('--dx', `${clamp(drag.dx + e.clientX - drag.x, drag.minX, drag.maxX).toFixed(1)}px`);
+      el.style.setProperty('--dy', `${clamp(drag.dy + e.clientY - drag.y, drag.minY, drag.maxY).toFixed(1)}px`);
+    });
+    const drop = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      drag = null;
+      el.classList.remove('is-held');
+      el.classList.add('is-dropped');
+    };
+    el.addEventListener('pointerup', drop);
+    el.addEventListener('pointercancel', drop);
+  });
+
+  scroller.addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', queue);
+  // Browsers pause muted video in a background tab; pick it back up when the tab is shown again.
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) queue(); });
+  render();
+})();
+
 (() => {
   const dock = document.querySelector('.dock');
   const hero = document.querySelector('.frame');
@@ -1459,6 +1834,8 @@
   const resetNote = () => {
     noteForm.hidden = false;
     noteDone.hidden = true;
+    noteDone.style.minHeight = '';
+    note.classList.remove('is-sent');
     noteStatus.textContent = '';
     noteStatus.classList.remove('is-error');
     noteMsg.removeAttribute('aria-invalid');
@@ -1478,7 +1855,6 @@
     }, 600);
   });
   note.querySelector('.credits-close').addEventListener('click', () => note.close());
-  note.querySelector('.note-ok').addEventListener('click', () => note.close());
   note.addEventListener('click', (e) => {
     const r = note.getBoundingClientRect();
     const outside = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
@@ -1507,7 +1883,14 @@
     noteSend.textContent = 'Sending…';
     noteStatus.textContent = '';
     noteStatus.classList.remove('is-error');
-    const done = () => { noteForm.hidden = true; noteDone.hidden = false; noteDone.querySelector('.note-ok').focus(); };
+    // Sent: blank the note to just the message, keeping its size (the form's height) so it doesn't jump.
+    const done = () => {
+      noteDone.style.minHeight = `${noteForm.offsetHeight}px`;
+      noteForm.hidden = true;
+      noteDone.hidden = false;
+      note.classList.add('is-sent');
+      note.querySelector('.credits-close').focus();
+    };
     if (data._honey) { done(); return; } // a bot filled the trap: pretend it worked, send nothing
     try {
       const res = await fetch(`https://formsubmit.co/ajax/${NOTE_TO}`, {
@@ -1612,6 +1995,7 @@
   name.addEventListener('blur', hide);
   name.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
   scroller.addEventListener('scroll', () => { if (open && document.activeElement !== name) hide(); }, { passive: true });
+
 })();
 // Work (ticket): a pinned stage. Intro: "MY WORK" grows into the centre, then the ticket slides in from the left and the
 // frame from the right, covering it. Then scrolling moves through the projects: each project has its own ticket, which
@@ -1622,9 +2006,14 @@
   const section = document.getElementById('work-ticket');
   if (!section || section.hidden) return;
   const PROJECTS = [
-    { title: 'LoanMonk - Simplifying Education Loans', href: 'https://www.figma.com/design/A86DOoD0vwsy7bmCpTnhIs/LoanMonk?node-id=1-2102&t=oJBl6TXTApUuZJvi-1',
+    { title: 'LoanMonk - Simplifying Education Loans', href: 'loanmonk/', // case study on this site (its Figma link is inside)
       desc: 'A mobile application that simplifies the process of finding and applying for education loans for students planning to study abroad.',
-      scene: 'assets/loanmonk-scene.jpg', phone: 'assets/loanmonk-phone.png' },
+      scene: 'assets/loanmonk-scene.jpg', phone: 'assets/loanmonk-phone.png',
+      // The Work picture plays this flow on loop (it starts streaming at once: index at the front; poster shows meanwhile).
+      video: 'assets/loanmonk-flow.mp4', poster: 'assets/loanmonk-flow-poster.jpg' },
+    { title: 'VisaMonk - AI Mock Visa Interviews', href: 'visamonk/', // case study on this site
+      desc: 'An AI-powered mock visa interview product for study-abroad students, sold through finance partners: ₹1 crore in B2B deals and a 9/10 pass rate.',
+      mark: 'assets/icon-visamonk.svg', bg: 'radial-gradient(120% 90% at 50% 20%, #3B4BD0, #1B2380 55%, #0c0c0d)' },
     { title: 'Coding Judge - Learn Coding & AI the Right Way', href: 'https://www.figma.com/design/OuNIb2khirIPRZ3FH2Jl5B/Coding-Judge?node-id=54-11&t=ZssSQCR24Sl3CayA-1',
       desc: 'An edtech platform designed for college students to learn coding and AI through a structured, hands-on experience. Led the end-to-end product design — from information architecture to high-fidelity UI.',
       mark: 'assets/icon-codingjudge.svg', bg: 'radial-gradient(120% 90% at 50% 20%, #0B3A86, #001A41 55%, #0c0c0d)' },
@@ -1635,6 +2024,7 @@
       desc: 'A pet shopping app designed to help pet parents easily find and buy food, accessories, and care essentials for their furry friends.',
       mark: 'assets/icon-fluff.svg', bg: 'radial-gradient(120% 90% at 50% 20%, #5A2A22, #22100F 55%, #0c0c0d)' },
   ];
+  window.PROJECTS = PROJECTS; // shared with the project cards section below
   const N = PROJECTS.length;
   const track = section.querySelector('.wt-track');
   const stage = section.querySelector('.wt-stage');
@@ -1647,7 +2037,8 @@
   const pics = PROJECTS.map((p, i) => {
     const el = document.createElement('div');
     el.className = 'wt-pic';
-    if (p.phone) el.innerHTML = `<img class="wt-scene" src="${p.scene}" alt="" draggable="false"><img class="wt-phone" src="${p.phone}" alt="" draggable="false">`;
+    if (p.video) el.innerHTML = `<video class="wt-video" src="${p.video}" poster="${p.poster}" muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>`;
+    else if (p.phone) el.innerHTML = `<img class="wt-scene" src="${p.scene}" alt="" draggable="false"><img class="wt-phone" src="${p.phone}" alt="" draggable="false">`;
     else { el.style.setProperty('--media-bg', p.bg); el.innerHTML = `<img class="wt-mark" src="${p.mark}" alt="" draggable="false">`; }
     frame.append(el);
     return el;
@@ -1768,7 +2159,15 @@
       const c = document.createElement('canvas');
       c.width = w; c.height = hh;
       const g = c.getContext('2d');
-      if (pr.phone) {
+      const cover = (src, sw0, sh0) => {
+        const s = Math.max(w / sw0, hh / sh0), sw = sw0 * s, sh = sh0 * s;
+        g.drawImage(src, (w - sw) / 2, (hh - sh) / 2, sw, sh);
+      };
+      if (pr.video) {
+        const v = pics[PROJECTS.indexOf(pr)].querySelector('video');
+        if (v && v.readyState >= 2 && v.videoWidth) cover(v, v.videoWidth, v.videoHeight);
+        else { const poster = await getImg(pr.poster); if (poster) cover(poster, poster.naturalWidth, poster.naturalHeight); }
+      } else if (pr.phone) {
         const [scene, phone] = await Promise.all([getImg(pr.scene), getImg(pr.phone)]);
         g.fillStyle = '#BFD1DC';
         g.fillRect(0, 0, w, hh);
@@ -1850,6 +2249,13 @@
     const api = {
       grainPx: GRAIN,
       prepare: (i) => want(i),
+      // Re-take a picture's snapshot (a video's current frame) before it turns to dust.
+      refresh(i) {
+        const old = textures.get(i);
+        if (old) old.then((t) => gl.deleteTexture(t));
+        textures.delete(i); ready.delete(i);
+        want(i);
+      },
       // Draw project i turning to dust at t (0..1). Returns false if its picture isn't painted yet.
       draw(i, t) {
         want(i);
@@ -1915,33 +2321,19 @@
     } catch { /* no audio */ }
   };
 
-  // ── Opening: a white sheet comes out of the ticket, fills the screen, names the project, then the page goes to the
-  // project (same tab, so a case study on this site will feel like it unfolded out of the ticket). ──
+  // ── Opening: straight to the project's link, in the same tab (back brings you here with fresh stubs). ──
+  // The project hosts are preconnected up front so the page starts loading the moment the stub comes off.
+  [...new Set(PROJECTS.map((pr) => new URL(pr.href, location.href).origin))].forEach((origin) => {
+    if (origin === location.origin) return;
+    const l = document.createElement('link');
+    l.rel = 'preconnect'; l.href = origin;
+    document.head.append(l);
+  });
   let opening = false;
-  const openProject = (pr, body) => {
+  const openProject = (pr) => {
     if (opening) return;
     opening = true;
-    const go = () => location.assign(pr.href);
-    const r = body.getBoundingClientRect();
-    const paper = document.createElement('div');
-    paper.className = 'wt-paper';
-    paper.innerHTML = '<p class="wt-paper-title"></p>';
-    paper.firstChild.textContent = pr.title;
-    Object.assign(paper.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
-    document.body.append(paper);
-    if (reduceMotion) {
-      paper.style.inset = '0'; paper.style.width = paper.style.height = 'auto'; paper.style.borderRadius = '0';
-      paper.classList.add('is-full');
-      paper.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, fill: 'forwards' }).finished.then(() => setTimeout(go, 500));
-      return;
-    }
-    const box = (x, y, w, hh) => ({ left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${hh}px` });
-    const anim = paper.animate([
-      { ...box(r.left + r.width * 0.06, r.top + r.height * 0.1, r.width * 0.88, r.height * 0.86), borderRadius: '14px', opacity: 0, transform: 'translateY(30px) rotate(0deg)' },
-      { ...box(r.left + r.width * 0.06, r.top + r.height * 0.1, r.width * 0.88, r.height * 0.86), borderRadius: '14px', opacity: 1, transform: 'translateY(-48px) rotate(-2.5deg)', offset: 0.38 },
-      { ...box(0, 0, innerWidth, innerHeight), borderRadius: '0px', opacity: 1, transform: 'translateY(0) rotate(0deg)' },
-    ], { duration: 1100, easing: 'cubic-bezier(0.55, 0, 0.2, 1)', fill: 'forwards' });
-    anim.finished.then(() => { paper.classList.add('is-full'); setTimeout(go, 650); });
+    location.assign(pr.href);
   };
 
   // ── A ticket: body (title, description) + a stub that tears off like a packet strip ──
@@ -1961,12 +2353,16 @@
       </div>`;
     el.querySelector('.wt-name').textContent = pr.title;
     el.querySelector('.wt-desc').textContent = pr.desc;
-    const body = el.querySelector('.wt-body');
     const stub = el.querySelector('.wt-stub');
     stub.href = el.querySelector('.wt-opened').href = pr.href;
     stub.setAttribute('aria-label', `Tear to open ${pr.title}`);
     deck.append(el);
+    return { el, ...wireTear(el, stub, pr) };
+  };
 
+  // The tear, for any ticket-like card: `el` gets .is-torn once its `stub` (an a.wt-stub holding one .wt-face) is torn
+  // off; a sibling a.wt-opened shows in its place. Returns { regrow, hint }. Shared with the project cards section.
+  const wireTear = (el, stub, pr) => {
     stub.style.setProperty('--n', NS);
     const whole = stub.querySelector('.wt-face');
     const strips = Array.from({ length: NS }, (_, i) => {
@@ -2046,7 +2442,7 @@
         stub.classList.add('is-growing');
       }
     };
-    const open = () => openProject(pr, body);
+    const open = () => openProject(pr);
 
     stub.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 || torn) return;
@@ -2068,7 +2464,7 @@
       tear.front = Math.min(w, Math.max(0, (dx * tear.dir) / 0.6));
       const progress = tear.front / w;
       if (progress - tear.last > 0.03) { grain(0.03, 0.1 + progress * 0.18); tear.last = progress; }
-      if (progress >= 1) { pose(w, tear.dir, dx, dy); fall(tear.dir); tear = null; setTimeout(open, 260); return; }
+      if (progress >= 1) { pose(w, tear.dir, dx, dy); fall(tear.dir); tear = null; open(); return; } // go now; it falls while the page loads
       pose(tear.front, tear.dir, dx, dy);
     });
     const endTear = () => {
@@ -2090,11 +2486,11 @@
       stub.classList.add('is-tearing');
       const start = performance.now();
       const run = (now) => {
-        const k = Math.min(1, (now - start) / 620);
+        const k = Math.min(1, (now - start) / 320);
         const ease = 1 - Math.pow(1 - k, 2);
         pose(ease * W(), 1, ease * W() * 0.6, ease * 18);
         if (k < 1) { if (Math.random() < 0.45) grain(0.03, 0.14); requestAnimationFrame(run); }
-        else { fall(1); setTimeout(open, 260); }
+        else { fall(1); open(); }
       };
       requestAnimationFrame(run);
     });
@@ -2104,14 +2500,14 @@
       open();
     });
     const hint = () => { stub.classList.add('is-hint'); setTimeout(() => stub.classList.remove('is-hint'), 1200); };
-    return { el, regrow, hint };
+    return { regrow, hint };
   };
+  window.wireTear = wireTear;
   const tickets = PROJECTS.map(makeTicket);
 
-  // Back from the project (browser back button): clear the sheet and put fresh stubs in place.
+  // Back from the project (browser back button): put fresh stubs in place.
   addEventListener('pageshow', (e) => {
     if (!e.persisted) return;
-    document.querySelectorAll('.wt-paper').forEach((el) => el.remove());
     opening = false;
     tickets.forEach((t) => t.regrow(true));
   });
@@ -2134,13 +2530,15 @@
   const intro = section.querySelector('.wt-intro');
   const clamp01 = (v) => Math.min(1, Math.max(0, v));
   const easeOut = (t) => 1 - Math.pow(1 - t, 3);
-  let p = 0, q = 0, target = 0, targetQ = 0, raf = 0, hinted = false;
+  let p = 0, q = 0, target = 0, targetQ = 0, outro = 0, raf = 0, hinted = false;
   const trackTop = () => track.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
   const measure = () => {
     const sh = stage.offsetHeight, introLen = sh * INTRO, range = track.offsetHeight - sh;
     const scrolled = scroller.scrollTop - trackTop();
+    const outroLen = sh * (parseFloat(getComputedStyle(track).getPropertyValue('--outro')) || 0);
     targetQ = clamp01(scrolled / introLen);
-    target = clamp01((scrolled - introLen) / (range - introLen)) * (N - 1);
+    target = clamp01((scrolled - introLen) / (range - introLen - outroLen)) * (N - 1);
+    outro = outroLen ? clamp01((scrolled - (range - outroLen)) / outroLen) : 0;
   };
   const renderIntro = () => {
     const w = stage.clientWidth;
@@ -2150,8 +2548,8 @@
       deck.style.opacity = frame.style.opacity = done ? '' : '0';
       return;
     }
-    // "MY WORK" grows into the centre…
-    const a = easeOut(clamp01(q / 0.3));
+    // "MY WORK" grows into the centre as the section fades in…
+    const a = easeOut(clamp01((q - 0.15) / 0.15));
     // …then the ticket slides in from the left and, a beat later, the frame from the right, covering it.
     const e1 = easeOut(clamp01((q - 0.3) / 0.55));
     const e2 = easeOut(clamp01((q - 0.38) / 0.58));
@@ -2166,7 +2564,18 @@
       setTimeout(() => tickets[Math.max(0, active)].hint(), 500);
     }
   };
+  // The stage fades in where it stands over the first stretch of its pin (while the hero fades out underneath), and
+  // out again over the last (while Testimonials fades in over it). It takes clicks only while fully in, so whatever
+  // is showing underneath stays usable.
+  const renderEntry = () => {
+    // In over q 0.15–0.3 (the hero has faded out by then); out over the first half of the outro (Testimonials fades
+    // in over the second half), so two sections never show at once.
+    const e = (reduceMotion ? (q > 0.15 ? 1 : 0) : clamp01((q - 0.15) / 0.15)) * (1 - clamp01(outro / 0.5));
+    stage.style.opacity = e >= 1 ? '' : e.toFixed(3);
+    stage.style.pointerEvents = e >= 1 ? '' : 'none';
+  };
   const render = () => {
+    renderEntry();
     renderIntro();
     const tw = deck.offsetWidth;
     // Each project: its picture drops into the frame from the top, its ticket slides in from the left; the ones
@@ -2175,6 +2584,16 @@
     // underneath. Tickets: each slides in from the left over the one before, which fades away.
     const i0 = Math.min(N - 1, Math.floor(p + 1e-4)), t = p - i0;
     const moving = t > 0.002 && i0 < N - 1;
+    // Videos: play while their project is the one on show (section in view, not mid-change). On leaving, freeze the
+    // frame and re-take the dust snapshot from it, so the frame on screen is the one that breaks into dust.
+    const inView = q > 0 && outro < 1;
+    pics.forEach((pic, i) => {
+      const v = pic.querySelector('video');
+      if (!v) return;
+      const live = inView && i === i0 && !moving && !reduceMotion;
+      if (live && v.paused) v.play().catch(() => {});
+      else if (!live && !v.paused) { v.pause(); if (Dust && moving && i === i0) Dust.refresh(i); }
+    });
     const dusted = moving && Dust ? Dust.draw(i0, t) : false;
     if (!moving && Dust) Dust.hide();
     if (Dust) { Dust.prepare(i0); if (i0 + 1 < N) Dust.prepare(i0 + 1); }
@@ -2220,6 +2639,70 @@
   addEventListener('resize', () => { measure(); q = targetQ; p = target; render(); });
   measure();
   p = target; q = targetQ;
+  render();
+})();
+
+// Project cards: one tear-off card per project (from window.PROJECTS; the tear is the Work tickets' wireTear). On desktop the stage pins and fades in over
+// Work's last stretch, then scrolling slides the row right to left (1px of scroll moves it 1px), then it fades out
+// while Testimonials fades in. The track's length is set here to fit the row (one card on screen on phones, two above).
+(() => {
+  const section = document.getElementById('work-cards');
+  const projects = window.PROJECTS || [];
+  if (!section || !projects.length) return;
+  const track = section.querySelector('.pc-track');
+  const stage = section.querySelector('.pc-stage');
+  const row = section.querySelector('.pc-row');
+  const scroller = document.querySelector('.frame-scroll');
+
+  const tears = [];
+  projects.forEach((pr) => {
+    const card = document.createElement('article');
+    card.className = 'pc-card';
+    card.innerHTML = `
+      <a class="pc-body"><div class="pc-media"></div><h3 class="pc-name"></h3><p class="pc-desc"></p></a>
+      <div class="wt-slot">
+        <a class="wt-opened">Open the project ↗</a>
+        <a class="wt-stub" draggable="false"><span class="wt-face">Tear to open the project</span></a>
+      </div>`;
+    card.querySelector('.pc-name').textContent = pr.title;
+    card.querySelector('.pc-desc').textContent = pr.desc;
+    card.querySelectorAll('a').forEach((a) => { a.href = pr.href; });
+    card.querySelector('.pc-body').setAttribute('aria-label', pr.title);
+    const stub = card.querySelector('.wt-stub');
+    stub.setAttribute('aria-label', `Tear to open ${pr.title}`);
+    const media = card.querySelector('.pc-media');
+    const img = (src, cls) => { const el = document.createElement('img'); el.src = src; el.alt = ''; el.loading = 'lazy'; el.draggable = false; if (cls) el.className = cls; media.append(el); };
+    if (pr.scene) { img(pr.scene); if (pr.phone) img(pr.phone, 'pc-phone'); }
+    else { media.style.setProperty('--media-bg', pr.bg); img(pr.mark, 'pc-mark'); }
+    row.append(card);
+    if (window.wireTear) tears.push(window.wireTear(card, stub, pr)); // the same packet-style tear as the Work tickets
+  });
+  // Back from a project: fresh stubs.
+  addEventListener('pageshow', (e) => { if (e.persisted) tears.forEach((t) => t.regrow(true)); });
+
+  let fadeLen = 0, travel = 0, raf = 0;
+  const clamp01 = (v) => Math.min(1, Math.max(0, v));
+  const measure = () => {
+    const H = scroller.clientHeight;
+    fadeLen = 0.4 * (H - 88); // same fade length as Work's outro and Testimonials' fade
+    travel = Math.max(0, row.scrollWidth - stage.clientWidth);
+    track.style.height = `${Math.round(H + 2 * fadeLen + travel)}px`;
+  };
+  const render = () => {
+    raf = 0;
+    const s = -(track.getBoundingClientRect().top - scroller.getBoundingClientRect().top); // scrolled into the pin
+    const inn = clamp01((s / fadeLen - 0.5) / 0.5);                 // second half of Work's outro: Work is gone by then
+    const slide = travel ? clamp01((s - fadeLen) / travel) : 0;
+    const out = clamp01((s - fadeLen - travel) / fadeLen / 0.5);     // first half of Testimonials' fade-in window
+    const o = inn * (1 - out);
+    stage.style.opacity = o.toFixed(3);
+    stage.style.pointerEvents = o >= 1 ? 'auto' : 'none';
+    row.style.transform = `translateX(${(-slide * travel).toFixed(1)}px)`;
+  };
+  const queue = () => { if (!raf) raf = requestAnimationFrame(render); };
+  scroller.addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', () => { measure(); queue(); });
+  measure();
   render();
 })();
 
@@ -2505,41 +2988,30 @@
   addEventListener('resize', schedule);
   update();
 })();
-// Hero "Now" pill: what I'm doing right now, looked up from my day's time slots in IST. Edit SCHEDULE to change it.
+// Hero job pill: toggles the dropdown of jobs. Closes on a click outside, Escape, or scrolling away.
 (() => {
-  const SCHEDULE = [ // hours on a 24h clock in IST; a slot whose `to` is smaller than `from` runs past midnight
-    { from: 7, to: 10, what: 'Gyming' },
-    { from: 10, to: 12, what: 'Designing' },
-    { from: 12, to: 13, what: 'Cooking' },
-    { from: 13, to: 14, what: 'Lunch and chill' },
-    { from: 14, to: 17, what: 'Designing' },
-    { from: 17, to: 19, what: 'Walking around' },
-    { from: 19, to: 23, what: 'Finishing off work, and building something with AI', short: 'Building with AI' },
-    { from: 23, to: 7, what: 'Sleeping', asleep: true },
-  ];
-  const TIME_ZONE = 'Asia/Kolkata', ZONE = 'IST';
-
   const box = document.querySelector('.now');
+  if (!box) return;
   const pill = box.querySelector('.now-pill');
-  const doing = pill.querySelector('.now-doing');
-  const time = pill.querySelector('.now-time');
-  const parts = new Intl.DateTimeFormat('en-US', { timeZone: TIME_ZONE, hour: 'numeric', minute: 'numeric', hourCycle: 'h23' });
-  const clock = new Intl.DateTimeFormat('en-US', { timeZone: TIME_ZONE, hour: 'numeric', minute: '2-digit' });
-
-  const tick = () => {
-    const now = new Date();
-    const p = Object.fromEntries(parts.formatToParts(now).map((x) => [x.type, x.value]));
-    const mins = Number(p.hour) * 60 + Number(p.minute);
-    const slot = SCHEDULE.find((s) => {
-      const a = s.from * 60, b = s.to * 60;
-      return a < b ? mins >= a && mins < b : mins >= a || mins < b;
-    });
-    doing.textContent = slot.short || slot.what;
-    time.textContent = `${clock.format(now)} ${ZONE}`;
-    box.classList.toggle('is-asleep', !!slot.asleep);
+  const list = box.querySelector('.now-jobs');
+  const scroller = document.querySelector('.frame-scroll');
+  const set = (open) => { list.hidden = !open; pill.setAttribute('aria-expanded', String(open)); };
+  // Pill and dropdown share one width: the wider of the two at their natural size.
+  const match = () => {
+    box.style.removeProperty('--now-w');
+    const was = list.hidden;
+    list.hidden = false; list.style.visibility = 'hidden';
+    const w = Math.ceil(Math.max(pill.getBoundingClientRect().width, list.getBoundingClientRect().width));
+    list.hidden = was; list.style.visibility = '';
+    box.style.setProperty('--now-w', `${w}px`);
   };
-  tick();
-  setInterval(tick, 20000);
+  match();
+  document.fonts.ready.then(match);
+  addEventListener('resize', match);
+  pill.addEventListener('click', () => set(list.hidden));
+  document.addEventListener('pointerdown', (e) => { if (!list.hidden && !box.contains(e.target)) set(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !list.hidden) { set(false); pill.focus(); } });
+  scroller.addEventListener('scroll', () => { if (!list.hidden && scroller.scrollTop > 40) set(false); }, { passive: true });
 })();
 
 // Hero work-experience tags: each tag is a damped pendulum hanging from its own pin. The cursor stirs a breeze,
